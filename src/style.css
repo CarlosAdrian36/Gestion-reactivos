@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+@plugin "daisyui";
+
+@theme {
+  --font-sans: 'Lexend', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@plugin "daisyui/theme" {
+  name: 'light';
+
+  --color-primary: #2563eb;
+
+  --color-primary-content: #e8f1fd;
+
+  --color-texto: #64748b;
+
+  --color-texto-principal: #0f172a;
+  --color-texto-secundario: #94a3b8;
+
+  --radius-box: 1rem;
+}
+@plugin "daisyui/theme" {
+  name: 'dark';
+
+  --color-primary: #2563eb;
+
+  --color-primary-content: #e8f1fd;
+}
