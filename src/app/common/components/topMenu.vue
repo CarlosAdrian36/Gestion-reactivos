@@ -26,7 +26,12 @@ const sidebar = useSidebarStore()
         </div>
       </div>
       <span class="ps-4 text-xl font-semibold">Banco Reactivos</span>
-      <button class="btn btn-ghost" @click="sidebar.toggleSidebar()">☰</button>
+      <button class="btn btn-ghost swap swap-rotate" @click="sidebar.toggleSidebar()">
+        <i class="fa-regular fa-arrow-right-from-bracket" v-if="!sidebar.isOpen"></i>
+      </button>
+      <!-- <i class="fa-duotone fa-regular fa-arrow-left-from-bracket"></i> -->
+      <i class="fa-solid fa-arrow-left-from-bracket"></i>
+      <i class="fa-solid fa-chevron-left"></i>
     </div>
 
     <div class="navbar-end">
