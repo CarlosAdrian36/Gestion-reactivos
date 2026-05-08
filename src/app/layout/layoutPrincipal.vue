@@ -10,7 +10,9 @@ import TopMenu from '../common/components/topMenu.vue'
       <!-- <Sidebar /> -->
       <Sidebar />
 
-      <main></main>
+      <main class="flex-1 overflow-y-auto p-6 bg-base-200">
+        <RouterView />
+      </main>
     </div>
   </div>
 </template>

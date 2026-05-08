@@ -16,11 +16,8 @@ const sidebar = useSidebarStore()
       <p class="px-3 text-[11px] font-bold uppercase tracking-widest text-(--color-texto) mb-2">
         Navegación
       </p>
-      <ul class="menu bg-base-200 rounded-box  ">
-        <li>
-            <a "> Item1</a>
-        </li>
-
+      <ul class="menu bg-base-200 rounded-box">
+        <RouterLink> </RouterLink>
       </ul>
     </div>
   </aside>

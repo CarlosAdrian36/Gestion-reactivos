@@ -8,6 +8,18 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: LayoutPrincipal,
+      children: [
+        {
+          path: 'mis-bancos',
+          name: 'misBancos',
+          component: () => import('@/app/views/misbancos.vue'),
+        },
+        {
+          path: 'proyectos',
+          name: 'proyectos',
+          component: () => import('@/app/views/proyectos.vue'),
+        },
+      ],
     },
   ],
 })
