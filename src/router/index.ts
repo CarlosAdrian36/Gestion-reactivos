@@ -15,9 +15,24 @@ const router = createRouter({
           component: () => import('@/app/views/misbancos.vue'),
         },
         {
-          path: 'proyectos',
+          path: 'Proyectos',
           name: 'proyectos',
           component: () => import('@/app/views/proyectos.vue'),
+        },
+        {
+          path: 'Compartidos',
+          name: 'compartidos',
+          component: () => import('@/app/views/compartidos.vue'),
+        },
+        {
+          path: 'Usuarios',
+          name: 'usuarios',
+          component: () => import('@/app/views/usuarios.vue'),
+        },
+        {
+          path: 'Recursos',
+          name: 'recursos',
+          component: () => import('@/app/views/recursos.vue'),
         },
       ],
     },

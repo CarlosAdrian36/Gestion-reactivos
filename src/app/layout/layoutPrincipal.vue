@@ -12,6 +12,10 @@ import TopMenu from '../common/components/topMenu.vue'
 
       <main class="flex-1 overflow-y-auto p-6 bg-base-200">
         <RouterView />
+
+        <!-- <span class="font-sans"> safdasdasdaI </span>
+        <span>123123123</span>
+        <span class="font-mono">123123</span> -->
       </main>
     </div>
   </div>
