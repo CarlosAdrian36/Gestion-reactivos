@@ -3,8 +3,10 @@ export interface Banco {
   nombre: string
   descripcion: string
   fecha: string
-  reactivos: string
+  reactivos: number
   estatus?: string
   esCompartido: boolean
   esProyecto: boolean
+
+  carpetaId: number | null
 }

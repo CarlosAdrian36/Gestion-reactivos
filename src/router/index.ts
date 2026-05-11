@@ -17,7 +17,7 @@ const router = createRouter({
         {
           path: 'Proyectos',
           name: 'proyectos',
-          component: () => import('@/app/views/proyectos.vue'),
+          component: () => import('@/app/views/gestionProyectos.vue'),
         },
         {
           path: 'Compartidos',
