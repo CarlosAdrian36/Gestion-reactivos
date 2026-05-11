@@ -1,6 +1,7 @@
 export interface Carpeta {
   id: number
   nombre: string
-  fecha: string
+  fechaModificacion: string
+  fechaCreacion?: string
   bancos: number
 }

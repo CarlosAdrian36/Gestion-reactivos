@@ -1,22 +1,25 @@
 import type { Carpeta } from '@/app/interface/carpetoInterface'
 
 export const carpetasMock: Carpeta[] = [
-  // {
-  //   id: 1,
-  //   nombre: 'Matemáticas',
-  //   fecha: '2026-05-10',
-  //   bancos: 5,
-  // },
-  // {
-  //   id: 2,
-  //   nombre: 'Física',
-  //   fecha: '2026-05-09',
-  //   bancos: 2,
-  // },
-  // {
-  //   id: 3,
-  //   nombre: 'Química',
-  //   fecha: '2026-05-08',
-  //   bancos: 4,
-  // },
+  {
+    id: 3434,
+    nombre: 'Matemáticas',
+    fechaModificacion: '2026-05-10',
+    fechaCreacion: '2026-05-01',
+    bancos: 5,
+  },
+  {
+    id: 345345,
+    nombre: 'Física',
+    fechaModificacion: '2026-05-09',
+    fechaCreacion: '2026-05-01',
+    bancos: 2,
+  },
+  {
+    id: 43553434,
+    nombre: 'Química',
+    fechaModificacion: '2026-05-08',
+    fechaCreacion: '2026-05-07',
+    bancos: 4,
+  },
 ]

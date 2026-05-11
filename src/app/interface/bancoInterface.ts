@@ -2,7 +2,8 @@ export interface Banco {
   id: number
   nombre: string
   descripcion: string
-  fecha: string
+  fechaModificacion: string
+  fechaCreacion?: string
   reactivos: number
   estatus?: string
   esCompartido: boolean
