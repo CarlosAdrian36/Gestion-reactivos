@@ -4,7 +4,9 @@ import { useBancoStore } from '../store/bancos.store'
 import { useFolderStore } from '../store/folders.store'
 import { storeToRefs } from 'pinia'
 import type { Carpeta } from '../interface/carpetoInterface'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const bancoStore = useBancoStore()
 const carpetaStore = useFolderStore()
 
@@ -52,6 +54,16 @@ const items = computed<ExplorerItem[]>(() => [
 ])
 
 const loading = computed(() => bancosLoading.value || carpetasLoading.value)
+
+const goToItem = (item: ExplorerItem) => {
+  if (item.tipo === 'banco') {
+    router.push({ name: 'bancoDetalle', params: { id: item.id } })
+  } else {
+    // Si es carpeta, podrías navegar a una vista de carpeta o expandirla
+    // router.push({ name: 'detalleCarpeta', params: { id: item.id } })
+    console.log('Carpeta seleccionada:', item.nombre)
+  }
+}
 </script>
 
 <!-- <template>
@@ -195,6 +207,7 @@ const loading = computed(() => bancosLoading.value || carpetasLoading.value)
               v-for="value in items"
               :key="value.id"
               class="hover transition-colors cursor-pointer"
+              @click="goToItem(value)"
             >
               <!-- ICON -->
               <td class="text-center align-middle">

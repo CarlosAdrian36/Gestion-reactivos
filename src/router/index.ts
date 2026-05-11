@@ -34,6 +34,11 @@ const router = createRouter({
           name: 'recursos',
           component: () => import('@/app/views/recursos.vue'),
         },
+        {
+          path: 'banco/:id',
+          name: 'bancoDetalle',
+          component: () => import('@/app/bancos/bancodetalle/bancoMenu.vue'),
+        },
       ],
     },
   ],
