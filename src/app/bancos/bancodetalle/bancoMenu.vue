@@ -16,26 +16,27 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-200 text-base-content">
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <!-- {{ bancoStore.selectedBanco?.esProyecto ? 'Es un proyecto' : 'No es un proyecto' }} -->
+  <div class="bg-base-200 text-base-content">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 box-border">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-8 flex flex-col gap-10">
+        <div class="min-w-0 lg:col-span-8 flex flex-col gap-10">
           <header class="space-y-4">
-            <h1 class="text-3xl md:text-5xl font-semibold">
+            <h1 class="text-3xl md:text-5xl font-semibold wrap-break-word">
               {{ bancoStore.selectedBanco?.nombre }}
             </h1>
-            <p class="text-base-content/70 max-w-2xl text-lg">
+            <p class="text-base-content/70 max-w-2xl text-lg wrap-break-word">
               {{ bancoStore.selectedBanco?.descripcion }}
             </p>
 
-            <div class="flex flex-wrap gap-3 pt-4">
+            <div v-if="bancoStore.selectedBanco?.esProyecto" class="flex flex-wrap gap-3 pt-4">
               <button class="btn btn-outline btn-sm md:btn-md rounded-full">
                 <i class="fa-solid fa-users"></i>
                 Miembros
               </button>
               <button class="btn btn-outline btn-sm md:btn-md rounded-full text-primary">
                 <i class="fa-regular fa-message-medical"></i>
-                Agregrar Observacion
+                Agregar Observación
               </button>
               <button class="btn btn-primary btn-sm md:btn-md rounded-full">
                 <i class="fa-solid fa-paper-plane-top"></i>
@@ -44,19 +45,17 @@ onMounted(async () => {
             </div>
           </header>
 
-          <section
-            class="card max-h-86 bg-base-100 shadow-sm border border-base-300 overflow-hidden"
-          >
+          <section class="card bg-base-100 shadow-sm border border-base-300 overflow-hidden">
             <div
               class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-base-300"
             >
-              <div class="p-6 max-h-86 flex flex-col">
+              <div class="p-6 flex flex-col min-h-0">
                 <div class="flex flex-row items-center mb-4">
                   <i class="fa-regular fa-ballot-check text-primary pe-2"></i>
                   <h2 class="text-xs font-bold uppercase tracking-widest">Listado de Reactivos</h2>
                 </div>
 
-                <div class="space-y-2 grow overflow-y-auto pr-2 pb-6 custom-scrollbar">
+                <div class="space-y-2 grow overflow-y-auto max-h-80 pr-2 pb-6">
                   <div
                     class="max-h-20 p-3 bg-base-200 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
                   >
@@ -145,7 +144,7 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <div class="p-6">
+              <div v-if="bancoStore.selectedBanco?.esProyecto" class="p-6">
                 <div class="flex flex-row items-center mb-4">
                   <i class="fa-regular fa-user-gear text-primary pe-2"></i>
                   <h2 class="text-xs font-bold uppercase tracking-widest">Miembros</h2>
@@ -217,8 +216,80 @@ onMounted(async () => {
                   Intregrar
                 </button>
               </div>
+              <div v-if="!bancoStore.selectedBanco?.esProyecto" class="p-6">
+                <div class="flex flex-row items-center mb-4">
+                  <i class="fa-regular fa-user-gear text-primary pe-2"></i>
+                  <h2 class="text-xs font-bold uppercase tracking-widest">Banco Compartido</h2>
+                </div>
 
-              <div class="p-6">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="avatar">
+                        <div class="w-8 h-8 rounded-full">
+                          <img
+                            src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <p class="text-xs font-semibold">Admin Usuario</p>
+                        <p class="text-[10px] text-slate-500">Propietario</p>
+                      </div>
+                    </div>
+                    <button class="hover:text-primary transition-colors text-slate-400">
+                      <i class="fa-regular fa-gear"></i>
+                    </button>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="avatar">
+                        <div class="w-8 h-8 rounded-full">
+                          <img
+                            src="https://img.daisyui.com/images/profile/demo/distracted1@192.webp"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <p class="text-xs font-semibold">Jorge Rodriguez</p>
+                        <p class="text-[10px] text-slate-500">Editor</p>
+                      </div>
+                    </div>
+                    <button
+                      class="cursor-pointer w-4 h-4 hover:text-error transition-colors text-slate-400"
+                    >
+                      <i class="fa-regular fa-user-minus"></i>
+                    </button>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="avatar">
+                        <div class="w-8 h-8 rounded-full">
+                          <img
+                            src="https://img.daisyui.com/images/profile/demo/distracted2@192.webp"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <p class="text-xs font-semibold">Maria Gonzales</p>
+                        <p class="text-[10px] text-slate-500">Revisor</p>
+                      </div>
+                    </div>
+                    <button
+                      class="cursor-pointer w-4 h-4 hover:text-error transition-colors text-slate-400"
+                    >
+                      <i class="fa-regular fa-user-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <button
+                  class="btn btn-dash btn-block hover:border-primary hover:text-primary hover:bg-base-100 btn-sm rounded-lg border-dashed border-slate-300"
+                >
+                  Compartir
+                </button>
+              </div>
+
+              <div v-if="bancoStore.selectedBanco?.esProyecto" class="p-6">
                 <div class="flex flex-row items-center mb-4">
                   <i class="fa-regular fa-comment-plus text-primary pe-2"></i>
                   <h2 class="text-xs font-bold uppercase tracking-widest">
@@ -233,7 +304,10 @@ onMounted(async () => {
             </div>
           </section>
 
-          <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <section
+            v-if="bancoStore.selectedBanco?.esProyecto"
+            class="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
             <div class="card bg-base-100 border border-base-300 shadow-sm">
               <div class="card-body p-5">
                 <div class="flex items-center gap-3">
@@ -256,24 +330,11 @@ onMounted(async () => {
           </section>
         </div>
 
-        <aside class="lg:col-span-4 mt-12 lg:mt-0">
-          <div class="sticky top-10 flex flex-col gap-6">
+        <aside v-if="bancoStore.selectedBanco?.esProyecto" class="lg:col-span-4 mt-12 lg:mt-0">
+          <div class="sticky py-1 flex flex-col gap-6">
             <div class="card bg-base-100 shadow-xl p-8 border border-base-300">
               <h3 class="text-2xl font-bold mb-10">Flujo de trabajo</h3>
 
-              <!-- <ul class="steps steps-vertical w-full">
-                <li class="step step-primary text-sm font-medium">
-                  Elaboración
-                </li>
-                <li class="step step-primary text-sm font-medium">Revisión</li>
-                <li class="step text-sm font-medium" data-content="●">
-                  Traducción
-                </li>
-                <li class="step text-sm font-medium">Revisión Final</li>
-                <li class="step text-sm font-medium">Terminado</li>
-              </ul> -->
-
-              <!--  -->
               <ul class="timeline timeline-vertical">
                 <li>
                   <div class="timeline-middle">
@@ -326,12 +387,12 @@ onMounted(async () => {
                   <hr class="py-4" />
                   <div class="timeline-middle">
                     <div
-                      class="w-10 h-10 rounded-full bg-neutral flex items-center justify-center text-white"
+                      class="w-10 h-10 rounded-full bg-base-300 flex items-center justify-center text-white"
                     >
                       <i class="fa-solid fa-check"></i>
                     </div>
                   </div>
-                  <div class="timeline-end font-bold ps-5">Terminado</div>
+                  <div class="timeline-end text-base-300 font-bold ps-5">Terminado</div>
                 </li>
               </ul>
             </div>
@@ -349,3 +410,8 @@ onMounted(async () => {
     </main>
   </div>
 </template>
+<style scoped>
+/* * {
+  outline: 1px solid red;
+} */
+</style>

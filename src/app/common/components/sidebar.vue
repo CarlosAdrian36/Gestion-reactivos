@@ -1,4 +1,5 @@
 <script setup>
+import { useRoute } from 'vue-router'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 
 const sidebar = useSidebarStore()

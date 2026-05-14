@@ -3,7 +3,7 @@ import { bancosMock } from './bancos.mock'
 import { delay } from '@/lib/dealy'
 
 export const getBancos = async (): Promise<Banco[]> => {
-  await delay(5000)
+  await delay(2000)
 
   return bancosMock
 }

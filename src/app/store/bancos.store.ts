@@ -8,6 +8,11 @@ export const useBancoStore = defineStore('bancos', {
     selectedBanco: null as Banco | null,
     loading: false,
   }),
+  getters: {
+    proyectos: (state) => state.bancos.filter((banco) => banco.esProyecto),
+    compartidos: (state) => state.bancos.filter((banco) => banco.esCompartido),
+    misbancos: (state) => state.bancos.filter((banco) => !banco.esProyecto),
+  },
   actions: {
     async fetchBancos() {
       try {
@@ -20,18 +25,14 @@ export const useBancoStore = defineStore('bancos', {
       }
     },
     async fetchBancoById(id: number) {
-      try {
-        this.loading = true
-        const banco = await getBancoById(id)
-        if (!banco) {
-          throw new Error('Banco no encontrado')
-        }
-        this.selectedBanco = banco
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.loading = false
+      const existenteBanco = this.bancos.find((banco) => banco.id === id)
+      if (existenteBanco) {
+        this.selectedBanco = existenteBanco
+        return
       }
+
+      const banco = await getBancoById(id)
+      this.selectedBanco = banco ?? null
     },
   },
 })

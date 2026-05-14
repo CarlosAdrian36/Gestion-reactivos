@@ -47,7 +47,7 @@ const items = computed<ExplorerItem[]>(() => [
     tipo: 'carpeta' as const,
   })),
 
-  ...bancos.value.map((banco) => ({
+  ...Array.from(bancoStore.misbancos.values()).map((banco) => ({
     ...banco,
     tipo: 'banco' as const,
   })),
@@ -66,93 +66,6 @@ const goToItem = (item: ExplorerItem) => {
 }
 </script>
 
-<!-- <template>
-  <div class="max-w-350 mx-auto px-6 py-6">
-    <div v-if="loading" class="space-y-2">
-      <div class="skeleton h-16 w-full"></div>
-      <div class="skeleton h-90 w-full"></div>
-    </div>
-
-    <table
-      v-else
-      class="table overflow-x-auto rounded-box border border-base-content/5 bg-base-100"
-    >
-      <thead class="bg-base-200">
-        <tr>
-          <th class="w-8 text-center">Tipo</th>
-          <th>Nombre</th>
-          <th>Contenidos</th>
-          <th>Ultima Modificacion</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody v-if="items.length">
-        <tr v-for="value in items">
-          <td class="text-center">
-            <i
-              :class="{
-                'fa-regular fa-folder fa-xl text-warning': value.tipo === 'carpeta',
-                'fa-regular fa-file-lines fa-xl text-primary': value.tipo === 'banco',
-              }"
-            ></i>
-          </td>
-          <td>
-            <div v-if="value.tipo === 'banco'">
-              <p class="text-sm font-semibold">
-                {{ value.nombre }}
-              </p>
-              <p class="text-xs text-base-content/70">
-                {{ value.descripcion }}
-              </p>
-            </div>
-            <div v-else>
-              <p class="text-sm font-semibold">
-                {{ value.nombre }}
-              </p>
-            </div>
-          </td>
-          <td>
-            <p class="text-sm text-base-content/70">
-              {{
-                value.tipo === 'carpeta' ? `${value.bancos} bancos` : `${value.reactivos} reactivos`
-              }}
-            </p>
-          </td>
-          <td>
-            <p class="text-sm text-base-content/70">
-              {{
-                new Date(value.fechaModificacion).toLocaleDateString('es-ES', {
-                  dateStyle: 'medium',
-                })
-              }}
-            </p>
-          </td>
-          <td></td>
-        </tr>
-      </tbody>
-      <tbody v-else>
-        <tr>
-          <td colspan="6">
-            <div class="flex flex-col items-center justify-center py-10 text-center">
-              <i class="fa-regular fa-folder-open text-4xl text-base-content/40 mb-3"></i>
-
-              <p class="font-semibold text-base-content/70">No hay elementos aún</p>
-
-              <p class="text-sm text-base-content/50">
-                Puedes crear una carpeta o banco para comenzar
-              </p>
-
-              <button class="btn btn-primary btn-sm mt-4">
-                <i class="fa-regular fa-plus"></i>
-                Crear elemento
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</template> -->
 <template>
   <div class="max-w-7xl mx-auto px-4">
     <!-- HEADER -->
