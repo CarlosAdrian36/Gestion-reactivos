@@ -64,6 +64,13 @@ const goToItem = (item: ExplorerItem) => {
     console.log('Carpeta seleccionada:', item.nombre)
   }
 }
+
+const abrirCrearBanco = () => {
+  console.log('Abrir modal para crear banco')
+}
+const abrirCrearCarpeta = () => {
+  console.log('Abrir modal para crear carpeta')
+}
 </script>
 
 <template>
@@ -78,10 +85,30 @@ const goToItem = (item: ExplorerItem) => {
 
       <div class="flex items-center gap-2">
         <!-- BOTON -->
-        <button class="btn btn-primary">
+        <!-- <button class="btn btn-primary">
           <i class="fa-regular fa-plus"></i>
           Crear
-        </button>
+        </button> -->
+
+        <div class="dropdown dropdown-bottom dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-primary">
+            <i class="fa-regular fa-plus"></i>Crear
+          </div>
+
+          <ul
+            tabindex="1"
+            class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+          >
+            <li class="pb-2">
+              <button class="btn btn-soft btn-info" @click="abrirCrearBanco">
+                Banco de Reactivos
+              </button>
+            </li>
+            <li>
+              <button class="btn btn-soft btn-warning" @click="abrirCrearCarpeta">Carpeta</button>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 
