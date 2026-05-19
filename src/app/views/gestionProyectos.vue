@@ -25,14 +25,16 @@ const goToItem = (item: Banco) => {
 </script>
 
 <template>
-  metodo /getProyectos
+  <!-- metodo /getProyectos -->
   <div class="max-w-7xl mx-auto px-4">
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
       <div>
-        <h1 class="text-2xl font-bold">Gestión de Bancos</h1>
+        <h1 class="text-2xl font-bold">Gestión de Proyectos</h1>
 
-        <p class="text-sm text-base-content/70">Administra carpetas y bancos de reactivos</p>
+        <p class="text-sm text-base-content/70">
+          Administra carpetas y bancos de reactivos con flujos de trabajo
+        </p>
       </div>
 
       <div class="flex items-center gap-2">
