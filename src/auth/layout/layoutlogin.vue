@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { apiClient } from '@/api/http'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
@@ -14,6 +15,7 @@ const toggleTheme = () => {
   const current = html.getAttribute('data-theme')
   html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark')
 }
+apiClient
 </script>
 
 <template>
