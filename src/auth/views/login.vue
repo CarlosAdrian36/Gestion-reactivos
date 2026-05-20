@@ -3,6 +3,12 @@ import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useAuthStore } from '../store/auth.store'
+import { useRoute, useRouter } from 'vue-router'
+import { ca } from 'zod/v4/locales'
+
+const router = useRouter()
+const route = useRoute()
 
 const loginSchema = z.object({
   usuario: z.string().min(1, 'El usuario es requerido'),
@@ -23,14 +29,23 @@ const { handleSubmit, errors, meta, defineField, isSubmitting } = useForm<LoginF
     contrasena: '',
   },
 })
+const loginError = ref('')
+const authStore = useAuthStore()
 const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
-const onSubmit = handleSubmit((formValues) => {
-  setTimeout(() => {
-    isSubmitting.value = false
-    console.log('Simulando envío de formulario...')
-    console.log('Formulario válido:', formValues)
-  }, 1000)
+const onSubmit = handleSubmit(async (formvalues) => {
+  // console.log('Intentando iniciar sesión con:', formvalues)
+  loginError.value = ''
+  try {
+    await authStore.login({
+      nombreUsuario: formvalues.usuario,
+      password: formvalues.contrasena,
+    })
+    const redirect = route.query.redirect?.toString()
+    await router.push(redirect || { name: 'misBancos' })
+  } catch (error) {
+    loginError.value = 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'
+  }
 })
 </script>
 
