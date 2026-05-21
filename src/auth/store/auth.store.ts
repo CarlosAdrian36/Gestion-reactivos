@@ -1,33 +1,45 @@
 import { defineStore } from 'pinia'
-import type { LoginRequest } from '../interface/loginRequest'
-import { loginApi } from '../api/auth.api'
+import { ref } from 'vue'
+import { AuthStatus, type LoginCredentials } from '../interface'
+import { loginAction } from '../actions'
 
-export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    token: localStorage.getItem('token') || null,
-    tiempoRestante: localStorage.getItem('tiempoRestante') || null,
-  }),
-  getters: {
-    isAuthenticated: (state) => Boolean(state.token),
-  },
-  actions: {
-    async login(credenciales: LoginRequest) {
-      //   console.log('Intentando iniciar sesión con:', credenciales)
-      const response = await loginApi({
-        nombreUsuario: credenciales.nombreUsuario,
-        password: credenciales.password,
-      })
-      //   console.log('Respuesta del servidor:', response)
-      this.token = response.token
-      this.tiempoRestante = response.tiempoRestante
-      localStorage.setItem('token', response.token)
-      localStorage.setItem('tiempoRestante', response.tiempoRestante)
-    },
-    logout() {
-      this.token = null
-      this.tiempoRestante = null
-      localStorage.removeItem('token')
-      localStorage.removeItem('tiempoRestante')
-    },
-  },
+export const useAuthStore = defineStore('auth', () => {
+  // Autenticado,desautenticado,verificando
+  const authStatus = ref(AuthStatus.Checking)
+  // const user = ref<LoginRequest | undefined>()
+  const token = ref('')
+
+  const login = async (data: LoginCredentials) => {
+    try {
+      const loginResp = await loginAction(data)
+      if (!loginResp.ok) {
+        return false
+      }
+      token.value = loginResp.token
+      authStatus.value = AuthStatus.Authenticated
+      return true
+    } catch (error) {
+      return logout()
+    }
+  }
+
+  const logout = () => {
+    authStatus.value = AuthStatus.NotAuthenticated
+    token.value = ''
+    return false
+  }
+  return {
+    // user,
+    token,
+    authStatus,
+
+    // Getters
+    isChecking: () => authStatus.value === AuthStatus.Checking,
+    isAuthenticated: () => authStatus.value === AuthStatus.Authenticated,
+    isNotAuthenticated: () => authStatus.value === AuthStatus.NotAuthenticated,
+
+    // Actions
+    login,
+    logout,
+  }
 })

@@ -5,7 +5,6 @@ import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useAuthStore } from '../store/auth.store'
 import { useRoute, useRouter } from 'vue-router'
-import { ca } from 'zod/v4/locales'
 
 const router = useRouter()
 const route = useRoute()
@@ -33,20 +32,33 @@ const loginError = ref('')
 const authStore = useAuthStore()
 const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
-const onSubmit = handleSubmit(async (formvalues) => {
-  // console.log('Intentando iniciar sesión con:', formvalues)
-  loginError.value = ''
-  try {
-    await authStore.login({
-      nombreUsuario: formvalues.usuario,
-      password: formvalues.contrasena,
-    })
-    const redirect = route.query.redirect?.toString()
-    await router.push(redirect || { name: 'misBancos' })
-  } catch (error) {
-    loginError.value = 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'
-  }
-})
+// const onSubmit = handleSubmit(async (formvalues) => {
+//   loginError.value = ''
+//   try {
+//     await authStore.login({
+//       nombreUsuario: formvalues.usuario,
+//       password: formvalues.contrasena,
+//     })
+//     const redirect = route.query.redirect?.toString()
+//     await router.push(redirect || { name: 'misBancos' })
+//   } catch (error) {
+//     loginError.value = 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'
+//   }
+// })
+
+const onSubmit = async () => {
+  const ok = await authStore.login({
+    usuario: usuario.value,
+    contrasena: contrasena.value,
+  })
+  console.log(ok)
+  //  if (ok) {
+  //   const redirect = route.query.redirect?.toString()
+  //   await router.push(redirect || { name: 'misBancos' })
+  // } else {
+  //   loginError.value = 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'
+  // }
+}
 </script>
 
 <template>
@@ -165,7 +177,6 @@ const onSubmit = handleSubmit(async (formvalues) => {
         </button> -->
         <button
           type="submit"
-          :disabled="isSubmitting"
           class="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition-all active:scale-[0.98]"
         >
           <span v-if="isSubmitting">Iniciando sesión...</span>

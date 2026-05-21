@@ -50,18 +50,18 @@ const router = createRouter({
 
 export default router
 
-router.beforeEach((to) => {
-  const authStore = useAuthStore()
-  const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
+// router.beforeEach((to) => {
+//   const authStore = useAuthStore()
+//   const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
 
-  if (requiresAuth && !authStore.isAuthenticated) {
-    return {
-      name: 'login',
-      query: { redirect: to.fullPath },
-    }
-  }
+//   if (requiresAuth && !authStore.isAuthenticated) {
+//     return {
+//       name: 'login',
+//       query: { redirect: to.fullPath },
+//     }
+//   }
 
-  if (to.name === 'login' && authStore.isAuthenticated) {
-    return { name: 'misBancos' }
-  }
-})
+//   if (to.name === 'login' && authStore.isAuthenticated) {
+//     return { name: 'misBancos' }
+//   }
+// })
