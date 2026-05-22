@@ -13,6 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const loginResp = await loginAction(data)
       if (!loginResp.ok) {
+        logout()
         return false
       }
       token.value = loginResp.token

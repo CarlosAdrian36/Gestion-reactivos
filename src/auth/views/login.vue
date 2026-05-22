@@ -48,10 +48,10 @@ const [contrasena, contrasenaatributos] = defineField('contrasena')
 
 const onSubmit = async () => {
   const ok = await authStore.login({
-    usuario: usuario.value,
-    contrasena: contrasena.value,
+    nombreUsuario: usuario.value,
+    password: contrasena.value,
   })
-  console.log(ok)
+  console.log({ ok })
   //  if (ok) {
   //   const redirect = route.query.redirect?.toString()
   //   await router.push(redirect || { name: 'misBancos' })
