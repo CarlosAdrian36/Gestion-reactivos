@@ -3,13 +3,15 @@ import { computed, onMounted } from 'vue'
 import { useBancoStore } from '../store/bancos.store'
 import { useFolderStore } from '../store/folders.store'
 import { storeToRefs } from 'pinia'
-import type { Carpeta } from '../interface/carpetoInterface'
 import { useRouter } from 'vue-router'
+import { useModalStore } from '../store/modal.store'
+import crearCarpeta from '@/common/modals/views/crearCarpeta.vue'
+import type { Banco, Carpeta } from '../interface'
 
 const router = useRouter()
 const bancoStore = useBancoStore()
 const carpetaStore = useFolderStore()
-
+const modal = useModalStore()
 onMounted(async () => {
   await Promise.all([bancoStore.fetchBancos(), carpetaStore.fetchFolders()])
 })
@@ -41,16 +43,30 @@ type ExplorerItem =
       carpetaId: number | null
     }
 
-const items = computed<ExplorerItem[]>(() => [
-  ...folders.value.map((carpeta: Carpeta) => ({
-    ...carpeta,
-    tipo: 'carpeta' as const,
-  })),
+// const items = computed<ExplorerItem[]>(() => [
+//   ...folders.value.map((carpeta: Carpeta) => ({
+//     ...carpeta,
+//     tipo: 'carpeta' as const,
+//   })),
 
-  ...Array.from(bancoStore.misbancos.values()).map((banco) => ({
-    ...banco,
-    tipo: 'banco' as const,
-  })),
+//   ...Array.from(bancoStore.misbancos.values()).map((banco) => ({
+//     ...banco,
+//     tipo: 'banco' as const,
+//   })),
+// ])
+
+const maperFolderToExplorerItem = (carpeta: Carpeta): ExplorerItem => ({
+  ...carpeta,
+  tipo: 'carpeta',
+})
+
+const maperBancoToExplorerItem = (banco: Banco): ExplorerItem => ({
+  ...banco,
+  tipo: 'banco',
+})
+const items = computed(() => [
+  ...folders.value.map(maperFolderToExplorerItem),
+  ...Array.from(bancoStore.misbancos.values()).map(maperBancoToExplorerItem),
 ])
 
 const loading = computed(() => bancosLoading.value || carpetasLoading.value)
@@ -69,7 +85,22 @@ const abrirCrearBanco = () => {
   console.log('Abrir modal para crear banco')
 }
 const abrirCrearCarpeta = () => {
-  console.log('Abrir modal para crear carpeta')
+  modal.openModal(crearCarpeta, { modo: 'crear' }, [
+    {
+      label: 'Cancelar',
+      variant: 'outline',
+    },
+    {
+      label: 'Crear',
+      variant: 'primary',
+      type: 'submit',
+    },
+  ])
+}
+
+
+const itemClass = (item: ExplorerItem) => {
+  return item.tipo === 'carpeta' ? 'bg-warning/10' : 'bg-primary/10'
 }
 </script>
 
@@ -153,7 +184,7 @@ const abrirCrearCarpeta = () => {
               <td class="text-center align-middle">
                 <div
                   class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
-                  :class="value.tipo === 'carpeta' ? 'bg-warning/10' : 'bg-primary/10'"
+                  :class="itemClass(value)"
                 >
                   <i
                     :class="{
