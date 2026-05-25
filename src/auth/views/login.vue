@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useAuthStore } from '../store/auth.store'
 import { useRoute, useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const route = useRoute()
@@ -28,8 +29,8 @@ const { handleSubmit, errors, meta, defineField, isSubmitting } = useForm<LoginF
     contrasena: '',
   },
 })
-const loginError = ref('')
 const authStore = useAuthStore()
+const toast = useToast()
 const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
 // const onSubmit = handleSubmit(async (formvalues) => {
@@ -52,6 +53,8 @@ const onSubmit = async () => {
     password: contrasena.value,
   })
   console.log({ ok })
+  if (ok) return
+  toast.error('Credenciales incorrectas. Por favor, inténtalo de nuevo.')
   //  if (ok) {
   //   const redirect = route.query.redirect?.toString()
   //   await router.push(redirect || { name: 'misBancos' })
