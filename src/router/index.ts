@@ -11,7 +11,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: LayoutPrincipal,
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
       children: [
         {
           path: 'mis-bancos',
@@ -48,20 +48,18 @@ const router = createRouter({
   ],
 })
 
-export default router
-
 // router.beforeEach((to) => {
 //   const authStore = useAuthStore()
 //   const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
 
-//   if (requiresAuth && !authStore.isAuthenticated) {
-//     return {
-//       name: 'login',
-//       query: { redirect: to.fullPath },
-//     }
+//   authStore.checkAuthStatus()
+
+//   if (requiresAuth && !authStore.isAuthenticated()) {
+//     return { name: 'login', query: { redirect: to.fullPath } }
 //   }
 
-//   if (to.name === 'login' && authStore.isAuthenticated) {
+//   if (to.name === 'login' && authStore.isAuthenticated()) {
 //     return { name: 'misBancos' }
 //   }
 // })
+export default router
