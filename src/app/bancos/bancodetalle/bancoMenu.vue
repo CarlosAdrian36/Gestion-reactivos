@@ -2,6 +2,9 @@
 import { useBancoStore } from '@/app/store/bancos.store'
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import ListaReactivos from '../banconormal/components/lista-reactivos.vue'
+import ListaCompartidos from '../banconormal/components/lista-compartidos.vue'
+import InfromacionBanco from '../banconormal/components/infromacion-banco.vue'
 
 const route = useRoute()
 
@@ -50,101 +53,16 @@ onMounted(async () => {
               class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-base-300"
             >
               <div class="p-6 flex flex-col min-h-0">
-                <div class="flex flex-row items-center mb-4">
-                  <i class="fa-regular fa-ballot-check text-primary pe-2"></i>
-                  <h2 class="text-xs font-bold uppercase tracking-widest">Listado de Reactivos</h2>
-                </div>
-
-                <div class="space-y-2 grow overflow-y-auto max-h-80 pr-2 pb-6">
-                  <div
-                    class="max-h-20 p-3 bg-base-200 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-[10px] font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="max-h-20 p-3 bg-base-200 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-[10px] font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="max-h-20 p-3 bg-base-200 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-[10px] font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="max-h-20 p-3 bg-base-200 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-[10px] font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200/50 border border-base-200 rounded-xl cursor-pointer hover:border-primary transition-colors group shadow-sm"
-                  >
-                    <p class="text-xs font-bold text-primary">ID: 2043</p>
-                    <p class="text-sm line-clamp-1 opacity-80">Cálculo de derivadas...</p>
-                  </div>
-                  <div
-                    class="p-3 bg-base-200 rounded-lg cursor-pointer hover:bg-base-300 transition"
-                  >
-                    <p class="text-xs font-bold">ID: 2043</p>
-                    <p class="text-sm line-clamp-1">Cálculo de derivadas...</p>
-                  </div>
-                  <div class="h-2"></div>
-                </div>
+                <ListaReactivos />
+              </div>
+              <div>
+                <ListaCompartidos />
+              </div>
+              <div>
+                <InfromacionBanco />
               </div>
 
-              <div v-if="bancoStore.selectedBanco?.esProyecto" class="p-6">
+              <!-- <div v-if="bancoStore.selectedBanco?.esProyecto" class="p-6">
                 <div class="flex flex-row items-center mb-4">
                   <i class="fa-regular fa-user-gear text-primary pe-2"></i>
                   <h2 class="text-xs font-bold uppercase tracking-widest">Miembros</h2>
@@ -215,79 +133,7 @@ onMounted(async () => {
                 >
                   Intregrar
                 </button>
-              </div>
-              <div v-if="!bancoStore.selectedBanco?.esProyecto" class="p-6">
-                <div class="flex flex-row items-center mb-4">
-                  <i class="fa-regular fa-user-gear text-primary pe-2"></i>
-                  <h2 class="text-xs font-bold uppercase tracking-widest">Banco Compartido</h2>
-                </div>
-
-                <div class="space-y-4">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div class="avatar">
-                        <div class="w-8 h-8 rounded-full">
-                          <img
-                            src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <p class="text-xs font-semibold">Admin Usuario</p>
-                        <p class="text-[10px] text-slate-500">Propietario</p>
-                      </div>
-                    </div>
-                    <button class="hover:text-primary transition-colors text-slate-400">
-                      <i class="fa-regular fa-gear"></i>
-                    </button>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div class="avatar">
-                        <div class="w-8 h-8 rounded-full">
-                          <img
-                            src="https://img.daisyui.com/images/profile/demo/distracted1@192.webp"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <p class="text-xs font-semibold">Jorge Rodriguez</p>
-                        <p class="text-[10px] text-slate-500">Editor</p>
-                      </div>
-                    </div>
-                    <button
-                      class="cursor-pointer w-4 h-4 hover:text-error transition-colors text-slate-400"
-                    >
-                      <i class="fa-regular fa-user-minus"></i>
-                    </button>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div class="avatar">
-                        <div class="w-8 h-8 rounded-full">
-                          <img
-                            src="https://img.daisyui.com/images/profile/demo/distracted2@192.webp"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <p class="text-xs font-semibold">Maria Gonzales</p>
-                        <p class="text-[10px] text-slate-500">Revisor</p>
-                      </div>
-                    </div>
-                    <button
-                      class="cursor-pointer w-4 h-4 hover:text-error transition-colors text-slate-400"
-                    >
-                      <i class="fa-regular fa-user-minus"></i>
-                    </button>
-                  </div>
-                </div>
-                <button
-                  class="btn btn-dash btn-block hover:border-primary hover:text-primary hover:bg-base-100 btn-sm rounded-lg border-dashed border-slate-300"
-                >
-                  Compartir
-                </button>
-              </div>
+              </div> -->
 
               <div v-if="bancoStore.selectedBanco?.esProyecto" class="p-6">
                 <div class="flex flex-row items-center mb-4">
