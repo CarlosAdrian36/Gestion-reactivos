@@ -5,7 +5,7 @@ import { isAxiosError } from 'axios'
 export const loginAction = async (data: LoginCredentials): Promise<loginSuccess | LoginError> => {
   try {
     const { nombreUsuario, password } = data
-    const { data: response } = await apiClient.post<loginSuccess>('/sesiones', {
+    const { data: response } = await apiClient.post<loginSuccess>('/sesion', {
       nombreUsuario,
       password,
     })
