@@ -3,9 +3,10 @@ import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
+import { toast } from 'vue-sonner'
+
 import { useAuthStore } from '../store/auth.store'
 import { useRoute, useRouter } from 'vue-router'
-import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const route = useRoute()
@@ -30,7 +31,6 @@ const { handleSubmit, errors, meta, defineField, isSubmitting } = useForm<LoginF
   },
 })
 const authStore = useAuthStore()
-const toast = useToast()
 const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
 // const onSubmit = handleSubmit(async (formvalues) => {
@@ -171,13 +171,6 @@ const onSubmit = async () => {
           </div>
         </div>
 
-        <!-- Button -->
-        <!-- <button
-          type="submit"
-          class="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition-all active:scale-[0.98]"
-        >
-          Iniciar Sesión
-        </button> -->
         <button
           type="submit"
           class="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition-all active:scale-[0.98]"

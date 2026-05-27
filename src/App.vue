@@ -3,6 +3,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from './auth/store/auth.store'
 import BaseModal from './common/modals/BaseModal.vue'
 
+import { Toaster } from 'vue-sonner'
+
 const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
@@ -14,24 +16,31 @@ const route = useRoute()
 //   authStore.checkAuthStatus()
 // }
 
-authStore.$subscribe(
-  (_, state) => {
-    console.log({ state })
-    console.log(state.authStatus)
+// authStore.$subscribe(
+//   (_, state) => {
+//     console.log({ state })
+//     console.log(state.authStatus)
 
-    if (state.authStatus === authStore.authStatus) {
-      console.log('Auth status is the same, checking auth status...')
-      authStore.checkAuthStatus()
-      return
-    }
-  },
-  {
-    immediate: true,
-  },
-)
+//     if (state.authStatus === authStore.authStatus) {
+//       console.log('Auth status is the same, checking auth status...')
+//       authStore.checkAuthStatus()
+//       return
+//     }
+//   },
+//   {
+//     immediate: true,
+//   },
+// )
 </script>
 
 <template>
+  <Toaster
+    theme="light"
+    rich-colors
+    position="bottom-center"
+    close-button
+    close-button-position="top-left"
+  />
   <BaseModal />
   <router-view></router-view>
 </template>
