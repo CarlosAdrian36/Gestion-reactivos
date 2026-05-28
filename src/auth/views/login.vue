@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
@@ -52,7 +52,7 @@ const onSubmit = async () => {
     nombreUsuario: usuario.value,
     password: contrasena.value,
   })
-  console.log({ ok })
+  console.log(ok)
   if (ok) return
   toast.error('Credenciales incorrectas. Por favor, inténtalo de nuevo.')
   //  if (ok) {
