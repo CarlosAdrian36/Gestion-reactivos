@@ -5,10 +5,12 @@ import { checkAuthAction, loginAction } from '../actions'
 import { useLocalStorage } from '@vueuse/core'
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref(useLocalStorage('token', ''))
-  const authStatus = ref(AuthStatus.Checking)
+  const token = useLocalStorage('token', '')
+  const authStatus = ref<AuthStatus>(AuthStatus.Checking)
+  console.log('1', authStatus.value)
 
   const login = async (data: LoginCredentials) => {
+    console.log('Aqui dio click en el login', authStatus.value)
     try {
       const loginResp = await loginAction(data)
       if (!loginResp.ok) {
@@ -27,13 +29,12 @@ export const useAuthStore = defineStore('auth', () => {
   const checkAuthStatus = async (): Promise<boolean> => {
     try {
       const statusResp = await checkAuthAction()
-      console.warn(statusResp)
       if (!statusResp.ok) {
         logout()
         return false
       }
       authStatus.value = AuthStatus.Authenticated
-      // token.value = token.value
+      token.value = statusResp.token
       return true
     } catch (error) {
       logout()
@@ -42,6 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = () => {
+    console.error('logout Ejecutado')
     authStatus.value = AuthStatus.NotAuthenticated
     token.value = ''
     return false

@@ -5,6 +5,8 @@ import { Toaster } from 'vue-sonner'
 import BaseModal from './common/modals/BaseModal.vue'
 import { useAuthStore } from './auth/store/auth.store'
 import { AuthStatus } from './auth/interface/auth-status.enum'
+import vueDevTools from 'vite-plugin-vue-devtools'
+import { isReturnStatement } from 'typescript'
 
 const authStore = useAuthStore()
 
@@ -12,14 +14,14 @@ const router = useRouter()
 const route = useRoute()
 authStore.$subscribe(
   (_, state) => {
-    console.log(state.authStatus)
-    if (state.authStatus === AuthStatus.Checking) {
+    if (state.authStatus === AuthStatus.Checking && localStorage.getItem('token')) {
+      console.log('Aqui entro al subscribe del authStore')
       authStore.checkAuthStatus()
       return
     }
+
     if (route.path.includes('/auth') && state.authStatus === AuthStatus.Authenticated) {
       router.replace({ name: 'misBancos' })
-      return
     }
   },
   {

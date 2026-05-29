@@ -8,19 +8,21 @@ interface checkError {
 
 interface checkSuccess {
   ok: boolean
+  token: string
 }
 
 export const checkAuthAction = async (): Promise<checkError | checkSuccess> => {
   try {
     const localToken = localStorage.getItem('token')
-    if (!localToken || localToken.length < 10) {
+    if (!localToken) {
       return { ok: false }
     }
 
     const { data } = await apiClient.get<validate>('/sesion/validate')
-    console.log(data)
+    console.log('Respuesta del checkaction', data)
     return {
       ok: data.ok,
+      token: localToken,
     }
   } catch (error) {
     console.log(error)
