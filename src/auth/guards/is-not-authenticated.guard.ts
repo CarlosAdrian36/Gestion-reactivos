@@ -12,4 +12,7 @@ export const isNotAuthenticatedGuard = async (
   console.log(authStore.authStatus)
   authStore.authStatus === AuthStatus.Authenticated ? next({ name: 'misBancos' }) : next()
   //   console.log(to)
+  return
 }
+
+export default isNotAuthenticatedGuard

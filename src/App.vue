@@ -10,9 +10,9 @@ const authStore = useAuthStore()
 
 const router = useRouter()
 const route = useRoute()
-
 authStore.$subscribe(
   (_, state) => {
+    console.log(state.authStatus)
     if (state.authStatus === AuthStatus.Checking) {
       authStore.checkAuthStatus()
       return
