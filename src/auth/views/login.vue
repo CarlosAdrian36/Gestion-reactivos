@@ -33,34 +33,15 @@ const { handleSubmit, errors, meta, defineField, isSubmitting } = useForm<LoginF
 const authStore = useAuthStore()
 const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
-// const onSubmit = handleSubmit(async (formvalues) => {
-//   loginError.value = ''
-//   try {
-//     await authStore.login({
-//       nombreUsuario: formvalues.usuario,
-//       password: formvalues.contrasena,
-//     })
-//     const redirect = route.query.redirect?.toString()
-//     await router.push(redirect || { name: 'misBancos' })
-//   } catch (error) {
-//     loginError.value = 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'
-//   }
-// })
 
 const onSubmit = async () => {
   const ok = await authStore.login({
     nombreUsuario: usuario.value,
     password: contrasena.value,
   })
-  console.log(ok)
+  console.log('Estado si paso o no:', ok)
   if (ok) return
   toast.error('Credenciales incorrectas. Por favor, inténtalo de nuevo.')
-  //  if (ok) {
-  //   const redirect = route.query.redirect?.toString()
-  //   await router.push(redirect || { name: 'misBancos' })
-  // } else {
-  //   loginError.value = 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'
-  // }
 }
 </script>
 

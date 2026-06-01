@@ -7,7 +7,7 @@ interface checkError {
 }
 
 interface checkSuccess {
-  ok: boolean
+  ok: true
   token: string
 }
 
@@ -18,10 +18,12 @@ export const checkAuthAction = async (): Promise<checkError | checkSuccess> => {
       return { ok: false }
     }
 
-    const { data } = await apiClient.get<validate>('/sesion/validate')
-    console.log('Respuesta del checkaction', data)
+    const { data } = await apiClient.get<boolean>('/sesion/validate')
+    if (!data) {
+      return { ok: false }
+    }
     return {
-      ok: data.ok,
+      ok: data,
       token: localToken,
     }
   } catch (error) {

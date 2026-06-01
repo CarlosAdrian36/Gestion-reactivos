@@ -29,16 +29,16 @@ export const useAuthStore = defineStore('auth', () => {
   const checkAuthStatus = async (): Promise<boolean> => {
     try {
       const statusResp = await checkAuthAction()
-      if (!statusResp.ok) {
+      if (statusResp.ok === false) {
         logout()
         return false
       }
       authStatus.value = AuthStatus.Authenticated
       token.value = statusResp.token
-      return true
+      return false
     } catch (error) {
       logout()
-      return false
+      return true
     }
   }
 
