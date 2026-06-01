@@ -12,16 +12,16 @@ const authStore = useAuthStore()
 
 const router = useRouter()
 const route = useRoute()
+//detectar cambios en el estado de autenticación
 authStore.$subscribe(
   (_, state) => {
     if (state.authStatus === AuthStatus.Checking && localStorage.getItem('token')) {
       console.log('Aqui entro al subscribe del authStore')
-      authStore.checkAuthStatus()
-      return
+      return authStore.checkAuthStatus()
     }
 
     if (route.path.includes('/auth') && state.authStatus === AuthStatus.Authenticated) {
-      router.replace({ name: 'misBancos' })
+      return router.replace({ name: 'misBancos' })
     }
   },
   {
