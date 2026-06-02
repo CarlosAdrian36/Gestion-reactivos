@@ -9,7 +9,6 @@ export const isAuthenticatedGuard = async (
 ) => {
   const authStore = useAuthStore()
   console.log('!!!!!!!!!!!!!!!!!!!!!!!', to)
-
   console.log('!!!!!!!!!!', authStore.authStatus)
   await authStore.checkAuthStatus()
   authStore.authStatus === AuthStatus.NotAuthenticated ? next({ name: 'login' }) : next()

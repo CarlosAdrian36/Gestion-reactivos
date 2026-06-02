@@ -9,9 +9,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
-    console.log('Si hay token existente')
     config.headers['Token'] = token
-    console.log('Aqui ya se puso el Token en el header')
   }
   return config
 })

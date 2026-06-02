@@ -27,7 +27,7 @@ export const checkAuthAction = async (): Promise<checkError | checkSuccess> => {
       token: localToken,
     }
   } catch (error) {
-    console.log(error)
+    console.log('en el checkauterror', error)
     if (isAxiosError(error) && error.response?.status === 401) {
       return {
         ok: false,

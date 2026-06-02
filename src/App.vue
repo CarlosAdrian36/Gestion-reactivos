@@ -13,6 +13,7 @@ const route = useRoute()
 //detectar cambios en el estado de autenticación
 authStore.$subscribe(
   (_, state) => {
+    console.log('Estado de autenticación cambiado:', state.authStatus)
     if (
       state.authStatus === AuthStatus.NotAuthenticated ||
       state.authStatus === AuthStatus.Checking
