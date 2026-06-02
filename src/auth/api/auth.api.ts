@@ -8,3 +8,8 @@ export const loginApi = async (loginRequest: LoginRequest): Promise<loginSuccess
   const { data } = await apiClient.post<loginSuccess>('/sesion', loginRequest)
   return data
 }
+
+export const logoutApi = async (): Promise<boolean> => {
+  const { data } = await apiClient.delete('/sesion')
+  return data
+}

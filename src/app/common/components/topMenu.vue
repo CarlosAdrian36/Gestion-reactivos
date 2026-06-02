@@ -13,10 +13,11 @@ function cerrarSesion() {
   modal.openModal(CerrarSesion, {}, [
     { label: 'Cerrar', variant: 'outline' },
     {
-      label: 'Guardar',
-      variant: 'primary',
+      label: 'Salir',
+      variant: 'error',
       action: () => {
-        ;(alert('Guardado!'), modal.closeModal())
+        modal.closeModal() // Cierra el modal
+        authStore.logout() // Llama a la función de logout del store de autenticación
       },
     },
   ]) // Abre el modal de cerrar sesión

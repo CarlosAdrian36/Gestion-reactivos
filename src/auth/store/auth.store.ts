@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { AuthStatus, type LoginCredentials } from '../interface'
 import { checkAuthAction, loginAction } from '../actions'
 import { useLocalStorage } from '@vueuse/core'
+import { logoutApi } from '../api/auth.api'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')
@@ -64,12 +65,25 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const logout = () => {
+  const logout = async () => {
     console.error('logout Ejecutado')
-    authStatus.value = AuthStatus.NotAuthenticated
-    token.value = ''
-    expiracion.value = 0
-    return false
+
+    try {
+      if (authStatus.value === AuthStatus.Authenticated) {
+        const logoutResp = await logoutApi()
+        console.warn('logoutResp', logoutResp)
+        if (logoutResp === false) {
+          return false
+        }
+        authStatus.value = AuthStatus.NotAuthenticated
+        token.value = ''
+        expiracion.value = 0
+        return true
+      }
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+      return false
+    }
   }
   watch(remainingSeconds, (value) => {
     if (value <= 0 && token.value) {
