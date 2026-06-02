@@ -5,6 +5,7 @@ import { Toaster } from 'vue-sonner'
 import BaseModal from './common/modals/BaseModal.vue'
 import { useAuthStore } from './auth/store/auth.store'
 import { AuthStatus } from './auth/interface/auth-status.enum'
+import { watch } from 'vue'
 
 const authStore = useAuthStore()
 
@@ -28,6 +29,18 @@ authStore.$subscribe(
   },
   {
     immediate: true,
+  },
+)
+watch(
+  () => authStore.authStatus,
+  (status) => {
+    if (status === AuthStatus.NotAuthenticated) {
+      router.replace({ name: 'login' })
+    }
+
+    if (status === AuthStatus.Authenticated && route.path.includes('/auth')) {
+      router.replace({ name: 'misBancos' })
+    }
   },
 )
 </script>

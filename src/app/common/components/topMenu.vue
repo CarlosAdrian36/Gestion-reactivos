@@ -2,9 +2,12 @@
 import { useModalStore } from '@/app/store/modal.store'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import CerrarSesion from './modals/cerrarSesion.vue'
+import { useAuthStore } from '@/auth/store/auth.store.ts'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const sidebar = useSidebarStore()
 const modal = useModalStore()
+const authStore = useAuthStore()
 function cerrarSesion() {
   // Lógica para cerrar sesión, como limpiar tokens, redirigir a la página de login, etc.
   modal.openModal(CerrarSesion, {}, [
@@ -68,6 +71,23 @@ function cerrarSesion() {
 
         <i v-else class="fa-solid fa-arrow-right-from-line text-sm"></i>
       </button>
+      <span class="countdown font-mono text-4xl">
+        <span
+          :style="{ '--value': authStore.minutes, '--digits': 2 }"
+          aria-live="polite"
+          aria-label="minutos"
+          >{{ authStore.minutes }}</span
+        >
+      </span>
+      :
+      <span class="countdown font-mono text-4xl">
+        <span
+          :style="{ '--value': authStore.seconds, '--digits': 2 }"
+          aria-live="polite"
+          aria-label="segundos"
+          >{{ authStore.seconds }}</span
+        >
+      </span>
     </div>
 
     <!-- RIGHT -->

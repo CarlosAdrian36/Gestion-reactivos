@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { AuthStatus, type LoginCredentials } from '../interface'
 import { checkAuthAction, loginAction } from '../actions'
 import { useLocalStorage } from '@vueuse/core'
@@ -7,6 +7,27 @@ import { useLocalStorage } from '@vueuse/core'
 export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')
   const authStatus = ref<AuthStatus>(AuthStatus.Checking)
+  const expiracion = useLocalStorage('expiracion', 0)
+
+  const now = ref(Date.now())
+
+  setInterval(() => {
+    now.value = Date.now()
+  }, 1000)
+  const remainingSeconds = computed(() => {
+    const diff = Math.floor((expiracion.value - now.value) / 1000)
+
+    return Math.max(diff, 0)
+  })
+
+  const minutes = computed(() => {
+    return Math.floor(remainingSeconds.value / 60)
+  })
+
+  const seconds = computed(() => {
+    return remainingSeconds.value % 60
+  })
+
   console.log('1', authStatus.value)
 
   const login = async (data: LoginCredentials) => {
@@ -20,7 +41,8 @@ export const useAuthStore = defineStore('auth', () => {
 
       token.value = loginResp.token
       authStatus.value = AuthStatus.Authenticated
-
+      expiracion.value = Date.now() + loginResp.tiempoRestante * 1000
+      console.warn('2', expiracion.value)
       return true
     } catch (error) {
       return logout()
@@ -35,10 +57,10 @@ export const useAuthStore = defineStore('auth', () => {
       }
       authStatus.value = AuthStatus.Authenticated
       token.value = statusResp.token
-      return false
+      return true
     } catch (error) {
       logout()
-      return true
+      return false
     }
   }
 
@@ -46,13 +68,21 @@ export const useAuthStore = defineStore('auth', () => {
     console.error('logout Ejecutado')
     authStatus.value = AuthStatus.NotAuthenticated
     token.value = ''
+    expiracion.value = 0
     return false
   }
+  watch(remainingSeconds, (value) => {
+    if (value <= 0 && token.value) {
+      logout()
+    }
+  })
 
   return {
     token,
     authStatus,
-
+    remainingSeconds,
+    minutes,
+    seconds,
     //Getters
 
     isChecking: computed(() => authStatus.value === AuthStatus.Checking),
