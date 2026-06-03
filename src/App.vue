@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { Toaster } from 'vue-sonner'
+import { VueQueryDevtools, VueQueryDevtoolsPanel } from '@tanstack/vue-query-devtools'
 
 import BaseModal from './common/modals/BaseModal.vue'
 import { useAuthStore } from './auth/store/auth.store'
@@ -58,6 +59,7 @@ onMounted(() => {
   <!-- <router-view></router-view> -->
   <Fullscreenloaded v-if="authStore.isChecking" />
   <router-view v-else />
+  <VueQueryDevtools />
 </template>
 
 <style scoped></style>

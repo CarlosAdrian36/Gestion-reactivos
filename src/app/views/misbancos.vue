@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 import { useModalStore } from '../store/modal.store'
 import crearCarpeta from '@/common/modals/views/crearCarpeta.vue'
 import type { Banco, Carpeta } from '../interface'
+import { getBancosAction } from '@/api/bancos/actions/get-bancos.actions'
 
 const router = useRouter()
 const bancoStore = useBancoStore()
@@ -19,6 +20,8 @@ onMounted(async () => {
 const { bancos, loading: bancosLoading } = storeToRefs(bancoStore)
 
 const { folders, loading: carpetasLoading } = storeToRefs(carpetaStore)
+
+getBancosAction()
 
 type ExplorerItem =
   | {
@@ -97,7 +100,6 @@ const abrirCrearCarpeta = () => {
     },
   ])
 }
-
 
 const itemClass = (item: ExplorerItem) => {
   return item.tipo === 'carpeta' ? 'bg-warning/10' : 'bg-primary/10'
