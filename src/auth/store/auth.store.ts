@@ -31,12 +31,14 @@ export const useAuthStore = defineStore('auth', () => {
 
   console.log('1', authStatus.value)
 
-  const login = async (data: LoginCredentials) => {
-    console.log('Aqui dio click en el login', authStatus.value)
+  const login = async (data: LoginCredentials): Promise<boolean> => {
+    authStatus.value = AuthStatus.Checking
+
+    // console.log('Aqui dio click en el login', authStatus.value)
     try {
       const loginResp = await loginAction(data)
       if (!loginResp.ok) {
-        logout()
+        clearSession()
         return false
       }
 
@@ -46,21 +48,22 @@ export const useAuthStore = defineStore('auth', () => {
       console.warn('2', expiracion.value)
       return true
     } catch (error) {
-      return logout()
+      clearSession()
+      return false
     }
   }
   const checkAuthStatus = async (): Promise<boolean> => {
+    authStatus.value = AuthStatus.Checking
     try {
       const statusResp = await checkAuthAction()
-      if (statusResp.ok === false) {
-        logout()
+      if (!statusResp) {
+        clearSession()
         return false
       }
       authStatus.value = AuthStatus.Authenticated
-      token.value = statusResp.token
       return true
     } catch (error) {
-      logout()
+      clearSession()
       return false
     }
   }
@@ -69,15 +72,13 @@ export const useAuthStore = defineStore('auth', () => {
     console.error('logout Ejecutado')
 
     try {
-      if (authStatus.value === AuthStatus.Authenticated) {
+      if (token.value) {
         const logoutResp = await logoutApi()
         console.warn('logoutResp', logoutResp)
         if (logoutResp === false) {
           return false
         }
-        authStatus.value = AuthStatus.NotAuthenticated
-        token.value = ''
-        expiracion.value = 0
+        clearSession()
         return true
       }
     } catch (error) {
@@ -85,9 +86,16 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
   }
+  const clearSession = () => {
+    token.value = ''
+    expiracion.value = 0
+    authStatus.value = AuthStatus.NotAuthenticated
+    localStorage.removeItem('token')
+    localStorage.removeItem('expiracion')
+  }
   watch(remainingSeconds, (value) => {
     if (value <= 0 && token.value) {
-      logout()
+      clearSession()
     }
   })
 

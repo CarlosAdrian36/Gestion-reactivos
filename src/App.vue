@@ -5,7 +5,8 @@ import { Toaster } from 'vue-sonner'
 import BaseModal from './common/modals/BaseModal.vue'
 import { useAuthStore } from './auth/store/auth.store'
 import { AuthStatus } from './auth/interface/auth-status.enum'
-import { watch } from 'vue'
+import { onMounted, watch } from 'vue'
+import Fullscreenloaded from './app/common/components/fullscreenloaded.vue'
 
 const authStore = useAuthStore()
 
@@ -15,10 +16,7 @@ const route = useRoute()
 authStore.$subscribe(
   (_, state) => {
     console.log('Estado de autenticación cambiado:', state.authStatus)
-    if (
-      state.authStatus === AuthStatus.NotAuthenticated ||
-      state.authStatus === AuthStatus.Checking
-    ) {
+    if (state.authStatus === AuthStatus.Checking) {
       if (localStorage.getItem('token')) {
         return authStore.checkAuthStatus()
       }
@@ -43,6 +41,9 @@ watch(
     }
   },
 )
+onMounted(() => {
+  authStore.checkAuthStatus()
+})
 </script>
 
 <template>
@@ -54,7 +55,9 @@ watch(
     close-button-position="top-left"
   />
   <BaseModal />
-  <router-view></router-view>
+  <!-- <router-view></router-view> -->
+  <Fullscreenloaded v-if="authStore.isChecking" />
+  <router-view v-else />
 </template>
 
 <style scoped></style>
