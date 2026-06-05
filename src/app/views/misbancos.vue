@@ -13,13 +13,7 @@ const { data, isLoading, error, isError } = useQuery({
   // refetchOnWindowFocus: true, // refetch al volver a la pestaña
   // refetchOnReconnect: true, // refetch al recuperar red
 })
-watchEffect(() => {
-  console.log({
-    data: data.value,
-    error: error.value,
-    isError: isError.value,
-  })
-})
+
 const itemClass = (item: ItemUnificado) => {
   return item.tipo === 'banco' ? ' bg-primary/10' : 'bg-warning/10'
 }
@@ -86,11 +80,11 @@ const isMobile = useMediaQuery('(max-width: 768px)')
 
               <th class="min-w-62.5">Nombre</th>
 
-              <th class="w-40 text-center">Compartido</th>
-
-              <th class="w-40 text-center">Elementos</th>
+              <th class="w-40 text-center">Contenido</th>
 
               <th class="w-52 text-center">Última modificación</th>
+
+              <th class="w-40 text-center">Compartido</th>
 
               <th class="w-32 text-center">Acciones</th>
             </tr>
@@ -109,12 +103,17 @@ const isMobile = useMediaQuery('(max-width: 768px)')
                   class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
                   :class="itemClass(value)"
                 >
-                  <i class="fa-regular fa-file-lines text-primary text-lg"></i>
-                  <!-- 'fa-regular fa-folder text-warning text-lg': value.tipo === 'carpeta', -->
+                  <i
+                    :class="{
+                      'fa-regular fa-folder text-warning text-lg': value.tipo === 'carpeta',
+
+                      'fa-regular fa-file-lines text-primary text-lg': value.tipo === 'banco',
+                    }"
+                  ></i>
                 </div>
               </td>
 
-              <!-- NAME -->
+              <!-- Nombre y descripción -->
               <td class="align-middle">
                 <div class="min-w-0">
                   <div class="flex items-center gap-2">
@@ -132,28 +131,21 @@ const isMobile = useMediaQuery('(max-width: 768px)')
                   </p>
                 </div>
               </td>
-              <!-- <td>
-                <div v-if="value.tipo === 'banco' && value.esCompartido === true">
-                  <i class="fa-regular fa-share-nodes text-xl"></i>
-                </div>
-              </td> -->
-
-              <!-- CONTENT -->
+              <!-- Contenido -->
               <td class="text-center align-middle">
-                <div class="flex justify-center">
-                  <div class="badge badge-ghost">
-                    {{ value.compartido }}
+                <div class="flex justify-center text-base-content/60">
+                  <div class="inline-flex items-center min-w-30">
+                    <span class="w-12 text-right font-mono">
+                      {{ value.id || 0 }}
+                    </span>
+
+                    <span class="ml-2 text-left">
+                      {{ value.tipo === 'banco' ? 'reactivos' : 'bancos' }}
+                    </span>
                   </div>
                 </div>
               </td>
-
-              <td class="text-center align-middle">
-                <div class="flex justify-center">
-                  <div class="badge badge-ghost">{{ value.id }}</div>
-                </div>
-              </td>
-
-              <!-- DATE -->
+              <!-- Última modificación -->
               <td class="text-center align-middle">
                 <div class="flex flex-col">
                   <span class="font-medium text-sm">
@@ -172,8 +164,33 @@ const isMobile = useMediaQuery('(max-width: 768px)')
                   }}
                 </span>
               </td>
+              <!-- Compartido -->
 
-              <!-- ACTIONS -->
+              <td class="text-center align-middle">
+                <div class="flex justify-center">
+                  <div
+                    v-if="value.tipo === 'banco'"
+                    class="inline-flex items-center text-success min-w-30"
+                  >
+                    <span class="w-5 text-center">
+                      <i class="fa-light fa-user-group"></i>
+                    </span>
+
+                    <span class="ml-2">
+                      {{ value.id }}
+                      {{ value.id === 1 ? 'usuario' : 'usuarios' }}
+                    </span>
+                  </div>
+
+                  <div v-else class="inline-flex items-center min-w-30">
+                    <span class="w-5 text-center">
+                      <i class="fa-regular fa-minus"></i>
+                    </span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Acciones -->
               <td class="text-center align-middle overflow-visible">
                 <div class="dropdown dropdown-end dropdown-left">
                   <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
