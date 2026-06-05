@@ -1,2 +1,1 @@
-export * from './carpetoInterface'
-export * from './bancoInterface'
+export * from '../unifiacados/interface/item-unificado.interface'

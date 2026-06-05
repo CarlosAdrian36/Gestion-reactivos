@@ -1,109 +1,29 @@
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue'
-import { useBancoStore } from '../store/bancos.store'
-import { useFolderStore } from '../store/folders.store'
-import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
-import { useModalStore } from '../store/modal.store'
-import crearCarpeta from '@/common/modals/views/crearCarpeta.vue'
-import type { Banco, Carpeta } from '../interface'
-import { getBancosAction } from '@/api/bancos/actions/get-bancos.actions'
+import { getItemsUnificadosAction } from '@/app/unifiacados/actions/get-items-unificados.actions'
+import { useQuery } from '@tanstack/vue-query'
+import { useMediaQuery } from '@vueuse/core'
+import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
+import { watchEffect } from 'vue'
 
-const router = useRouter()
-const bancoStore = useBancoStore()
-const carpetaStore = useFolderStore()
-const modal = useModalStore()
-onMounted(async () => {
-  await Promise.all([bancoStore.fetchBancos(), carpetaStore.fetchFolders()])
+const { data, isLoading, error, isError } = useQuery({
+  queryKey: ['items-unificados'],
+  queryFn: () => getItemsUnificadosAction(),
+  staleTime: 1000 * 60, // 1 minutes
+  // refetchOnMount: true, // refetch si está stale al montar
+  // refetchOnWindowFocus: true, // refetch al volver a la pestaña
+  // refetchOnReconnect: true, // refetch al recuperar red
 })
-
-const { bancos, loading: bancosLoading } = storeToRefs(bancoStore)
-
-const { folders, loading: carpetasLoading } = storeToRefs(carpetaStore)
-
-getBancosAction()
-
-type ExplorerItem =
-  | {
-      tipo: 'carpeta'
-      id: number
-      nombre: string
-      fechaModificacion: string
-      fechaCreacion?: string
-      bancos: number
-    }
-  | {
-      tipo: 'banco'
-      id: number
-      nombre: string
-      descripcion: string
-      fechaModificacion: string
-      fechaCreacion?: string
-      reactivos: number
-      estatus?: string
-      esCompartido: boolean
-      esProyecto: boolean
-      carpetaId: number | null
-    }
-
-// const items = computed<ExplorerItem[]>(() => [
-//   ...folders.value.map((carpeta: Carpeta) => ({
-//     ...carpeta,
-//     tipo: 'carpeta' as const,
-//   })),
-
-//   ...Array.from(bancoStore.misbancos.values()).map((banco) => ({
-//     ...banco,
-//     tipo: 'banco' as const,
-//   })),
-// ])
-
-const maperFolderToExplorerItem = (carpeta: Carpeta): ExplorerItem => ({
-  ...carpeta,
-  tipo: 'carpeta',
+watchEffect(() => {
+  console.log({
+    data: data.value,
+    error: error.value,
+    isError: isError.value,
+  })
 })
-
-const maperBancoToExplorerItem = (banco: Banco): ExplorerItem => ({
-  ...banco,
-  tipo: 'banco',
-})
-const items = computed(() => [
-  ...folders.value.map(maperFolderToExplorerItem),
-  ...Array.from(bancoStore.misbancos.values()).map(maperBancoToExplorerItem),
-])
-
-const loading = computed(() => bancosLoading.value || carpetasLoading.value)
-
-const goToItem = (item: ExplorerItem) => {
-  if (item.tipo === 'banco') {
-    router.push({ name: 'bancoDetalle', params: { id: item.id } })
-  } else {
-    // Si es carpeta, podrías navegar a una vista de carpeta o expandirla
-    // router.push({ name: 'detalleCarpeta', params: { id: item.id } })
-    console.log('Carpeta seleccionada:', item.nombre)
-  }
+const itemClass = (item: ItemUnificado) => {
+  return item.tipo === 'banco' ? ' bg-primary/10' : 'bg-warning/10'
 }
-
-const abrirCrearBanco = () => {
-  console.log('Abrir modal para crear banco')
-}
-const abrirCrearCarpeta = () => {
-  modal.openModal(crearCarpeta, { modo: 'crear' }, [
-    {
-      label: 'Cancelar',
-      variant: 'outline',
-    },
-    {
-      label: 'Crear',
-      variant: 'primary',
-      type: 'submit',
-    },
-  ])
-}
-
-const itemClass = (item: ExplorerItem) => {
-  return item.tipo === 'carpeta' ? 'bg-warning/10' : 'bg-primary/10'
-}
+const isMobile = useMediaQuery('(max-width: 768px)')
 </script>
 
 <template>
@@ -133,12 +53,10 @@ const itemClass = (item: ExplorerItem) => {
             class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
           >
             <li class="pb-2">
-              <button class="btn btn-soft btn-info" @click="abrirCrearBanco">
-                Banco de Reactivos
-              </button>
+              <button class="btn btn-soft btn-info" @click="">Banco de Reactivos</button>
             </li>
             <li>
-              <button class="btn btn-soft btn-warning" @click="abrirCrearCarpeta">Carpeta</button>
+              <button class="btn btn-soft btn-warning" @click="">Carpeta</button>
             </li>
           </ul>
         </div>
@@ -146,10 +64,13 @@ const itemClass = (item: ExplorerItem) => {
     </div>
 
     <!-- TABLA -->
-    <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible">
+    <div
+      v-if="!isMobile"
+      class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible"
+    >
       <!-- LOADING -->
-      <div class="overflow-x-auto">
-        <div v-if="loading" class="p-6 space-y-3">
+      <div class="overflow-visible">
+        <div v-if="isLoading" class="p-6 space-y-3">
           <div class="skeleton h-14 w-full"></div>
           <div class="skeleton h-16 w-full"></div>
           <div class="skeleton h-16 w-full"></div>
@@ -157,16 +78,17 @@ const itemClass = (item: ExplorerItem) => {
         </div>
 
         <!-- TABLE -->
-        <table v-else class="table table-fixed w-full">
+        <table v-else class="table table-fixed w-full block overflow-x-auto whitespace-nowrap">
           <!-- HEAD -->
           <thead class="bg-base-200">
             <tr>
               <th class="w-16 text-center">Tipo</th>
 
               <th class="min-w-62.5">Nombre</th>
-              <th class="w-10"></th>
 
-              <th class="w-40 text-center">Contenidos</th>
+              <th class="w-40 text-center">Compartido</th>
+
+              <th class="w-40 text-center">Elementos</th>
 
               <th class="w-52 text-center">Última modificación</th>
 
@@ -175,12 +97,11 @@ const itemClass = (item: ExplorerItem) => {
           </thead>
 
           <!-- BODY -->
-          <tbody v-if="items.length">
+          <tbody v-if="data && data.length > 0">
             <tr
-              v-for="value in items"
+              v-for="value in data"
               :key="value.id"
               class="hover transition-colors cursor-pointer"
-              @click="goToItem(value)"
             >
               <!-- ICON -->
               <td class="text-center align-middle">
@@ -188,13 +109,8 @@ const itemClass = (item: ExplorerItem) => {
                   class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
                   :class="itemClass(value)"
                 >
-                  <i
-                    :class="{
-                      'fa-regular fa-folder text-warning text-lg': value.tipo === 'carpeta',
-
-                      'fa-regular fa-file-lines text-primary text-lg': value.tipo === 'banco',
-                    }"
-                  ></i>
+                  <i class="fa-regular fa-file-lines text-primary text-lg"></i>
+                  <!-- 'fa-regular fa-folder text-warning text-lg': value.tipo === 'carpeta', -->
                 </div>
               </td>
 
@@ -208,7 +124,7 @@ const itemClass = (item: ExplorerItem) => {
                   </div>
 
                   <p
-                    v-if="value.tipo === 'banco'"
+                    v-if="value.descripcion"
                     class="text-sm text-base-content/60 truncate mt-1"
                     :title="value.descripcion"
                   >
@@ -216,22 +132,24 @@ const itemClass = (item: ExplorerItem) => {
                   </p>
                 </div>
               </td>
-              <td>
+              <!-- <td>
                 <div v-if="value.tipo === 'banco' && value.esCompartido === true">
                   <i class="fa-regular fa-share-nodes text-xl"></i>
                 </div>
-              </td>
+              </td> -->
 
               <!-- CONTENT -->
               <td class="text-center align-middle">
                 <div class="flex justify-center">
                   <div class="badge badge-ghost">
-                    {{
-                      value.tipo === 'carpeta'
-                        ? `${value.bancos} bancos`
-                        : `${value.reactivos} reactivos`
-                    }}
+                    {{ value.compartido }}
                   </div>
+                </div>
+              </td>
+
+              <td class="text-center align-middle">
+                <div class="flex justify-center">
+                  <div class="badge badge-ghost">{{ value.id }}</div>
                 </div>
               </td>
 
@@ -246,6 +164,13 @@ const itemClass = (item: ExplorerItem) => {
                     }}
                   </span>
                 </div>
+                <span class="text-sm text-base-content/60">
+                  {{
+                    new Date(value.fechaModificacion).toLocaleTimeString('es-ES', {
+                      timeStyle: 'short',
+                    })
+                  }}
+                </span>
               </td>
 
               <!-- ACTIONS -->
@@ -261,20 +186,13 @@ const itemClass = (item: ExplorerItem) => {
                   >
                     <li>
                       <a>
-                        <i class="fa-regular fa-eye"></i>
-                        Ver
-                      </a>
-                    </li>
-
-                    <li>
-                      <a>
-                        <i class="fa-regular fa-pen"></i>
+                        <i class="fa-regular fa-pen-to-square"></i>
                         Editar
                       </a>
                     </li>
                     <li>
                       <a>
-                        <i class="fa-regular fa-pen"></i>
+                        <i class="fa-regular fa-share"></i>
                         Compartir
                       </a>
                     </li>
@@ -326,6 +244,27 @@ const itemClass = (item: ExplorerItem) => {
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+    <!-- esto es para movil -->
+    <div v-else class="grid grid-cols-1 gap-4">
+      <div v-for="item in data" :key="item.id" class="card bg-base-100 shadow-md border">
+        <div class="card-body p-4">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <i class="fa-regular fa-file-lines text-primary"></i>
+            </div>
+            <div class="font-bold truncate">{{ item.nombre }}</div>
+          </div>
+          <p v-if="item.descripcion" class="text-sm text-base-content/60">{{ item.descripcion }}</p>
+          <div class="flex justify-between mt-3 text-sm">
+            <span class="badge badge-ghost">{{ item.compartido ? 'Compartido' : 'Privado' }}</span>
+            <span class="text-xs">{{ new Date(item.fechaModificacion).toLocaleDateString() }}</span>
+          </div>
+          <div class="card-actions justify-end mt-2">
+            <button class="btn btn-xs btn-ghost">Acciones</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
