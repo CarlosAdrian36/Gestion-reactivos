@@ -7,6 +7,7 @@ export const getBancosAction = async () => {
     // console.log('Estos son los bancos', data)
     return data
   } catch (error) {
+    console.log(error)
     throw new Error('Error al obtener los bancos')
   }
 }

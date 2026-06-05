@@ -3,7 +3,9 @@ import { getItemsUnificadosAction } from '@/app/unifiacados/actions/get-items-un
 import { useQuery } from '@tanstack/vue-query'
 import { useMediaQuery } from '@vueuse/core'
 import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
-import { watchEffect } from 'vue'
+import { useModalStore } from '@/common/modals/store/modal.store'
+import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
+const modal = useModalStore()
 
 const { data, isLoading, error, isError } = useQuery({
   queryKey: ['items-unificados'],
@@ -18,6 +20,20 @@ const itemClass = (item: ItemUnificado) => {
   return item.tipo === 'banco' ? ' bg-primary/10' : 'bg-warning/10'
 }
 const isMobile = useMediaQuery('(max-width: 768px)')
+
+function Carpeta() {
+  console.log('Abrir modal para crear carpeta')
+  modal.openModal(CrearCarpeta, {}, [
+    { label: 'Cerrar', variant: 'outline' },
+    {
+      label: 'Guardar',
+      variant: 'primary',
+      action: () => {
+        ;(alert('Guardado!'), modal.closeModal())
+      },
+    },
+  ])
+}
 </script>
 
 <template>
@@ -30,30 +46,15 @@ const isMobile = useMediaQuery('(max-width: 768px)')
         <p class="text-sm text-base-content/70">Administra carpetas y bancos de reactivos</p>
       </div>
 
-      <div class="flex items-center gap-2">
-        <!-- BOTON -->
-        <!-- <button class="btn btn-primary">
-          <i class="fa-regular fa-plus"></i>
-          Crear
-        </button> -->
-
-        <div class="dropdown dropdown-bottom dropdown-end">
-          <div tabindex="0" role="button" class="btn btn-primary">
-            <i class="fa-regular fa-plus"></i>Crear
-          </div>
-
-          <ul
-            tabindex="1"
-            class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-          >
-            <li class="pb-2">
-              <button class="btn btn-soft btn-info" @click="">Banco de Reactivos</button>
-            </li>
-            <li>
-              <button class="btn btn-soft btn-warning" @click="">Carpeta</button>
-            </li>
-          </ul>
-        </div>
+      <div v-if="data?.length" class="flex items-center gap-2">
+        <button class="btn bg-white" @click="Carpeta">
+          <i class="fa-regular fa-folder text-warning"></i>
+          Nueva Carpeta
+        </button>
+        <button class="btn btn-primary">
+          <i class="fa-regular fa-file-lines"></i>
+          Nuevo Banco
+        </button>
       </div>
     </div>
 
@@ -192,7 +193,7 @@ const isMobile = useMediaQuery('(max-width: 768px)')
 
               <!-- Acciones -->
               <td class="text-center align-middle overflow-visible">
-                <div class="dropdown dropdown-end dropdown-left">
+                <div class="dropdown dropdown-left">
                   <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
                     <i class="fa-regular fa-ellipsis-vertical"></i>
                   </div>
@@ -219,6 +220,19 @@ const isMobile = useMediaQuery('(max-width: 768px)')
                         <i class="fa-regular fa-copy"></i>
                         Copiar
                       </a>
+                    </li>
+                    <li>
+                      <div class="dropdown dropdown-hover">
+                        <!-- <div tabindex="0" role="button" class="btn m-1">Hover</div> -->
+                        Mover a
+                        <ul
+                          tabindex="-1"
+                          class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                        >
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                        </ul>
+                      </div>
                     </li>
 
                     <div class="divider my-1"></div>
@@ -252,10 +266,16 @@ const isMobile = useMediaQuery('(max-width: 768px)')
                     Puedes crear una carpeta o banco para comenzar
                   </p>
 
-                  <button class="btn btn-primary mt-5">
-                    <i class="fa-regular fa-plus"></i>
-                    Crear elemento
-                  </button>
+                  <div v-if="!data?.length" class="flex items-center gap-2 mt-5">
+                    <button class="btn bg-white" @click="Carpeta()">
+                      <i class="fa-regular fa-folder text-warning"> </i>
+                      Nueva Carpeta
+                    </button>
+                    <button class="btn btn-primary">
+                      <i class="fa-regular fa-file-lines"></i>
+                      Nuevo Banco
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>
