@@ -11,15 +11,12 @@ const { data, isLoading, error, isError } = useQuery({
   queryKey: ['items-unificados'],
   queryFn: () => getItemsUnificadosAction(),
   staleTime: 1000 * 60, // 1 minutes
-  // refetchOnMount: true, // refetch si está stale al montar
-  // refetchOnWindowFocus: true, // refetch al volver a la pestaña
-  // refetchOnReconnect: true, // refetch al recuperar red
+  refetchOnMount: true, // refetch si está stale al montar
+  refetchOnWindowFocus: true, // refetch al volver a la pestaña
+  refetchOnReconnect: true, // refetch al recuperar red
 })
 
-// createCarpetaAction({
-//   nombre:
-//     'Prueba de valor que se tiene que hacer , apra saber si se manda bien o no se manda bien el elemento',
-// })
+
 
 const itemClass = (item: ItemUnificado) => {
   return item.tipo === 'banco' ? ' bg-primary/10' : 'bg-warning/10'
@@ -28,7 +25,7 @@ const isMobile = useMediaQuery('(max-width: 768px)')
 
 function crearCarpeta() {
   console.log('Abrir modal para crear carpeta')
-  modal.openModal(CrearCarpeta, {modo: "crear"}, [
+  modal.openModal(CrearCarpeta, {}, [
     { label: 'Cerrar', variant: 'outline' },
     {
       label: 'Guardar',
@@ -37,6 +34,27 @@ function crearCarpeta() {
     },
   ])
 }
+
+
+function ActualizarCarpeta(item: ItemUnificado){
+  if (item.tipo !== 'carpeta') return
+  modal.openModal(CrearCarpeta, {carpeta:item.original},[
+        { label: 'Cerrar', variant: 'outline' },
+    {
+      label: 'Guardar',
+      variant: 'primary',
+      type: 'submit',
+    },
+  ])
+}
+function abrirModalEditar(event: Event,
+  item: ItemUnificado,) {
+  ;(document.activeElement as HTMLElement)?.blur()
+
+  ActualizarCarpeta(item)
+}
+
+
 </script>
 
 <template>
@@ -206,7 +224,7 @@ function crearCarpeta() {
                     class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
                   >
                     <li>
-                      <a>
+                      <a  @click="abrirModalEditar($event,value )"  >
                         <i class="fa-regular fa-pen-to-square"></i>
                         Editar
                       </a>

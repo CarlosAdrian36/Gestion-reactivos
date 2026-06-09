@@ -9,5 +9,5 @@ export interface getCarpetasResponse {
   carpetas: Carpeta[]
 }
 export interface createCarpetasResponse {
-  carpeta: Carpeta[]
+  carpeta: Carpeta
 }

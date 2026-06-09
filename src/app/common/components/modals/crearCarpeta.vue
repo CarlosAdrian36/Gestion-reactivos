@@ -1,5 +1,7 @@
 <template>
-  <h3 class="text-lg font-bold">Crear carpeta</h3>
+  <h3 class="text-lg font-bold">
+    {{ props.carpeta ? 'Editar carpeta' : 'Crear carpeta' }}
+  </h3>
   <!-- <from method="dialog">
     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
   </from> -->
@@ -9,6 +11,7 @@
       <label class="relative block">
         <input
           v-model="nombre"
+          v-bind="nombreAttrs"
           type="text"
           placeholder=" "
           class="peer w-full h-12 px-3 leading-5 bg-base-100 border border-neutral-400 rounded-md shadow-sm transition focus:shadow-none focus:border-primary focus:ring-1 focus:ring-primary/40 focus:outline-none"
@@ -31,15 +34,20 @@
 import z from 'zod'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
-import { createCarpetaAction } from '@/api/carpetas/actions/create-update-carpeta.action'
+import {
+  // createCarpetaAction,
+  saveCarpetaAction,
+} from '@/api/carpetas/actions/create-update-carpeta.action'
 import { useModalStore } from '@/app/store/modal.store'
 import { toast } from 'vue-sonner'
 import { isAxiosError } from 'axios'
 import { onMounted, onUnmounted } from 'vue'
-import { QueryClient, useQueryClient } from '@tanstack/vue-query'
-const props = defineProps({
-  modo: String,
-})
+import { useQueryClient } from '@tanstack/vue-query'
+import type { Carpeta } from '../../../../api/carpetas/interfaces/carpeta.interface'
+
+const props = defineProps<{
+  carpeta?: Carpeta
+}>()
 const queryClient = useQueryClient()
 const modal = useModalStore()
 const carpetaSchema = z.object({
@@ -59,7 +67,7 @@ const carpetaSchema = z.object({
 const { handleSubmit, errors, defineField, setFieldError, isSubmitting } = useForm({
   validationSchema: toTypedSchema(carpetaSchema),
   initialValues: {
-    nombre: '',
+    nombre: props.carpeta?.nombre ?? '',
   },
 })
 
@@ -69,14 +77,16 @@ const [nombre, nombreAttrs] = defineField('nombre')
 const onSubmit = handleSubmit(async (values) => {
   console.warn('Entro al submit')
   try {
-    await createCarpetaAction(values)
-    console.log('Formulario válido', values)
+    await saveCarpetaAction(values, props.carpeta?.carpetaId)
+
+    toast.success(
+      props.carpeta ? 'Carpeta actualizada correctamente' : 'Carpeta creada correctamente',
+    )
 
     await queryClient.invalidateQueries({
       queryKey: ['items-unificados'],
     })
 
-    toast.success('Carpeta creada correctamente')
     modal.closeModal()
   } catch (error) {
     console.log('Formulario inválido', errors)
