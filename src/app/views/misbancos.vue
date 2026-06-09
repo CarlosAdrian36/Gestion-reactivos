@@ -5,7 +5,6 @@ import { useMediaQuery } from '@vueuse/core'
 import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
-import { createCarpetaAction } from '@/api/carpetas/actions/create-update-carpeta.action.ts'
 const modal = useModalStore()
 
 const { data, isLoading, error, isError } = useQuery({
