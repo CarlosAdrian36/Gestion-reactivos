@@ -4,12 +4,13 @@ import { AuthStatus, type LoginCredentials } from '../interface'
 import { checkAuthAction, loginAction } from '../actions'
 import { useLocalStorage } from '@vueuse/core'
 import { logoutApi } from '../api/auth.api'
+import { useModalStore } from '@/app/store/modal.store'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')
   const authStatus = ref<AuthStatus>(AuthStatus.Checking)
   const expiracion = useLocalStorage('expiracion', 0)
-
+  const modal = useModalStore()
   const now = ref(Date.now())
 
   setInterval(() => {
@@ -87,6 +88,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   const clearSession = () => {
+    modal.isOpen = false
+    modal.closeModal()
     token.value = ''
     expiracion.value = 0
     authStatus.value = AuthStatus.NotAuthenticated
