@@ -11,7 +11,7 @@
           :key="i"
           class="btn"
           :class="{
-            'btn-primary': btn.variant === 'primary',
+            'btn-primary ': btn.variant === 'primary',
             'btn-error': btn.variant === 'error',
             'btn-outline': btn.variant === 'outline' || !btn.variant,
           }"

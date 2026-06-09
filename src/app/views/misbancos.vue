@@ -5,6 +5,7 @@ import { useMediaQuery } from '@vueuse/core'
 import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
+import { createCarpetaAction } from '@/api/carpetas/actions/create-update-carpeta.action.ts'
 const modal = useModalStore()
 
 const { data, isLoading, error, isError } = useQuery({
@@ -15,6 +16,11 @@ const { data, isLoading, error, isError } = useQuery({
   // refetchOnWindowFocus: true, // refetch al volver a la pestaña
   // refetchOnReconnect: true, // refetch al recuperar red
 })
+
+// createCarpetaAction({
+//   nombre:
+//     'Prueba de valor que se tiene que hacer , apra saber si se manda bien o no se manda bien el elemento',
+// })
 
 const itemClass = (item: ItemUnificado) => {
   return item.tipo === 'banco' ? ' bg-primary/10' : 'bg-warning/10'
@@ -28,9 +34,7 @@ function Carpeta() {
     {
       label: 'Guardar',
       variant: 'primary',
-      action: () => {
-        ;(alert('Guardado!'), modal.closeModal())
-      },
+      type: 'submit',
     },
   ])
 }
@@ -224,11 +228,78 @@ function Carpeta() {
                     <li>
                       <div class="dropdown dropdown-hover">
                         <!-- <div tabindex="0" role="button" class="btn m-1">Hover</div> -->
+                        <i class="fa-regular fa-folder"></i>
                         Mover a
                         <ul
                           tabindex="-1"
                           class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
                         >
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
+                          <li><a>Item 1</a></li>
+                          <li><a>Item 2</a></li>
                           <li><a>Item 1</a></li>
                           <li><a>Item 2</a></li>
                         </ul>

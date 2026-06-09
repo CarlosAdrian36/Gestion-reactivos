@@ -5,6 +5,9 @@ export interface Carpeta {
   fechaCreacion: string
   fechaModificacion: string
 }
-export interface CarpetasResponse {
+export interface getCarpetasResponse {
   carpetas: Carpeta[]
+}
+export interface createCarpetasResponse {
+  carpeta: Carpeta[]
 }

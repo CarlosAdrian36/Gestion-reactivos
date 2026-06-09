@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
@@ -34,15 +34,18 @@ const authStore = useAuthStore()
 const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
 
-const onSubmit = async () => {
+const onSubmit = handleSubmit(async () => {
   const ok = await authStore.login({
     nombreUsuario: usuario.value,
     password: contrasena.value,
   })
+  if (!ok) {
+    toast.error('Credenciales Incorrectas')
+  }
   console.log('Estado si paso o no:', ok)
   if (ok) return
-  toast.error('Credenciales incorrectas. Por favor, inténtalo de nuevo.')
-}
+  toast.error('Ocurrio un error inesperado')
+})
 </script>
 
 <template>
@@ -79,7 +82,7 @@ const onSubmit = async () => {
       </div>
 
       <!-- FORM -->
-      <form @submit.prevent="onSubmit" class="space-y-6">
+      <form @submit="onSubmit" class="space-y-6">
         <!-- Usuario -->
         <div>
           <label class="block text-sm font-medium text-base-content/80 mb-2"> Usuario </label>
