@@ -26,9 +26,9 @@ const itemClass = (item: ItemUnificado) => {
 }
 const isMobile = useMediaQuery('(max-width: 768px)')
 
-function Carpeta() {
+function crearCarpeta() {
   console.log('Abrir modal para crear carpeta')
-  modal.openModal(CrearCarpeta, {}, [
+  modal.openModal(CrearCarpeta, {modo: "crear"}, [
     { label: 'Cerrar', variant: 'outline' },
     {
       label: 'Guardar',
@@ -50,7 +50,7 @@ function Carpeta() {
       </div>
 
       <div v-if="data?.length" class="flex items-center gap-2">
-        <button class="btn bg-white" @click="Carpeta">
+        <button class="btn bg-white" @click="crearCarpeta()"">
           <i class="fa-regular fa-folder text-warning"></i>
           Nueva Carpeta
         </button>
@@ -337,7 +337,7 @@ function Carpeta() {
                   </p>
 
                   <div v-if="!data?.length" class="flex items-center gap-2 mt-5">
-                    <button class="btn bg-white" @click="Carpeta()">
+                    <button class="btn bg-white" @click="crearCarpeta()">
                       <i class="fa-regular fa-folder text-warning"> </i>
                       Nueva Carpeta
                     </button>

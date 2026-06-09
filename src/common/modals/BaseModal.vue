@@ -30,14 +30,15 @@ import { useModalStore } from './store/modal.store'
 import type { ModalButton } from './interface/modalButton.interface'
 
 const modal = useModalStore()
-const { isOpen, component, props, buttons } = storeToRefs(modal)
+const { isOpen, component, props, buttons, submitFN } = storeToRefs(modal)
 
-function handleButtonClick(btn: ModalButton) {
+async function handleButtonClick(btn: ModalButton) {
   if (btn.disabled) return
 
   // Solo dispara submit si el botón lo dice
   if (btn.type === 'submit') {
-    modal.submitFN?.()
+    console.log('Ejecutando Submit')
+    await submitFN.value?.()
     return
   }
 
