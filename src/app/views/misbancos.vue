@@ -1,10 +1,13 @@
 <script lang="ts" setup>
-import { getItemsUnificadosAction } from '@/app/unifiacados/actions/get-items-unificados.actions'
 import { useQuery } from '@tanstack/vue-query'
 import { useMediaQuery } from '@vueuse/core'
+
+import { getItemsUnificadosAction } from '@/app/unifiacados/actions/get-items-unificados.actions'
 import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
+import eliminarCarpeta from '../common/components/modals/eliminarCarpeta.vue'
+
 const modal = useModalStore()
 
 const { data, isLoading, error, isError } = useQuery({
@@ -29,6 +32,15 @@ function abrirModalCarpeta(carpeta?: ItemUnificado) {
     { label: 'Guardar', variant: 'primary', type: 'submit' },
   ])
 }
+
+function EliminarCarpeta(carpeta: ItemUnificado) {
+  closeDropdown()
+  modal.openModal(eliminarCarpeta, { carpeta: carpeta.original }, [
+    { label: 'Cerrar', variant: 'outline' },
+    { label: 'Eliminar', variant: 'error', type: 'submit' },
+  ])
+}
+
 function closeDropdown() {
   ;(document.activeElement as HTMLElement)?.blur()
 }
@@ -303,7 +315,7 @@ function closeDropdown() {
                     <div class="divider my-1"></div>
 
                     <li>
-                      <a class="text-error">
+                      <a @click="EliminarCarpeta(value)" class="text-error">
                         <i class="fa-regular fa-trash"></i>
                         Eliminar
                       </a>
