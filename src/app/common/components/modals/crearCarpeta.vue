@@ -42,13 +42,13 @@ import { useModalStore } from '@/app/store/modal.store'
 import { toast } from 'vue-sonner'
 import { isAxiosError } from 'axios'
 import { onMounted, onUnmounted } from 'vue'
-import { useQueryClient } from '@tanstack/vue-query'
 import type { Carpeta } from '../../../../api/carpetas/interfaces/carpeta.interface'
+import { useQueryClient } from '@tanstack/vue-query'
 
 const props = defineProps<{
   carpeta?: Carpeta
 }>()
-const queryClient = useQueryClient()
+// await props.afterSave?.()
 const modal = useModalStore()
 const carpetaSchema = z.object({
   nombre: z
@@ -70,26 +70,23 @@ const { handleSubmit, errors, defineField, setFieldError, isSubmitting } = useFo
     nombre: props.carpeta?.nombre ?? '',
   },
 })
-
+const queryClient = useQueryClient()
 // Campo
 const [nombre, nombreAttrs] = defineField('nombre')
 
 const onSubmit = handleSubmit(async (values) => {
-  console.warn('Entro al submit')
   try {
     await saveCarpetaAction(values, props.carpeta?.carpetaId)
 
     toast.success(
       props.carpeta ? 'Carpeta actualizada correctamente' : 'Carpeta creada correctamente',
     )
-
     await queryClient.invalidateQueries({
       queryKey: ['items-unificados'],
     })
 
     modal.closeModal()
   } catch (error) {
-    console.log('Formulario inválido', errors)
     if (isAxiosError(error)) {
       setFieldError('nombre', error.response?.data.detail ?? 'Error al crear carpeta')
     }
@@ -97,7 +94,6 @@ const onSubmit = handleSubmit(async (values) => {
 })
 
 onMounted(() => {
-  console.log('Registrando submit')
   modal.setSubmitFN(onSubmit)
 })
 

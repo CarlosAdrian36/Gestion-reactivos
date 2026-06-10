@@ -16,45 +16,22 @@ const { data, isLoading, error, isError } = useQuery({
   refetchOnReconnect: true, // refetch al recuperar red
 })
 
-
-
 const itemClass = (item: ItemUnificado) => {
   return item.tipo === 'banco' ? ' bg-primary/10' : 'bg-warning/10'
 }
 const isMobile = useMediaQuery('(max-width: 768px)')
 
-function crearCarpeta() {
-  console.log('Abrir modal para crear carpeta')
-  modal.openModal(CrearCarpeta, {}, [
+function abrirModalCarpeta(carpeta?: ItemUnificado) {
+  closeDropdown()
+  console.warn(carpeta?.id)
+  modal.openModal(CrearCarpeta, { carpeta: carpeta?.original }, [
     { label: 'Cerrar', variant: 'outline' },
-    {
-      label: 'Guardar',
-      variant: 'primary',
-      type: 'submit',
-    },
+    { label: 'Guardar', variant: 'primary', type: 'submit' },
   ])
 }
-
-
-function ActualizarCarpeta(item: ItemUnificado){
-  if (item.tipo !== 'carpeta') return
-  modal.openModal(CrearCarpeta, {carpeta:item.original},[
-        { label: 'Cerrar', variant: 'outline' },
-    {
-      label: 'Guardar',
-      variant: 'primary',
-      type: 'submit',
-    },
-  ])
-}
-function abrirModalEditar(event: Event,
-  item: ItemUnificado,) {
+function closeDropdown() {
   ;(document.activeElement as HTMLElement)?.blur()
-
-  ActualizarCarpeta(item)
 }
-
-
 </script>
 
 <template>
@@ -68,7 +45,7 @@ function abrirModalEditar(event: Event,
       </div>
 
       <div v-if="data?.length" class="flex items-center gap-2">
-        <button class="btn bg-white" @click="crearCarpeta()"">
+        <button class="btn bg-white" @click="abrirModalCarpeta()">
           <i class="fa-regular fa-folder text-warning"></i>
           Nueva Carpeta
         </button>
@@ -224,12 +201,12 @@ function abrirModalEditar(event: Event,
                     class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
                   >
                     <li>
-                      <a  @click="abrirModalEditar($event,value )"  >
+                      <a @click="abrirModalCarpeta(value)">
                         <i class="fa-regular fa-pen-to-square"></i>
                         Editar
                       </a>
                     </li>
-                    <li>
+                    <li v-if="value.tipo !== 'carpeta'">
                       <a>
                         <i class="fa-regular fa-share"></i>
                         Compartir
@@ -242,7 +219,7 @@ function abrirModalEditar(event: Event,
                         Copiar
                       </a>
                     </li>
-                    <li>
+                    <li v-if="value.tipo !== 'carpeta'">
                       <div class="dropdown dropdown-hover">
                         <!-- <div tabindex="0" role="button" class="btn m-1">Hover</div> -->
                         <i class="fa-regular fa-folder"></i>
@@ -355,7 +332,7 @@ function abrirModalEditar(event: Event,
                   </p>
 
                   <div v-if="!data?.length" class="flex items-center gap-2 mt-5">
-                    <button class="btn bg-white" @click="crearCarpeta()">
+                    <button class="btn bg-white" @click="abrirModalCarpeta()">
                       <i class="fa-regular fa-folder text-warning"> </i>
                       Nueva Carpeta
                     </button>

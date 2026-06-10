@@ -46,6 +46,7 @@ export const saveCarpetaAction = async (
 ): Promise<Carpeta> => {
   try {
     if (carpetaId) {
+      console.log('Actualizo ')
       const { data } = await apiClient.patch<createCarpetasResponse>(
         `/carpetas/${carpetaId}`,
         carpeta,
@@ -53,7 +54,7 @@ export const saveCarpetaAction = async (
 
       return data.carpeta
     }
-
+    console.log('Creoo')
     const { data } = await apiClient.post<createCarpetasResponse>('/carpetas', carpeta)
 
     return data.carpeta
