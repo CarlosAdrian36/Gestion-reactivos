@@ -154,8 +154,11 @@ function closeDropdown() {
               <td class="text-center align-middle">
                 <div class="flex justify-center text-base-content/60">
                   <div class="inline-flex items-center min-w-30">
-                    <span class="w-12 text-right font-mono">
-                      {{ value.id || 0 }}
+                    <span v-if="value.tipo === 'banco'" class="w-12 text-right font-mono">
+                      {{ value.cantidadReactivos || 0 }}
+                    </span>
+                    <span v-if="value.tipo === 'carpeta'" class="w-12 text-right font-mono">
+                      {{ value.cantidadBancos || 0 }}
                     </span>
 
                     <span class="ml-2 text-left">
@@ -196,7 +199,7 @@ function closeDropdown() {
                     </span>
 
                     <span class="ml-2">
-                      {{ value.id }}
+                      {{ value.cantidadCompartidos }}
                       {{ value.id === 1 ? 'usuario' : 'usuarios' }}
                     </span>
                   </div>
