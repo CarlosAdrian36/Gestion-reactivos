@@ -4,7 +4,7 @@ import { AuthStatus, type LoginCredentials } from '../interface'
 import { checkAuthAction, loginAction } from '../actions'
 import { useLocalStorage } from '@vueuse/core'
 import { logoutApi } from '../api/auth.api'
-import { useModalStore } from '@/app/store/modal.store'
+import { useModalStore } from '@/common/modals/store/modal.store'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')

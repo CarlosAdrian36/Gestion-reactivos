@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useModalStore } from '@/app/store/modal.store'
+import { useModalStore } from '@/common/modals/store/modal.store.ts'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import CerrarSesion from './modals/cerrarSesion.vue'
 import { useAuthStore } from '@/auth/store/auth.store.ts'

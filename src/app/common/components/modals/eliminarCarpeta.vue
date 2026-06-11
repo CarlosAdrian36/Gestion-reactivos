@@ -38,7 +38,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 
 import { deleteCarpeta } from '@/api/carpetas/actions/delete-carpeta.action'
 import type { Carpeta } from '@/api/carpetas/interfaces'
-import { useModalStore } from '@/app/store/modal.store'
+import { useModalStore } from '@/common/modals/store/modal.store'
 
 const modal = useModalStore()
 const queryClient = useQueryClient()
