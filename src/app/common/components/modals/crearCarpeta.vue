@@ -35,12 +35,12 @@ import z from 'zod'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { saveCarpetaAction } from '@/api/carpetas/actions/create-update-carpeta.action'
-import { useModalStore } from '@/app/store/modal.store'
 import { toast } from 'vue-sonner'
 import { isAxiosError } from 'axios'
 import { onMounted, onUnmounted } from 'vue'
 import type { Carpeta } from '../../../../api/carpetas/interfaces/carpeta.interface'
 import { useQueryClient } from '@tanstack/vue-query'
+import { useModalStore } from '@/common/modals/store/modal.store'
 
 const props = defineProps<{
   carpeta?: Carpeta

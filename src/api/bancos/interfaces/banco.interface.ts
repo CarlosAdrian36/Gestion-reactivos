@@ -1,12 +1,3 @@
-// export interface Banco {
-//   esProyecto: boolean
-//   fechaCreacion: Date
-//   fechaModificacion: Date
-//   bancoId: number
-//   nombre: string
-//   descripcion: string
-//   esCompartido: boolean
-// }
 export interface BancoResponse {
   bancos: Banco[]
 }
@@ -22,4 +13,8 @@ export interface Banco {
   propietarioCuentaId: number
   nombre: string
   descripcion: string
+}
+
+export interface createBancosResponse {
+  bancos: Banco
 }
