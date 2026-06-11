@@ -10,6 +10,9 @@ export const mapBanco = (banco: Banco): ItemUnificado => ({
   fechaModificacion: banco.fechaModificacion,
   compartido: banco.esCompartido,
   esProyecto: banco.esProyecto,
+  cantidadCompartidos: banco.cantidadCompartidos,
+  cantidadReactivos: banco.cantidadReactivos,
+  propietarioCuentaId: banco.propietarioCuentaId,
   original: banco,
 })
 

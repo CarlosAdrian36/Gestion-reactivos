@@ -7,6 +7,7 @@ import type { ItemUnificado } from '../unifiacados/interface/item-unificado.inte
 import { useModalStore } from '@/common/modals/store/modal.store'
 import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
 import eliminarCarpeta from '../common/components/modals/eliminarCarpeta.vue'
+import NuevoBanco from '../common/components/modals/nuevoBanco.vue'
 
 const modal = useModalStore()
 
@@ -40,6 +41,13 @@ function EliminarCarpeta(carpeta: ItemUnificado) {
     { label: 'Eliminar', variant: 'error', type: 'submit' },
   ])
 }
+function abrirModalBanco(banco?: ItemUnificado) {
+  closeDropdown()
+  modal.openModal(NuevoBanco, { banco: banco?.original }, [
+    { label: 'Cerrar', variant: 'outline' },
+    { label: 'Guardar', variant: 'primary', type: 'submit' },
+  ])
+}
 
 function closeDropdown() {
   ;(document.activeElement as HTMLElement)?.blur()
@@ -57,11 +65,11 @@ function closeDropdown() {
       </div>
 
       <div v-if="data?.length" class="flex items-center gap-2">
-        <button class="btn bg-white" @click="abrirModalCarpeta()">
+        <button class="btn bg-base-100" @click="abrirModalCarpeta()">
           <i class="fa-regular fa-folder text-warning"></i>
           Nueva Carpeta
         </button>
-        <button class="btn btn-primary">
+        <button class="btn btn-primary" @click="abrirModalBanco()">
           <i class="fa-regular fa-file-lines"></i>
           Nuevo Banco
         </button>
@@ -212,8 +220,14 @@ function closeDropdown() {
                     tabindex="0"
                     class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
                   >
-                    <li>
+                    <li v-if="value.tipo === 'carpeta'">
                       <a @click="abrirModalCarpeta(value)">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                        Editar
+                      </a>
+                    </li>
+                    <li v-if="value.tipo === 'banco'">
+                      <a @click="abrirModalBanco(value)">
                         <i class="fa-regular fa-pen-to-square"></i>
                         Editar
                       </a>
@@ -243,81 +257,23 @@ function closeDropdown() {
                           <li><a>Item 1</a></li>
                           <li><a>Item 2</a></li>
                           <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
                         </ul>
                       </div>
                     </li>
 
                     <div class="divider my-1"></div>
 
-                    <li>
+                    <li v-if="value.tipo === 'carpeta'">
                       <a @click="EliminarCarpeta(value)" class="text-error">
                         <i class="fa-regular fa-trash"></i>
                         Eliminar
+                      </a>
+                    </li>
+
+                    <li v-if="value.tipo === 'banco'">
+                      <a @click="" class="text-error">
+                        <i class="fa-regular fa-trash"></i>
+                        Eliminar banco
                       </a>
                     </li>
                   </ul>

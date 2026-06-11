@@ -10,6 +10,9 @@ export type ItemUnificado = {
   compartido?: boolean
   cantidadBancos?: number
   esProyecto?: boolean
+  cantidadCompartidos?: number
+  cantidadReactivos?: number
+  propietarioCuentaId?: number
 
   original: Banco | Carpeta
 }
