@@ -8,6 +8,7 @@ import { useModalStore } from '@/common/modals/store/modal.store'
 import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
 import eliminarCarpeta from '../common/components/modals/eliminarCarpeta.vue'
 import NuevoBanco from '../common/components/modals/nuevoBanco.vue'
+import eliminarBanco from '../common/components/modals/eliminarBanco.vue'
 
 const modal = useModalStore()
 
@@ -46,6 +47,13 @@ function abrirModalBanco(banco?: ItemUnificado) {
   modal.openModal(NuevoBanco, { banco: banco?.original }, [
     { label: 'Cerrar', variant: 'outline' },
     { label: 'Guardar', variant: 'primary', type: 'submit' },
+  ])
+}
+function EliminarBanco(Banco: ItemUnificado) {
+  closeDropdown()
+  modal.openModal(eliminarBanco, { banco: Banco.original }, [
+    { label: 'Cerrar', variant: 'outline' },
+    { label: 'Eliminar', variant: 'error', type: 'submit' },
   ])
 }
 
@@ -274,7 +282,7 @@ function closeDropdown() {
                     </li>
 
                     <li v-if="value.tipo === 'banco'">
-                      <a @click="" class="text-error">
+                      <a @click="EliminarBanco(value)" class="text-error">
                         <i class="fa-regular fa-trash"></i>
                         Eliminar banco
                       </a>
@@ -307,7 +315,7 @@ function closeDropdown() {
                       <i class="fa-regular fa-folder text-warning"> </i>
                       Nueva Carpeta
                     </button>
-                    <button class="btn btn-primary">
+                    <button class="btn btn-primary" @click="abrirModalBanco()">
                       <i class="fa-regular fa-file-lines"></i>
                       Nuevo Banco
                     </button>

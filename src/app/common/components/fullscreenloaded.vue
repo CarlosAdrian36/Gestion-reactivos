@@ -232,7 +232,9 @@ circle.on {
 </style>
 <template>
   <div class="h-screen w-screen flex items-center justify-center">
+    <!-- //El clas modifica el tamaño  -->
     <svg
+      class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20"" 
       viewBox="0 0 42 42"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
