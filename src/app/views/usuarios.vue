@@ -1,1 +1,139 @@
-<template>Aqui van los usuarios</template>
+<template>
+  <div class="max-w-7xl max-auto px-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+      <div>
+        <h1 class="text-2xl font-bold">Gestión de Usuarios</h1>
+
+        <p class="text-sm text-base-content/70">Administra usuarios dentro del sistema</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="btn btn-primary" @click="">
+          <i class="fa-regular fa-user"></i>
+          Nuevo Usuario
+        </button>
+      </div>
+    </div>
+    <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible">
+      <div class="overflow-visible">
+        <div v-if="isLoading" class="p-6 space-y-3">
+          <div class="skeleton h-14 w-full"></div>
+          <div class="skeleton h-16 w-full"></div>
+          <div class="skeleton h-16 w-full"></div>
+          <div class="skeleton h-16 w-full"></div>
+        </div>
+        <!-- TABLE 1 -->
+        <table v-else class="table table-fixed w-full block overflow-x-auto whitespace-nowrap">
+          <!-- HEAD -->
+          <thead class="bg-base-200">
+            <tr>
+              <th class="w-40 text-center align-middle">ID de ususario</th>
+
+              <th class="w-40 text-center align-middle">Nombre</th>
+
+              <th class="w-40 text-center align-middle">Correo electrónico</th>
+
+              <th class="w-20 text-center align-middle">Rol</th>
+
+              <!-- <th class="w-10 text-center">Compartido</th> -->
+
+              <th class="w-32 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody v-if="data && data?.length > 0">
+            <tr
+              v-for="value in data"
+              :key="value.guid"
+              class="hover transition-colors cursor-pointers"
+            >
+              <!-- Id -->
+              <td class="text-center align-middle">
+                {{ value.nombreUsuario }}
+              </td>
+
+              <!-- Nombre -->
+              <td class="text-center align-middle">
+                {{ value.identidad.nombre }} {{ value.identidad.apellidoPaterno }}
+                {{ value.identidad.apellidoMaterno }}
+              </td>
+
+              <td class="text-center align-middle">
+                {{ value.correos[0]?.direccion ?? 'Sin correo' }}
+              </td>
+              <td class="text-center align-middle">
+                {{ value.roles[0]?.nombre ?? 'Sin rol' }}
+              </td>
+              <td class="text-center align-middle">
+                <div class="dropdown dropdown-left">
+                  <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
+                    <i class="fa-regular fa-ellipsis-vertical"></i>
+                  </div>
+
+                  <ul
+                    tabindex="0"
+                    class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
+                  >
+                    <li>
+                      <a href="">Editar</a>
+                    </li>
+                    <li>
+                      <a href="">Editar</a>
+                    </li>
+                    <li>
+                      <a href="">Editar</a>
+                    </li>
+
+                    <div class="divider my-1"></div>
+
+                    <li>
+                      <a class="text-error">
+                        <i class="fa-regular fa-trash"></i>
+                        Eliminar
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td colspan="5">
+                <div class="flex flex-col items-center py-16">
+                  <div
+                    class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-4"
+                  >
+                    <i class="fa-regular fa-user text-4xl text-base-content/40"></i>
+                  </div>
+
+                  <h2 class="text-lg font-bold">No hay ususarios</h2>
+
+                  <p class="text-sm text-base-content/60 mt-1">
+                    Puedes crear un usuario para visualizarlo aqui
+                  </p>
+
+                  <div class="flex items-center gap-2 mt-5">
+                    <button class="btn bg-white" @click="">
+                      <i class="fa-regular fa-user"></i>
+                      Nuevo Usuario
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+<script lang="ts" setup>
+import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
+import { useQuery } from '@tanstack/vue-query'
+
+const { data, isLoading } = useQuery({
+  queryKey: ['Compartidos'],
+  queryFn: () => getUsuariosAction(),
+  staleTime: 1000 * 60,
+})
+</script>
