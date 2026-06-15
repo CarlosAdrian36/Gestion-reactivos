@@ -1,5 +1,7 @@
 <template>
-  <h3 class="text-lg font-bold">Nuevo Banco</h3>
+  <h3 class="text-lg font-bold">
+    {{ props.banco ? 'Editar banco' : 'Crear banco' }}
+  </h3>
 
   <div class="py-4">
     <div class="w-full">

@@ -257,83 +257,16 @@ function closeDropdown() {
                       </a>
                     </li>
                     <li v-if="value.tipo !== 'carpeta'">
-                      <div class="dropdown dropdown-hover">
-                        <!-- <div tabindex="0" role="button" class="btn m-1">Hover</div> -->
-                        <i class="fa-regular fa-folder"></i>
-                        Mover a
+                      <div class="dropdown">
+                        <div tabindex="0" role="button" class="m-1">
+                          <i class="fa-regular fa-folder"></i>
+                          Mover a
+                          <!-- <i class="fa-regular fa-angle-down"></i> -->
+                        </div>
                         <ul
                           tabindex="-1"
-                          class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                          class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
                         >
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
                           <li><a>Item 1</a></li>
                           <li><a>Item 2</a></li>
                           <li><a>Item 1</a></li>

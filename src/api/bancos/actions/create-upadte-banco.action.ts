@@ -10,7 +10,7 @@ export const saveBancoAction = async (
   try {
     if (BancoId) {
       console.log('Actualizacion')
-      const { data } = await apiClient.patch<createBancosResponse>(`/bancos/${BancoId}`, banco)
+      const { data } = await apiClient.put<createBancosResponse>(`/bancos/${BancoId}`, banco)
       return data.bancos
     }
     console.log('Creacion')

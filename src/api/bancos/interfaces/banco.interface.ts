@@ -10,7 +10,7 @@ export interface Banco {
   fechaCreacion: Date
   fechaModificacion: Date
   bancoId: number
-  propietarioCuentaId: number
+  // propietarioCuentaId: number
   nombre: string
   descripcion: string
 }
