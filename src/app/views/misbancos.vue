@@ -9,6 +9,7 @@ import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
 import eliminarCarpeta from '../common/components/modals/eliminarCarpeta.vue'
 import NuevoBanco from '../common/components/modals/nuevoBanco.vue'
 import eliminarBanco from '../common/components/modals/eliminarBanco.vue'
+import { useRouter } from 'vue-router'
 
 const modal = useModalStore()
 
@@ -59,6 +60,17 @@ function EliminarBanco(Banco: ItemUnificado) {
 
 function closeDropdown() {
   ;(document.activeElement as HTMLElement)?.blur()
+}
+
+const router = useRouter()
+
+const irADetalle = (item: ItemUnificado) => {
+  router.push({
+    name: item.tipo === 'carpeta' ? 'carpetaDetalle' : 'bancoDetalle',
+    params: {
+      id: item.id,
+    },
+  })
 }
 </script>
 
@@ -123,6 +135,7 @@ function closeDropdown() {
               v-for="value in data"
               :key="value.id"
               class="hover transition-colors cursor-pointer"
+              @click="irADetalle(value)"
             >
               <!-- ICON -->
               <td class="text-center align-middle">
@@ -223,7 +236,12 @@ function closeDropdown() {
               <!-- Acciones -->
               <td class="text-center align-middle overflow-visible">
                 <div class="dropdown dropdown-left">
-                  <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
+                  <div
+                    tabindex="0"
+                    role="button"
+                    class="btn btn-ghost btn-sm btn-circle"
+                    @click.stop
+                  >
                     <i class="fa-regular fa-ellipsis-vertical"></i>
                   </div>
 
@@ -232,13 +250,13 @@ function closeDropdown() {
                     class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
                   >
                     <li v-if="value.tipo === 'carpeta'">
-                      <a @click="abrirModalCarpeta(value)">
+                      <a @click.stop="abrirModalCarpeta(value)">
                         <i class="fa-regular fa-pen-to-square"></i>
                         Editar
                       </a>
                     </li>
                     <li v-if="value.tipo === 'banco'">
-                      <a @click="abrirModalBanco(value)">
+                      <a @click.stop="abrirModalBanco(value)">
                         <i class="fa-regular fa-pen-to-square"></i>
                         Editar
                       </a>

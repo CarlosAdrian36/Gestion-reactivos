@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useBancoStore } from '@/app/store/bancos.store'
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ListaReactivos from '../banconormal/components/lista-reactivos.vue'
@@ -11,11 +10,8 @@ const route = useRoute()
 const bancoId = route.params.id
 
 console.log(bancoId)
-const bancoStore = useBancoStore()
 
-onMounted(async () => {
-  await bancoStore.fetchBancoById(Number(route.params.id))
-})
+onMounted(async () => {})
 </script>
 
 <template>
@@ -26,13 +22,14 @@ onMounted(async () => {
         <div class="min-w-0 lg:col-span-8 flex flex-col gap-10">
           <header class="space-y-4">
             <h1 class="text-3xl md:text-5xl font-semibold wrap-break-word">
-              {{ bancoStore.selectedBanco?.nombre }}
+              <!-- {{ bancoStore.selectedBanco?.nombre }} -->
+              {{ bancoId }}
             </h1>
             <p class="text-base-content/70 max-w-2xl text-lg wrap-break-word">
-              {{ bancoStore.selectedBanco?.descripcion }}
+              <!-- {{ bancoStore.selectedBanco?.descripcion }} -->
             </p>
 
-            <div v-if="bancoStore.selectedBanco?.esProyecto" class="flex flex-wrap gap-3 pt-4">
+            <div class="flex flex-wrap gap-3 pt-4">
               <button class="btn btn-outline btn-sm md:btn-md rounded-full">
                 <i class="fa-solid fa-users"></i>
                 Miembros
@@ -135,7 +132,7 @@ onMounted(async () => {
                 </button>
               </div> -->
 
-              <div v-if="bancoStore.selectedBanco?.esProyecto" class="p-6">
+              <div class="p-6">
                 <div class="flex flex-row items-center mb-4">
                   <i class="fa-regular fa-comment-plus text-primary pe-2"></i>
                   <h2 class="text-xs font-bold uppercase tracking-widest">
@@ -150,10 +147,7 @@ onMounted(async () => {
             </div>
           </section>
 
-          <section
-            v-if="bancoStore.selectedBanco?.esProyecto"
-            class="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
+          <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="card bg-base-100 border border-base-300 shadow-sm">
               <div class="card-body p-5">
                 <div class="flex items-center gap-3">
@@ -176,7 +170,7 @@ onMounted(async () => {
           </section>
         </div>
 
-        <aside v-if="bancoStore.selectedBanco?.esProyecto" class="lg:col-span-4 mt-12 lg:mt-0">
+        <aside class="lg:col-span-4 mt-12 lg:mt-0">
           <div class="sticky py-1 flex flex-col gap-6">
             <div class="card bg-base-100 shadow-xl p-8 border border-base-300">
               <h3 class="text-2xl font-bold mb-10">Flujo de trabajo</h3>

@@ -1,4 +1,5 @@
 import LayoutPrincipal from '@/app/layout/layoutPrincipal.vue'
+import { bancoRoutes } from '@/app/routes'
 import { loginRoute } from '@/auth/routes'
 import { useAuthStore } from '@/auth/store/auth.store'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -18,6 +19,7 @@ const router = createRouter({
           name: 'misBancos',
           component: () => import('@/app/views/misbancos.vue'),
         },
+        ...bancoRoutes,
         {
           path: 'Proyectos',
           name: 'proyectos',
@@ -38,28 +40,9 @@ const router = createRouter({
           name: 'recursos',
           component: () => import('@/app/views/recursos.vue'),
         },
-        {
-          path: 'mis-bancos/banco/:id',
-          name: 'bancoDetalle',
-          component: () => import('@/app/bancos/bancodetalle/bancoMenu.vue'),
-        },
       ],
     },
   ],
 })
 
-// router.beforeEach((to) => {
-//   const authStore = useAuthStore()
-//   const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
-
-//   authStore.checkAuthStatus()
-
-//   if (requiresAuth && !authStore.isAuthenticated()) {
-//     return { name: 'login', query: { redirect: to.fullPath } }
-//   }
-
-//   if (to.name === 'login' && authStore.isAuthenticated()) {
-//     return { name: 'misBancos' }
-//   }
-// })
 export default router
