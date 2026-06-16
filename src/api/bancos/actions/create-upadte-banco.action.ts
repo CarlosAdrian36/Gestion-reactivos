@@ -1,21 +1,21 @@
 import { apiClient } from '@/api/http'
-import type { Banco, createBancosResponse } from '../interfaces/banco.interface'
+import type { Banco, CreateBancosResponse } from '../interfaces/banco.interface'
 import { isAxiosError } from 'axios'
-import type { CreateUpdateCarpetaRequest } from '@/api/carpetas/interfaces'
+import type { CreateUpdateBancoRequest } from '../interfaces/create-update-banco.interface'
 
 export const saveBancoAction = async (
-  banco: CreateUpdateCarpetaRequest,
-  BancoId?: number,
+  banco: CreateUpdateBancoRequest,
+  bancoId?: number,
 ): Promise<Banco> => {
   try {
-    if (BancoId) {
+    if (bancoId) {
       console.log('Actualizacion')
-      const { data } = await apiClient.put<createBancosResponse>(`/bancos/${BancoId}`, banco)
-      return data.bancos
+      const { data } = await apiClient.put<CreateBancosResponse>(`/bancos/${bancoId}`, banco)
+      return data.banco
     }
     console.log('Creacion')
-    const { data } = await apiClient.post<createBancosResponse>('/bancos', banco)
-    return data.bancos
+    const { data } = await apiClient.post<CreateBancosResponse>('/bancos', banco)
+    return data.banco
   } catch (error) {
     if (isAxiosError(error)) {
       console.log(error)

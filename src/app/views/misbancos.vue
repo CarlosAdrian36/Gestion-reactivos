@@ -235,7 +235,7 @@ const irADetalle = (item: ItemUnificado) => {
 
               <!-- Acciones -->
               <td class="text-center align-middle overflow-visible">
-                <div class="dropdown dropdown-left">
+                <div class="dropdown dropdown-left" @click.stop>
                   <div
                     tabindex="0"
                     role="button"

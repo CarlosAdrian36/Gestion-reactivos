@@ -53,7 +53,6 @@
 <script lang="ts" setup>
 import z from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
-import { isAxiosError } from 'axios'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useForm } from 'vee-validate'
 import { onMounted, onUnmounted } from 'vue'
@@ -63,9 +62,11 @@ import { saveBancoAction } from '@/api/bancos/actions/create-upadte-banco.action
 
 import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import { useModalStore } from '@/common/modals/store/modal.store'
+import { isAxiosError } from 'axios'
 
 const props = defineProps<{
   banco?: Banco
+  carpetaId?: number
 }>()
 
 const modal = useModalStore()
@@ -99,8 +100,9 @@ const [nombre, nombreAttrs] = defineField('nombre')
 const [descripcion, descripcionAttrs] = defineField('descripcion')
 
 const onSubmit = handleSubmit(async (values) => {
+  console.warn(props.carpetaId)
   try {
-    await saveBancoAction(values, props.banco?.bancoId)
+    await saveBancoAction({ ...values, carpetaId: props.carpetaId }, props.banco?.bancoId)
 
     toast.success(props.banco ? 'Banco Actualizado correctamente' : 'Banco creado correctamente')
     await queryClient.invalidateQueries({
@@ -109,6 +111,9 @@ const onSubmit = handleSubmit(async (values) => {
     modal.closeModal()
   } catch (error) {
     toast.error('Algo ocurrio y no se pudo completar la operacion')
+    if (isAxiosError(error)) {
+      setFieldError('nombre', 'Ya existe un banco con ese nombre')
+    }
   }
 })
 onMounted(() => {

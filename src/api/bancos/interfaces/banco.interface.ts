@@ -7,14 +7,14 @@ export interface Banco {
   esCompartido: boolean
   cantidadCompartidos: number
   cantidadReactivos: number
-  fechaCreacion: Date
-  fechaModificacion: Date
+  fechaCreacion: string
+  fechaModificacion: string
   bancoId: number
   // propietarioCuentaId: number
   nombre: string
   descripcion: string
 }
 
-export interface createBancosResponse {
-  bancos: Banco
+export interface CreateBancosResponse {
+  banco: Banco
 }

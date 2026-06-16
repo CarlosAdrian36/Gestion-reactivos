@@ -1,6 +1,5 @@
-export interface CreateUpdateRequest {
+export interface CreateUpdateBancoRequest {
   nombre: string
-  descripcion: string
-  esProyecto: boolean
-  esCompartido: boolean
+  descripcion?: string
+  carpetaId?: number
 }
