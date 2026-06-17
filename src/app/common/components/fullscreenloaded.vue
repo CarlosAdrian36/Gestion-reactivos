@@ -49,7 +49,7 @@
   }
 }
 </style> -->
-<style scoped>
+<style >
 circle {
   fill: var(--off);
 }
@@ -231,7 +231,7 @@ circle.on {
 }
 </style>
 <template>
-  <div class="h-screen w-screen flex items-center justify-center">
+  <div class="h-screen w-screen flex items-center justify-center bg-base-300">
     <!-- //El clas modifica el tamaño  -->
     <svg
       class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20"" 
