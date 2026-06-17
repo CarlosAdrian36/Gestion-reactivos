@@ -44,12 +44,20 @@ const queryClient = useQueryClient()
 
 const props = defineProps<{
   banco: Banco
+  carpetaId?: number
 }>()
 
 const onSubmit = async () => {
+  console.error(props.carpetaId)
   try {
     await deleteBanco(props.banco.bancoId)
     toast.success('Se elimino el banco correctamente')
+    if (props.carpetaId) {
+      console.log(props.carpetaId)
+      await queryClient.invalidateQueries({
+        queryKey: ['bancos-carpeta', props.carpetaId],
+      })
+    }
     await queryClient.invalidateQueries({
       queryKey: ['items-unificados'],
     })

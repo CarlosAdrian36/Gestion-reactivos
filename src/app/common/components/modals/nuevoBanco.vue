@@ -105,6 +105,11 @@ const onSubmit = handleSubmit(async (values) => {
     await saveBancoAction({ ...values, carpetaId: props.carpetaId }, props.banco?.bancoId)
 
     toast.success(props.banco ? 'Banco Actualizado correctamente' : 'Banco creado correctamente')
+    if (props.carpetaId) {
+      await queryClient.invalidateQueries({
+        queryKey: ['bancos-carpeta', props.carpetaId],
+      })
+    }
     await queryClient.invalidateQueries({
       queryKey: ['items-unificados'],
     })

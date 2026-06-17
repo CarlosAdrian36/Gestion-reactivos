@@ -10,7 +10,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button class="btn btn-primary" @click="abrirModalBanco()">
+        <button class="btn btn-primary" @click="abrirModalBanco(carpetaIdNumber)">
           <i class="fa-regular fa-file-lines"></i>
           Nuevo Banco
         </button>
@@ -192,7 +192,7 @@
                     <div class="divider my-1"></div>
 
                     <li>
-                      <a @click="" class="text-error">
+                      <a @click="Eliminar(value, carpetaIdNumber)" class="text-error">
                         <i class="fa-regular fa-trash"></i>
                         Eliminar banco
                       </a>
@@ -241,6 +241,8 @@ import { useModalStore } from '@/common/modals/store/modal.store'
 import { useQuery } from '@tanstack/vue-query'
 import { useRoute } from 'vue-router'
 
+import eliminarBanco from '@/app/common/components/modals/eliminarBanco.vue'
+
 const modal = useModalStore()
 const route = useRoute()
 
@@ -249,13 +251,27 @@ const carpetaIdNumber = Number(route.params.id)
 const { data, isLoading } = useQuery({
   queryKey: ['bancos-carpeta', carpetaIdNumber],
   queryFn: () => getBancoCarpetaAction(carpetaIdNumber),
+  staleTime: 1000 * 60, // 1 minutes
+  refetchOnMount: true, // refetch si está stale al montar
+  refetchOnWindowFocus: true, // refetch al volver a la pestaña
+  refetchOnReconnect: true, // refetch al recuperar red
 })
 
 function abrirModalBanco(carpetaId?: number, banco?: Banco) {
-  console.warn(carpetaId)
   modal.openModal(NuevoBanco, { carpetaId, banco }, [
     { label: 'Cerrar', variant: 'outline' },
     { label: 'Guardar', variant: 'primary', type: 'submit' },
   ])
+}
+
+function Eliminar(Banco: Banco, carpetaId?: number) {
+  closeDropdown()
+  modal.openModal(eliminarBanco, { banco: Banco, carpetaId }, [
+    { label: 'Cerrar', variant: 'outline' },
+    { label: 'Eliminar', variant: 'error', type: 'submit' },
+  ])
+}
+function closeDropdown() {
+  ;(document.activeElement as HTMLElement)?.blur()
 }
 </script>
