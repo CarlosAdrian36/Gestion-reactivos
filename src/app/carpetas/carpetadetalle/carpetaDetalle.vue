@@ -10,7 +10,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button class="btn btn-primary" @click="abrirModalBanco(carpetaIdNumber)">
+        <button class="btn btn-primary" @click="abrirModalBanco(undefined, carpetaIdNumber)">
           <i class="fa-regular fa-file-lines"></i>
           Nuevo Banco
         </button>
@@ -141,7 +141,7 @@
                     class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
                   >
                     <li>
-                      <a @click.stop="">
+                      <a @click.stop="abrirModalBanco(value, carpetaIdNumber)">
                         <i class="fa-regular fa-pen-to-square"></i>
                         Editar
                       </a>
@@ -219,7 +219,10 @@
                   </p>
 
                   <div class="flex items-center gap-2 mt-5">
-                    <button class="btn btn-primary" @click="abrirModalBanco(carpetaIdNumber)">
+                    <button
+                      class="btn btn-primary"
+                      @click="abrirModalBanco(undefined, carpetaIdNumber)"
+                    >
                       <i class="fa-regular fa-file-lines"></i>
                       Nuevo Banco
                     </button>
@@ -257,7 +260,8 @@ const { data, isLoading } = useQuery({
   refetchOnReconnect: true, // refetch al recuperar red
 })
 
-function abrirModalBanco(carpetaId?: number, banco?: Banco) {
+function abrirModalBanco(banco?: Banco, carpetaId?: number) {
+  console.warn('este es el id', banco?.bancoId)
   modal.openModal(NuevoBanco, { carpetaId, banco }, [
     { label: 'Cerrar', variant: 'outline' },
     { label: 'Guardar', variant: 'primary', type: 'submit' },
