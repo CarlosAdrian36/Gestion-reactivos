@@ -1,12 +1,15 @@
 <template>
   <div class="max-w-7xl mx-autopx-4">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
-      <div>
-        <h1 class="text-2xl font-bold">Carpeta: {{ carpetaIdNumber }}</h1>
+      <div class="flex flex-row gap-3.5">
+        <i class="fa-regular fa-folder text-warning text-5xl"></i>
+        <div>
+          <h1 class="text-2xl font-bold">Carpeta: {{ carpetaIdNumber }}</h1>
 
-        <p class="text-sm text-base-content/70">
-          Administra bancos de reactivos dentro de una carpeta
-        </p>
+          <p class="text-sm text-base-content/70">
+            Administra bancos de reactivos dentro de una carpeta
+          </p>
+        </div>
       </div>
 
       <div class="flex items-center gap-2">

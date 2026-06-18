@@ -319,7 +319,6 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
                           <i class="fa-regular fa-folder"></i>
                           Mover a
                         </div>
-
                         <ul
                           tabindex="-1"
                           class="menu dropdown-content bg-base-100 rounded-box z-1 w-72 p-2 shadow-xl border border-base-300"
@@ -333,12 +332,10 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
                               class="input input-sm input-bordered w-full"
                             />
                           </li>
-
                           <!-- LOADING -->
                           <li v-if="isLoadingCarpeta">
                             <div>Cargando carpetas...</div>
                           </li>
-
                           <!-- SIN RESULTADOS -->
                           <li
                             v-else-if="carpetasFiltradas.length === 0"
@@ -346,7 +343,6 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
                           >
                             No se encontraron carpetas
                           </li>
-
                           <!-- RESULTADOS -->
                           <li v-for="carpeta in carpetasFiltradas" :key="carpeta.carpetaId">
                             <a
@@ -360,7 +356,6 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
                                     : carpeta.nombre
                                 }}
                               </span>
-
                               <i class="fa-regular fa-folder text-warning"></i>
                             </a>
                           </li>
