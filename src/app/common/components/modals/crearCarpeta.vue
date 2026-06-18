@@ -81,6 +81,9 @@ const onSubmit = handleSubmit(async (values) => {
     await queryClient.invalidateQueries({
       queryKey: ['items-unificados'],
     })
+    await queryClient.invalidateQueries({
+      queryKey: ['carpetas'],
+    })
 
     modal.closeModal()
   } catch (error) {

@@ -1,16 +1,18 @@
 <script lang="ts" setup>
-import { useQuery } from '@tanstack/vue-query'
 import { useMediaQuery } from '@vueuse/core'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useRouter } from 'vue-router'
 
 import { getItemsUnificadosAction } from '@/app/unifiacados/actions/get-items-unificados.actions'
-import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
-import { useModalStore } from '@/common/modals/store/modal.store'
+import { getCarpetasAction } from '@/api/carpetas/actions/get-carpetas.actions.ts'
+
 import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
 import eliminarCarpeta from '../common/components/modals/eliminarCarpeta.vue'
 import NuevoBanco from '../common/components/modals/nuevoBanco.vue'
 import eliminarBanco from '../common/components/modals/eliminarBanco.vue'
-import { useRouter } from 'vue-router'
 
+import { useModalStore } from '@/common/modals/store/modal.store'
+import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
 const modal = useModalStore()
 
 const { data, isLoading, error, isError } = useQuery({
@@ -20,6 +22,15 @@ const { data, isLoading, error, isError } = useQuery({
   refetchOnMount: true, // refetch si está stale al montar
   refetchOnWindowFocus: true, // refetch al volver a la pestaña
   refetchOnReconnect: true, // refetch al recuperar red
+})
+
+const { data: carpetas, isLoading: isLoadingCarpeta } = useQuery({
+  queryKey: ['carpetas'],
+  queryFn: () => getCarpetasAction(),
+  staleTime: 1000 * 60,
+  refetchOnMount: true,
+  refetchOnWindowFocus: true,
+  refetchOnReconnect: true,
 })
 
 const itemClass = (item: ItemUnificado) => {
@@ -71,6 +82,34 @@ const irADetalle = (item: ItemUnificado) => {
       id: item.id,
     },
   })
+}
+
+import { computed, ref } from 'vue'
+import { moveBancoCarpeta } from '@/api/carpetas/actions/move-riaz-carpeta.action.ts'
+import { toast } from 'vue-sonner'
+
+const busquedaCarpeta = ref('')
+
+const carpetasFiltradas = computed(() => {
+  if (!carpetas.value) return []
+
+  return carpetas.value.filter((carpeta) =>
+    carpeta.nombre.toLowerCase().includes(busquedaCarpeta.value.toLowerCase()),
+  )
+})
+const queryClient = useQueryClient()
+const moverBanco = async (carpetaId: number, bancoId: number) => {
+  try {
+    const rep = await moveBancoCarpeta(carpetaId, bancoId)
+    if (rep.bancoAgregado === true) {
+      toast.success('Banco movido correctamente')
+      await queryClient.invalidateQueries({
+        queryKey: ['items-unificados'],
+      })
+    }
+  } catch (error) {
+    toast.error('Ocurrio algo inesperado')
+  }
 }
 </script>
 
@@ -279,27 +318,52 @@ const irADetalle = (item: ItemUnificado) => {
                         <div tabindex="0" role="button" class="m-1">
                           <i class="fa-regular fa-folder"></i>
                           Mover a
-                          <!-- <i class="fa-regular fa-angle-down"></i> -->
                         </div>
+
                         <ul
                           tabindex="-1"
-                          class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                          class="menu dropdown-content bg-base-100 rounded-box z-1 w-72 p-2 shadow-xl border border-base-300"
                         >
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 1</a></li>
-                          <li><a>Item 2</a></li>
-                          <li><a>Item 1</a></li>
+                          <!-- BUSCADOR -->
+                          <li class="sticky top-0 bg-base-100 z-10 p-2">
+                            <input
+                              v-model="busquedaCarpeta"
+                              type="text"
+                              placeholder="Buscar carpeta..."
+                              class="input input-sm input-bordered w-full"
+                            />
+                          </li>
+
+                          <!-- LOADING -->
+                          <li v-if="isLoadingCarpeta">
+                            <div>Cargando carpetas...</div>
+                          </li>
+
+                          <!-- SIN RESULTADOS -->
+                          <li
+                            v-else-if="carpetasFiltradas.length === 0"
+                            class="text-center text-base-content/60 py-2"
+                          >
+                            No se encontraron carpetas
+                          </li>
+
+                          <!-- RESULTADOS -->
+                          <li v-for="carpeta in carpetasFiltradas" :key="carpeta.carpetaId">
+                            <a
+                              @click="moverBanco(carpeta.carpetaId, value.id)"
+                              class="flex items-center justify-between"
+                            >
+                              <span class="truncate max-w-45" :title="carpeta.nombre">
+                                {{
+                                  carpeta.nombre.length > 30
+                                    ? carpeta.nombre.slice(0, 30) + '...'
+                                    : carpeta.nombre
+                                }}
+                              </span>
+
+                              <i class="fa-regular fa-folder text-warning"></i>
+                            </a>
+                          </li>
                         </ul>
                       </div>
                     </li>
