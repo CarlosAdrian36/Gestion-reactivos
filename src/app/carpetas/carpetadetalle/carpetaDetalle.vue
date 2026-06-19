@@ -61,7 +61,7 @@
               <tr
                 v-for="value in BancosCarpeta"
                 :key="value.bancoId"
-                class="hover transition-colors cursor-pointer"
+                class="hover transition-colors cursor-pointer hover:bg-base-300"
               >
                 <!-- ICON -->
                 <td class="text-center align-middle">
