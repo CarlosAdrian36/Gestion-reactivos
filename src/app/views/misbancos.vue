@@ -2,9 +2,13 @@
 import { useMediaQuery } from '@vueuse/core'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
+import { toast } from 'vue-sonner'
 
 import { getItemsUnificadosAction } from '@/app/unifiacados/actions/get-items-unificados.actions'
-import { getCarpetasAction } from '@/api/carpetas/actions/get-carpetas.actions.ts'
+import { moveBancoCarpeta } from '@/api/carpetas/actions/move-riaz-carpeta.action.ts'
+
+import { useCarpetas } from '@/api/carpetas/composable/useCarpetas.ts'
 
 import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
 import eliminarCarpeta from '../common/components/modals/eliminarCarpeta.vue'
@@ -13,6 +17,7 @@ import eliminarBanco from '../common/components/modals/eliminarBanco.vue'
 
 import { useModalStore } from '@/common/modals/store/modal.store'
 import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
+
 const modal = useModalStore()
 
 const { data, isLoading, error, isError } = useQuery({
@@ -24,14 +29,7 @@ const { data, isLoading, error, isError } = useQuery({
   refetchOnReconnect: true, // refetch al recuperar red
 })
 
-const { data: carpetas, isLoading: isLoadingCarpeta } = useQuery({
-  queryKey: ['carpetas'],
-  queryFn: () => getCarpetasAction(),
-  staleTime: 1000 * 60,
-  refetchOnMount: true,
-  refetchOnWindowFocus: true,
-  refetchOnReconnect: true,
-})
+const { data: carpetas, isLoading: isLoadingCarpeta } = useCarpetas()
 
 const itemClass = (item: ItemUnificado) => {
   return item.tipo === 'banco' ? ' bg-primary/10' : 'bg-warning/10'
@@ -84,10 +82,6 @@ const irADetalle = (item: ItemUnificado) => {
   })
 }
 
-import { computed, ref } from 'vue'
-import { moveBancoCarpeta } from '@/api/carpetas/actions/move-riaz-carpeta.action.ts'
-import { toast } from 'vue-sonner'
-
 const busquedaCarpeta = ref('')
 
 const carpetasFiltradas = computed(() => {
@@ -117,7 +111,8 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
   <div class="max-w-7xl mx-auto px-4">
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
-      <div>
+      <div class="">
+        <!-- <i class="fa-regular fa-code-branch"></i> -->
         <h1 class="text-2xl font-bold">Gestión de Bancos</h1>
 
         <p class="text-sm text-base-content/70">Administra carpetas y bancos de reactivos</p>
@@ -173,7 +168,7 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
             <tr
               v-for="value in data"
               :key="value.id"
-              class="hover transition-colors cursor-pointer"
+              class="hover transition-colors cursor-pointer hover:bg-base-300"
               @click="irADetalle(value)"
             >
               <!-- ICON -->

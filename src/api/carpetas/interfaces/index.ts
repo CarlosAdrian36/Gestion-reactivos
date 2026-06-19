@@ -1,3 +1,5 @@
 export * from './carpeta.interface'
 export * from './create-update-carpeta.interface'
 export * from './carpeta-delete.interface'
+export * from './carpeta-move.interface'
+export * from './moveBancoRequest.interface'

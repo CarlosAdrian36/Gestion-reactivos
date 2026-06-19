@@ -15,7 +15,7 @@
             <div class="skeleton h-4 w-80 mt-2"></div>
           </div>
           <div v-else>
-            <h1 class="text-2xl font-bold">Carpeta: {{ carpeta?.nombre }}</h1>
+            <h1 class="text-2xl font-bold">Carpeta: {{ carpetax?.nombre }}</h1>
             <p class="text-sm text-base-content/70">
               Administra bancos de reactivos dentro de una carpeta
             </p>
@@ -177,27 +177,64 @@
                           <div tabindex="0" role="button" class="m-1">
                             <i class="fa-regular fa-folder"></i>
                             Mover a
-                            <!-- <i class="fa-regular fa-angle-down"></i> -->
                           </div>
                           <ul
                             tabindex="-1"
-                            class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                            class="menu dropdown-content bg-base-100 rounded-box z-1 w-72 p-2 shadow-xl border border-base-300"
                           >
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 2</a></li>
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 2</a></li>
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 2</a></li>
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 2</a></li>
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 1</a></li>
-                            <li><a>Item 2</a></li>
-                            <li><a>Item 1</a></li>
+                            <!-- BUSCADOR -->
+                            <li class="sticky top-0 bg-base-100 z-10 p-2">
+                              <input
+                                v-model="busquedaCarpeta"
+                                type="text"
+                                placeholder="Buscar carpeta..."
+                                class="input input-sm input-bordered w-full"
+                              />
+                            </li>
+                            <!-- LOADING -->
+                            <li v-if="isLoadingCarpeta">
+                              <div>Cargando carpetas...</div>
+                            </li>
+                            <!-- SIN RESULTADOS -->
+                            <li
+                              v-else-if="carpetasFiltradas.length === 0"
+                              class="text-center text-base-content/60 py-2"
+                            >
+                              No se encontraron carpetas
+                            </li>
+                            <!-- RESULTADOS -->
+                            <li v-for="carpeta in carpetasFiltradas" :key="carpeta.carpetaId">
+                              <a
+                                :class="{
+                                  'pointer-events-none opacity-50 ':
+                                    carpetax?.carpetaId === carpeta.carpetaId,
+                                }"
+                                @click="
+                                  moverCarpetaACarpeta(
+                                    carpetax?.carpetaId!,
+                                    value.bancoId,
+                                    carpeta.carpetaId,
+                                  )
+                                "
+                                class="flex items-center justify-between"
+                              >
+                                <span class="truncate max-w-45" :title="carpeta.nombre">
+                                  {{
+                                    carpeta.nombre.length > 30
+                                      ? carpeta.nombre.slice(0, 30) + '...'
+                                      : carpeta.nombre
+                                  }}
+                                </span>
+                                <i
+                                  v-if="carpetax?.carpetaId === carpeta.carpetaId"
+                                  class="fa-solid fa-check text-success"
+                                ></i>
+                                <i v-else class="fa-regular fa-folder text-warning"></i>
+                              </a>
+                            </li>
+                            <li>
+                              <a class="flex items-center justify-between"> Sin carpeta </a>
+                            </li>
                           </ul>
                         </div>
                       </li>
@@ -255,17 +292,19 @@ import { getBancoCarpetaAction } from '@/api/bancos/actions'
 import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import NuevoBanco from '@/app/common/components/modals/nuevoBanco.vue'
 import { useModalStore } from '@/common/modals/store/modal.store'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useRoute } from 'vue-router'
 
 import eliminarBanco from '@/app/common/components/modals/eliminarBanco.vue'
 import { getCarpetaById } from '@/api/carpetas/actions/getById-carpeta.action'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useCarpetas } from '@/api/carpetas/composable/useCarpetas'
+import { moveCarpetaCarpeta } from '@/api/carpetas/actions/move-carpeta-carpeta.action'
+import { toast } from 'vue-sonner'
 
 const modal = useModalStore()
 const route = useRoute()
 
-// const carpetaId = computed(() => Number(route.params.id))
 const carpetaIdNumber = Number(route.params.id)
 const { data: BancosCarpeta, isLoading: isLoadingBancosCarpetas } = useQuery({
   queryKey: ['bancos-carpeta', carpetaIdNumber],
@@ -276,7 +315,7 @@ const { data: BancosCarpeta, isLoading: isLoadingBancosCarpetas } = useQuery({
   refetchOnReconnect: true, // refetch al recuperar red
 })
 
-const { data: carpeta, isLoading: isLoadingInformacionCarpeta } = useQuery({
+const { data: carpetax, isLoading: isLoadingInformacionCarpeta } = useQuery({
   queryKey: ['informacionCarpeta', carpetaIdNumber],
   queryFn: () => getCarpetaById(carpetaIdNumber),
   select: (res) => res.carpeta,
@@ -306,4 +345,40 @@ function Eliminar(Banco: Banco, carpetaId?: number) {
 function closeDropdown() {
   ;(document.activeElement as HTMLElement)?.blur()
 }
+
+const { data: carpetas, isLoading: isLoadingCarpeta } = useCarpetas()
+const queryClient = useQueryClient()
+
+const moverCarpetaACarpeta = async (carpetaId: number, bancoId: number, destino: number) => {
+  // const carpetaOrigen = carpetaId.toString()
+  const banco = bancoId.toString()
+  const DestinoC = destino.toString()
+
+  const origen = carpetaId.toString()
+  // console.warn(carpetaOrigen, banco)
+  // console.warn(typeof carpetaOrigen, typeof banco)
+  try {
+    const rep = await moveCarpetaCarpeta(origen, banco, DestinoC)
+    if (rep.bancoMovido === true) {
+      closeDropdown()
+      toast.success('Banco movido correctamente')
+      await queryClient.invalidateQueries({
+        queryKey: ['bancos-carpeta', carpetaIdNumber],
+      })
+    }
+  } catch (error) {
+    toast.error('Algo salio mal')
+  }
+}
+
+const busquedaCarpeta = ref('')
+
+const carpetasFiltradas = computed(() => {
+  console.warn(carpetax.value?.carpetaId)
+  if (!carpetas.value) return []
+
+  return carpetas.value.filter((carpeta) =>
+    carpeta.nombre.toLowerCase().includes(busquedaCarpeta.value.toLowerCase()),
+  )
+})
 </script>
