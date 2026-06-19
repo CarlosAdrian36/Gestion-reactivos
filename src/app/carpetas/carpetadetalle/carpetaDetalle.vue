@@ -233,7 +233,12 @@
                               </a>
                             </li>
                             <li>
-                              <a class="flex items-center justify-between"> Sin carpeta </a>
+                              <a
+                                @click="moveRaiz(carpetax?.carpetaId!, value.bancoId)"
+                                class="flex items-center justify-between"
+                              >
+                                Sin carpeta
+                              </a>
                             </li>
                           </ul>
                         </div>
@@ -301,6 +306,7 @@ import { computed, ref } from 'vue'
 import { useCarpetas } from '@/api/carpetas/composable/useCarpetas'
 import { moveCarpetaCarpeta } from '@/api/carpetas/actions/move-carpeta-carpeta.action'
 import { toast } from 'vue-sonner'
+import { moveCarpetaRaiz } from '@/api/carpetas/actions/move-carpeta-raiz.action'
 
 const modal = useModalStore()
 const route = useRoute()
@@ -348,6 +354,22 @@ function closeDropdown() {
 
 const { data: carpetas, isLoading: isLoadingCarpeta } = useCarpetas()
 const queryClient = useQueryClient()
+const moveRaiz = async (C: number, B: number) => {
+  const carpetaOrigen = C.toString()
+  const BancoMove = B.toString()
+  try {
+    const rep = await moveCarpetaRaiz(carpetaOrigen, BancoMove)
+    if (rep.bancoQuitado === true) {
+      closeDropdown()
+      toast.success('Banco movido correctamente')
+      await queryClient.invalidateQueries({
+        queryKey: ['bancos-carpeta', carpetaIdNumber],
+      })
+    }
+  } catch (error) {
+    toast.error('Algo salio mal')
+  }
+}
 
 const moverCarpetaACarpeta = async (carpetaId: number, bancoId: number, destino: number) => {
   // const carpetaOrigen = carpetaId.toString()
