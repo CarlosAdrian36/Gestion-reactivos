@@ -8,7 +8,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button class="btn btn-primary" @click="">
+        <button class="btn btn-primary" @click="NuevoUsuario()">
           <i class="fa-regular fa-user"></i>
           Nuevo Usuario
         </button>
@@ -129,11 +129,22 @@
 </template>
 <script lang="ts" setup>
 import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
+import { useModalStore } from '@/common/modals/store/modal.store'
 import { useQuery } from '@tanstack/vue-query'
+import CrearUsuario from '../common/components/modals/crearUsuario.vue'
 
 const { data, isLoading } = useQuery({
   queryKey: ['Compartidos'],
   queryFn: () => getUsuariosAction(),
   staleTime: 1000 * 60,
 })
+
+const modal = useModalStore()
+
+function NuevoUsuario() {
+  modal.openModal(CrearUsuario, {}, [
+    { label: 'Cerrar', variant: 'outline' },
+    { label: 'Guardar', variant: 'primary', type: 'submit' },
+  ])
+}
 </script>
