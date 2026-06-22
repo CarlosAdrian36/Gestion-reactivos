@@ -8,16 +8,20 @@ export const useModalStore = defineStore('modal', () => {
   const props = ref<Record<string, unknown>>({})
   const buttons = ref<ModalButton[]>([])
 
+  const modalClass = ref<string>('')
+
   const submitFN = ref<null | (() => Promise<void> | void)>(null)
   function openModal(
     componentRef: Component,
     componentProps = {},
     modalButton: ModalButton[] = [],
+    extraClass = '',
   ) {
     component.value = componentRef
     props.value = componentProps
     isOpen.value = true
     buttons.value = modalButton
+    modalClass.value = extraClass
   }
   function closeModal() {
     isOpen.value = false
@@ -25,11 +29,22 @@ export const useModalStore = defineStore('modal', () => {
     props.value = {}
     buttons.value = []
     submitFN.value = null
+    modalClass.value = ''
   }
 
   function setSubmitFN(fn: (() => void) | null) {
     submitFN.value = fn
   }
 
-  return { isOpen, component, props, buttons, submitFN, openModal, closeModal, setSubmitFN }
+  return {
+    isOpen,
+    component,
+    props,
+    buttons,
+    submitFN,
+    modalClass,
+    openModal,
+    closeModal,
+    setSubmitFN,
+  }
 })

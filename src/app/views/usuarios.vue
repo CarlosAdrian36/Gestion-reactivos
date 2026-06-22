@@ -142,9 +142,14 @@ const { data, isLoading } = useQuery({
 const modal = useModalStore()
 
 function NuevoUsuario() {
-  modal.openModal(CrearUsuario, {}, [
-    { label: 'Cerrar', variant: 'outline' },
-    { label: 'Guardar', variant: 'primary', type: 'submit' },
-  ])
+  modal.openModal(
+    CrearUsuario,
+    {},
+    [
+      { label: 'Cerrar', variant: 'outline' },
+      { label: 'Guardar', variant: 'primary', type: 'submit' },
+    ],
+    'max-w-5xl',
+  )
 }
 </script>

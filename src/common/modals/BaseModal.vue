@@ -1,6 +1,6 @@
 <template>
   <dialog class="modal" :open="isOpen">
-    <div class="modal-box">
+    <div class="modal-box" :class="modalClass">
       <!-- Contenido dinámico -->
       <component :is="component" v-bind="props" v-if="component" />
 
@@ -30,7 +30,7 @@ import { useModalStore } from './store/modal.store'
 import type { ModalButton } from './interface/modalButton.interface'
 
 const modal = useModalStore()
-const { isOpen, component, props, buttons, submitFN } = storeToRefs(modal)
+const { isOpen, component, props, buttons, submitFN, modalClass } = storeToRefs(modal)
 
 async function handleButtonClick(btn: ModalButton) {
   if (btn.disabled) return
