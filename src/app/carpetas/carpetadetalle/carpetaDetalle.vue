@@ -365,6 +365,9 @@ const moveRaiz = async (C: number, B: number) => {
       await queryClient.invalidateQueries({
         queryKey: ['bancos-carpeta', carpetaIdNumber],
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['items-unificados'],
+      })
     }
   } catch (error) {
     toast.error('Algo salio mal')
@@ -386,6 +389,9 @@ const moverCarpetaACarpeta = async (carpetaId: number, bancoId: number, destino:
       toast.success('Banco movido correctamente')
       await queryClient.invalidateQueries({
         queryKey: ['bancos-carpeta', carpetaIdNumber],
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['items-unificados'],
       })
     }
   } catch (error) {
