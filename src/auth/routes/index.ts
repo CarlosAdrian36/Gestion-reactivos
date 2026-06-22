@@ -14,5 +14,15 @@ export const loginRoute: RouteRecordRaw = {
       name: 'login',
       component: () => import('@/auth/views/login.vue'),
     },
+    {
+      path: 'enviar-correo',
+      name: 'EnviodeCorreo',
+      component: () => import('@/auth/views/envioCorreo.vue'),
+    },
+    {
+      path: 'establecerContrasena',
+      name: 'establecer',
+      component: () => import('@/auth/views/establecerContrasena.vue'),
+    },
   ],
 }

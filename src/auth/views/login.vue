@@ -113,12 +113,18 @@ const onSubmit = handleSubmit(async () => {
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-sm font-medium text-base-content/80"> Contraseña </label>
-            <!-- <router-link
-              :to="{ name: 'EnviarCorreo' }"
+            <router-link
+              :to="{ name: 'EnviodeCorreo' }"
               class="text-xs font-semibold text-primary hover:underline"
             >
               ¿Olvidaste tu contraseña?
-            </router-link> -->
+            </router-link>
+            <router-link
+              :to="{ name: 'establecer' }"
+              class="text-xs font-semibold text-primary hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </router-link>
           </div>
 
           <div class="relative group">
