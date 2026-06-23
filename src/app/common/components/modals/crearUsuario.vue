@@ -202,11 +202,12 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import z from 'zod'
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { getRolesAction } from '@/api/usuarios/actions/get-roles.actions'
-import { useQuery } from '@tanstack/vue-query'
-const tieneCaducidad = ref(false)
-
+import { useMutation, useQuery } from '@tanstack/vue-query'
+import { saveUser } from '@/api/usuarios/actions/create-users.action'
+import type { CreateUserRequest } from '@/api/usuarios/interfaces/createUser.interface'
+const modal = useModalStore()
 const usuarioSchema = z
   .object({
     nombreUsuario: z.string().trim().min(3, ' Al menos 3 caracteres'),
@@ -254,7 +255,8 @@ const [rol, rolAttrs] = defineField('rol')
 const [nombre, nombreAttrs] = defineField('nombre')
 const [apellidoPaterno, apellidoPaternoAttrs] = defineField('apellidoPaterno')
 const [apellidoMaterno, apellidoMaternoAttrs] = defineField('apellidoMaterno')
-const [tieneCaducidadAttrs] = defineField('tieneCaducidad')
+// const [tieneCaducidadAttrs] = defineField('tieneCaducidad')
+const [tieneCaducidad, tieneCaducidadAttrs] = defineField('tieneCaducidad')
 const [curp, curpAttrs] = defineField('curp')
 const [fechaExpiracion, fechaExpiracionAttrs] = defineField('fechaExpiracion')
 const [vigencia, vigenciaAttrs] = defineField('vigencia')
@@ -271,5 +273,46 @@ const {
   refetchOnMount: true, // refetch si está stale al montar
   refetchOnWindowFocus: true, // refetch al volver a la pestaña
   refetchOnReconnect: true, // refetch al recuperar red
+})
+const createUserMutation = useMutation({
+  mutationFn: saveUser,
+})
+
+import { toast } from 'vue-sonner'
+import { useModalStore } from '@/common/modals/store/modal.store'
+
+const onSubmit = handleSubmit(async (values) => {
+  try {
+    const payload: CreateUserRequest = {
+      nombreUsuario: values.nombreUsuario,
+      vigencia: values.vigencia,
+      correo: values.correo,
+      rol: values.rol,
+      nombre: values.nombre,
+      apellidoPaterno: values.apellidoPaterno,
+      apellidoMaterno: values.apellidoMaterno || null,
+      curp: values.curp || null,
+      fechaExpiracion:
+        values.tieneCaducidad && values.fechaExpiracion ? values.fechaExpiracion : null,
+    }
+
+    const response = await createUserMutation.mutateAsync(payload)
+
+    console.log(response.cuenta.guid)
+
+    toast.success('Usuario creado correctamente')
+
+    // modal.closeModal()
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : 'Error al crear usuario')
+  }
+})
+
+onMounted(() => {
+  modal.setSubmitFN(onSubmit)
+})
+
+onUnmounted(() => {
+  modal.setSubmitFN(null)
 })
 </script>
