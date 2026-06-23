@@ -5,7 +5,7 @@ export interface CreateUserRequest {
   rol: string
   nombre: string
   apellidoPaterno: string
-  apellidoMaterno: string | null
-  curp: string | null
-  fechaExpiracion: string | null
+  apellidoMaterno?: string
+  curp?: string
+  fechaExpiracion?: string
 }

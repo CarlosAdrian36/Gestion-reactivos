@@ -121,14 +121,11 @@
       <label class="form-control w-full">
         <span class="label-text mb-1">Rol</span>
 
-        <select
-          v-model="rol"
-          v-bind="rolAttrs"
-          class="select select-bordered w-full"
-          v-for="value in roles"
-        >
+        <select v-model="rol" v-bind="rolAttrs" class="select select-bordered w-full">
           <option value="">Seleccione un rol</option>
-          <option value="Administrador">{{ value.nombre }}</option>
+          <option v-for="value in roles" :key="value.rolId" :value="String(value.rolId)">
+            {{ value.nombre }}
+          </option>
         </select>
       </label>
 
@@ -137,29 +134,18 @@
       </p>
     </div>
 
-    <div class="md:col-span-3">
-      <!-- Fecha Expiración -->
-      <!-- <label class="form-control w-full">
-        <span class="label-text mb-1">Fecha de expiración</span>
-
-        <input
-          v-model="fechaExpiracion"
-          v-bind="fechaExpiracionAttrs"
-          type="date"
-          class="input input-bordered w-full"
-        />
-      </label>
-
-      <p v-if="errors.fechaExpiracion" class="text-error text-sm mt-1">
-        {{ errors.fechaExpiracion }}
-      </p> -->
-    </div>
+    <div class="md:col-span-3"></div>
     <!-- Fila 3 -->
     <div class="md:col-span-3">
       <div class="flex items-center gap-3 h-12">
         <span class="font-medium">Caducidad de la cuenta</span>
 
-        <input v-model="tieneCaducidad" type="checkbox" class="toggle toggle-success" />
+        <input
+          v-model="vigencia"
+          v-bind="vigenciaAttrs"
+          type="checkbox"
+          class="toggle toggle-success"
+        />
       </div>
 
       <div class="h-5"></div>
@@ -174,7 +160,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-show="tieneCaducidad">
+        <div v-show="vigencia">
           <label class="form-control w-full">
             <span class="label-text mb-1"> Fecha de expiración </span>
 
@@ -204,26 +190,27 @@ import { useForm } from 'vee-validate'
 import z from 'zod'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { getRolesAction } from '@/api/usuarios/actions/get-roles.actions'
-import { useMutation, useQuery } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { saveUser } from '@/api/usuarios/actions/create-users.action'
 import type { CreateUserRequest } from '@/api/usuarios/interfaces/createUser.interface'
+
+const queryClient = useQueryClient()
 const modal = useModalStore()
 const usuarioSchema = z
   .object({
     nombreUsuario: z.string().trim().min(3, ' Al menos 3 caracteres'),
     vigencia: z.boolean(),
     correo: z.string().email('Correo invalido'),
-    rol: z.string().trim().min(1, 'Debe seleccionar un rol'),
+    rol: z.string().min(1, 'Debe seleccionar un rol'),
     nombre: z.string().trim().min(2, ' Es obligatorio'),
     apellidoPaterno: z.string().trim().min(2, 'ES obligatorio'),
     apellidoMaterno: z.string().trim().nullable().optional(),
     curp: z.string().trim().length(18, '').nullable().optional().or(z.literal('')),
     fechaExpiracion: z.string().nullable().optional(),
-    tieneCaducidad: z.boolean(),
   })
   .refine(
     (data) => {
-      if (!data.tieneCaducidad) return true
+      if (!data.vigencia) return true
       return !!data.fechaExpiracion
     },
     {
@@ -237,7 +224,7 @@ const { handleSubmit, errors, defineField, isSubmitting } = useForm({
 
   initialValues: {
     nombreUsuario: '',
-    vigencia: true,
+    vigencia: false,
     correo: '',
     rol: '',
     nombre: '',
@@ -245,7 +232,6 @@ const { handleSubmit, errors, defineField, isSubmitting } = useForm({
     apellidoMaterno: '',
     curp: '',
     fechaExpiracion: '',
-    tieneCaducidad: false,
   },
 })
 
@@ -256,7 +242,6 @@ const [nombre, nombreAttrs] = defineField('nombre')
 const [apellidoPaterno, apellidoPaternoAttrs] = defineField('apellidoPaterno')
 const [apellidoMaterno, apellidoMaternoAttrs] = defineField('apellidoMaterno')
 // const [tieneCaducidadAttrs] = defineField('tieneCaducidad')
-const [tieneCaducidad, tieneCaducidadAttrs] = defineField('tieneCaducidad')
 const [curp, curpAttrs] = defineField('curp')
 const [fechaExpiracion, fechaExpiracionAttrs] = defineField('fechaExpiracion')
 const [vigencia, vigenciaAttrs] = defineField('vigencia')
@@ -267,7 +252,7 @@ const {
   error,
   isError,
 } = useQuery({
-  queryKey: ['Roles'],
+  queryKey: ['roles'],
   queryFn: () => getRolesAction(),
   staleTime: 1000 * 60, // 1 minutes
   refetchOnMount: true, // refetch si está stale al montar
@@ -280,26 +265,31 @@ const createUserMutation = useMutation({
 
 import { toast } from 'vue-sonner'
 import { useModalStore } from '@/common/modals/store/modal.store'
-
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const payload: CreateUserRequest = {
+    const user: CreateUserRequest = {
       nombreUsuario: values.nombreUsuario,
       vigencia: values.vigencia,
       correo: values.correo,
       rol: values.rol,
       nombre: values.nombre,
       apellidoPaterno: values.apellidoPaterno,
-      apellidoMaterno: values.apellidoMaterno || null,
-      curp: values.curp || null,
-      fechaExpiracion:
-        values.tieneCaducidad && values.fechaExpiracion ? values.fechaExpiracion : null,
+      ...(values.apellidoMaterno && {
+        apellidoMaterno: values.apellidoMaterno,
+      }),
+      ...(values.vigencia &&
+        values.fechaExpiracion && {
+          fechaExpiracion: values.fechaExpiracion,
+        }),
     }
 
-    const response = await createUserMutation.mutateAsync(payload)
+    const response = await createUserMutation.mutateAsync(user)
 
     console.log(response.cuenta.guid)
-
+    await queryClient.invalidateQueries({
+      queryKey: ['usuarios'],
+    })
+    modal.closeModal()
     toast.success('Usuario creado correctamente')
 
     // modal.closeModal()

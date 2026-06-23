@@ -66,17 +66,17 @@
               <td class="text-center align-middle">
                 <div class="flex gap-2">
                   <div class="tooltip" data-tip="Reenviar Correo">
-                    <button class="btn btn-success">
+                    <button class="btn btn-soft btn-success">
                       <i class="fa-regular fa-rotate-right"></i>
                     </button>
                   </div>
                   <div class="tooltip" data-tip="Editar">
-                    <button class="btn btn-info">
+                    <button class="btn btn-soft btn-info">
                       <i class="fa-regular fa-pen-to-square"></i>
                     </button>
                   </div>
                   <div class="tooltip" data-tip="Eliminar">
-                    <button class="btn btn-error">
+                    <button class="btn btn-soft btn-error">
                       <i class="fa-regular fa-trash"></i>
                     </button>
                   </div>
@@ -122,9 +122,12 @@ import { useQuery } from '@tanstack/vue-query'
 import CrearUsuario from '../common/components/modals/crearUsuario.vue'
 
 const { data, isLoading } = useQuery({
-  queryKey: ['Compartidos'],
+  queryKey: ['usuarios'],
   queryFn: () => getUsuariosAction(),
-  staleTime: 1000 * 60,
+  staleTime: 1000 * 60, // 1 minutes
+  refetchOnMount: true, // refetch si está stale al montar
+  refetchOnWindowFocus: true, // refetch al volver a la pestaña
+  refetchOnReconnect: true, // refetch al recuperar red
 })
 
 const modal = useModalStore()

@@ -17,6 +17,7 @@ import eliminarBanco from '../common/components/modals/eliminarBanco.vue'
 
 import { useModalStore } from '@/common/modals/store/modal.store'
 import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
+import CompartirBanco from '../common/components/modals/CompartirBanco.vue'
 
 const modal = useModalStore()
 
@@ -65,6 +66,19 @@ function EliminarBanco(Banco: ItemUnificado) {
     { label: 'Cerrar', variant: 'outline' },
     { label: 'Eliminar', variant: 'error', type: 'submit' },
   ])
+}
+
+function Compartirbanco(Banco: ItemUnificado) {
+  closeDropdown()
+  modal.openModal(
+    CompartirBanco,
+    { banco: Banco.original },
+    [
+      { label: 'Cerrar', variant: 'outline' },
+      { label: 'Compartir', variant: 'primary', type: 'submit' },
+    ],
+    'max-w-5xl',
+  )
 }
 
 function closeDropdown() {
@@ -296,7 +310,7 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
                       </a>
                     </li>
                     <li v-if="value.tipo !== 'carpeta'">
-                      <a>
+                      <a @click.stop="Compartirbanco(value)">
                         <i class="fa-regular fa-share"></i>
                         Compartir
                       </a>
