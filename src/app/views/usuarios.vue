@@ -64,34 +64,22 @@
                 {{ value.roles[0]?.nombre ?? 'Sin rol' }}
               </td>
               <td class="text-center align-middle">
-                <div class="dropdown dropdown-left">
-                  <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
-                    <i class="fa-regular fa-ellipsis-vertical"></i>
+                <div class="flex gap-2">
+                  <div class="tooltip" data-tip="Reenviar Correo">
+                    <button class="btn btn-success">
+                      <i class="fa-regular fa-rotate-right"></i>
+                    </button>
                   </div>
-
-                  <ul
-                    tabindex="0"
-                    class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
-                  >
-                    <li>
-                      <a href="">Editar</a>
-                    </li>
-                    <li>
-                      <a href="">Editar</a>
-                    </li>
-                    <li>
-                      <a href="">Editar</a>
-                    </li>
-
-                    <div class="divider my-1"></div>
-
-                    <li>
-                      <a class="text-error">
-                        <i class="fa-regular fa-trash"></i>
-                        Eliminar
-                      </a>
-                    </li>
-                  </ul>
+                  <div class="tooltip" data-tip="Editar">
+                    <button class="btn btn-info">
+                      <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+                  </div>
+                  <div class="tooltip" data-tip="Eliminar">
+                    <button class="btn btn-error">
+                      <i class="fa-regular fa-trash"></i>
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>
