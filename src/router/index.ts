@@ -40,6 +40,11 @@ const router = createRouter({
           name: 'recursos',
           component: () => import('@/app/views/recursos.vue'),
         },
+        {
+          path: 'Perfil',
+          name: 'perfil',
+          component: () => import('@/app/views/perfil.vue'),
+        },
       ],
     },
   ],

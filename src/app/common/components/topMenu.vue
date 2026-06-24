@@ -146,11 +146,21 @@ function cerrarSesion() {
         <ul
           class="menu menu-sm dropdown-content bg-base-100 rounded-2xl z-50 mt-3 w-60 p-2 shadow-xl border border-base-300"
         >
+          <li v-if="authStore.user" class="menu-header px-3 py-2">
+            <span class="text-sm font-semibold truncate">
+              {{ authStore.user.identidad.nombre }}
+              {{ authStore.user.identidad.apellidoPaterno }}
+            </span>
+            <span class="text-xs text-base-content/60 truncate">
+              &#64;{{ authStore.user.nombreUsuario }}
+            </span>
+          </li>
+          <div class="divider my-1"></div>
           <li>
-            <a class="text-sm">
+            <RouterLink :to="{ name: 'perfil' }" class="text-sm">
               <i class="fa-regular fa-user"></i>
               Perfil
-            </a>
+            </RouterLink>
           </li>
 
           <li>

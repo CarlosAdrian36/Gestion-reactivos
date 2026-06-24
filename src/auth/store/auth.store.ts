@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { AuthStatus, type LoginCredentials } from '../interface'
+import { AuthStatus, type Cuenta, type LoginCredentials } from '../interface'
 import { checkAuthAction, loginAction } from '../actions'
+import { getPerfilAction } from '@/api/usuarios/actions/get-perfil.action'
 import { useLocalStorage } from '@vueuse/core'
 import { logoutApi } from '../api/auth.api'
 import { useModalStore } from '@/common/modals/store/modal.store'
@@ -10,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')
   const authStatus = ref<AuthStatus>(AuthStatus.Checking)
   const expiracion = useLocalStorage('expiracion', 0)
+  const user = ref<Cuenta | null>(null)
   const modal = useModalStore()
   const now = ref(Date.now())
 
@@ -46,7 +48,9 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = loginResp.token
       authStatus.value = AuthStatus.Authenticated
       expiracion.value = Date.now() + loginResp.tiempoRestante * 1000
-      console.warn('2', expiracion.value)
+
+      await loadUserProfile()
+
       return true
     } catch (error) {
       clearSession()
@@ -62,10 +66,22 @@ export const useAuthStore = defineStore('auth', () => {
         return false
       }
       authStatus.value = AuthStatus.Authenticated
+
+      await loadUserProfile()
+
       return true
     } catch (error) {
       clearSession()
       return false
+    }
+  }
+
+  const loadUserProfile = async () => {
+    try {
+      const perfil = await getPerfilAction()
+      user.value = perfil
+    } catch (error) {
+      console.error('Error al cargar perfil:', error)
     }
   }
 
@@ -92,6 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
     modal.closeModal()
     token.value = ''
     expiracion.value = 0
+    user.value = null
     authStatus.value = AuthStatus.NotAuthenticated
     localStorage.removeItem('token')
     localStorage.removeItem('expiracion')
@@ -105,6 +122,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     token,
     authStatus,
+    user,
     remainingSeconds,
     minutes,
     seconds,
@@ -117,5 +135,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     checkAuthStatus,
+    loadUserProfile,
   }
 })
