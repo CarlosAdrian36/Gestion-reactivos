@@ -7,9 +7,13 @@ const apiClient = axios.create({
 })
 // Interceptrors
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers['Token'] = token
+  // const token = localStorage.getItem('token')
+  if (!config.headers['Token']) {
+    const token = localStorage.getItem('token')
+
+    if (token) {
+      config.headers['Token'] = token
+    }
   }
   return config
 })

@@ -12,7 +12,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: LayoutPrincipal,
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
       children: [
         {
           path: 'mis-bancos',

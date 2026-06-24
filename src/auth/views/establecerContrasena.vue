@@ -3,6 +3,9 @@ import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { establecerContrasena } from '../actions/establecercontrasena.action'
+import { toast } from 'vue-sonner'
 
 const showPassword = ref(false)
 
@@ -37,12 +40,31 @@ const { handleSubmit, errors, values, defineField, submitCount } = useForm<Reset
     confirmacion: '',
   },
 })
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit(async (values) => {
   console.log('Formulario válido:', values)
+  try {
+    await establecerContrasena(
+      {
+        password: values.confirmacion,
+      },
+      solicitud,
+    )
+    toast.success('Usuario creado exitosamente')
+  } catch (error: any) {
+    console.log(error.response?.data)
+    console.log(error.response?.status)
+  }
 })
 
 const [contrasena, contrasenaAttrs] = defineField('contrasena')
 const [confirmacion, confirmacionAttrs] = defineField('confirmacion')
+
+const route = useRoute()
+const solicitud = route.query.SolicitudId as string
+console.log(solicitud)
+console.log(route.query)
+console.log(route.query.Solicitud)
+console.log(route.query.SolicitudId)
 </script>
 
 <template>

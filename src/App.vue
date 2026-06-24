@@ -33,7 +33,7 @@ authStore.$subscribe(
 watch(
   () => authStore.authStatus,
   (status) => {
-    if (status === AuthStatus.NotAuthenticated) {
+    if (status === AuthStatus.NotAuthenticated && route.meta?.requiresAuth) {
       router.replace({ name: 'login' })
     }
 
