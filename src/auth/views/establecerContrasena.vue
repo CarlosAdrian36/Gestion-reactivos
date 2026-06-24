@@ -3,12 +3,13 @@ import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { establecerContrasena } from '../actions/establecercontrasena.action'
 import { toast } from 'vue-sonner'
 
+const isSubmitting = ref(false)
 const showPassword = ref(false)
-
+const router = useRouter()
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
@@ -49,10 +50,14 @@ const onSubmit = handleSubmit(async (values) => {
       },
       solicitud,
     )
-    toast.success('Usuario creado exitosamente')
+    toast.success('Contraseña establecida correctamente. Redirigiendo al inicio de sesión...')
+    setTimeout(() => {
+      router.replace('/auth/login')
+    }, 1500)
   } catch (error: any) {
-    console.log(error.response?.data)
-    console.log(error.response?.status)
+    toast.error(error.response?.data?.detail ?? 'Ocurrió un error al establecer la contraseña')
+  } finally {
+    isSubmitting.value = false
   }
 })
 
@@ -257,9 +262,14 @@ console.log(route.query.SolicitudId)
         <!-- Button -->
         <button
           type="submit"
+          :disabled="isSubmitting"
           class="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition-all active:scale-[0.98]"
         >
-          Establecer
+          <span v-if="isSubmitting">
+            <span class="loading loading-spinner"></span>
+          </span>
+          <span v-if="!isSubmitting"> Establecer </span>
+          <span v-else> Estableciendo contraseña </span>
         </button>
       </form>
     </div>

@@ -119,12 +119,6 @@ const onSubmit = handleSubmit(async () => {
             >
               ¿Olvidaste tu contraseña?
             </router-link>
-            <router-link
-              :to="{ name: 'establecer' }"
-              class="text-xs font-semibold text-primary hover:underline"
-            >
-              ¿Olvidaste tu contraseña?
-            </router-link>
           </div>
 
           <div class="relative group">
