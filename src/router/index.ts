@@ -2,8 +2,9 @@ import LayoutPrincipal from '@/app/layout/layoutPrincipal.vue'
 import { bancoRoutes } from '@/app/routes'
 import { loginRoute } from '@/auth/routes'
 import { createRouter, createWebHistory } from 'vue-router'
-import { isAuthenticatedGuard } from '@/auth/guards/is-authenticated.guard'
-import { isNotAuthenticatedGuard } from '@/auth/guards/is-not-authenticated.guard'
+import { useAuthStore } from '@/auth/store/auth.store'
+import { AuthStatus } from '@/auth/interface/auth-status.enum'
+import { hasRequiredRoles } from '@/auth/guards/role.guard'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +36,7 @@ const router = createRouter({
           path: 'Usuarios',
           name: 'usuarios',
           component: () => import('@/app/views/usuarios.vue'),
+          meta: { roles: ['Administrador'] },
         },
         {
           path: 'Recursos',
@@ -46,20 +48,47 @@ const router = createRouter({
           name: 'perfil',
           component: () => import('@/app/views/perfil.vue'),
         },
+        {
+          path: 'Forbidden',
+          name: 'forbidden',
+          component: () => import('@/app/views/forbidden.vue'),
+        },
       ],
     },
   ],
 })
 
 router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+
   if (to.meta?.requiresAuth) {
-    await isAuthenticatedGuard(to, from, next)
-    return
+    if (authStore.authStatus === AuthStatus.Checking) {
+      await authStore.checkAuthStatus()
+    }
+
+    if (authStore.authStatus === AuthStatus.NotAuthenticated) {
+      next({ name: 'login' })
+      return
+    }
   }
 
   if (to.path.startsWith('/auth')) {
-    await isNotAuthenticatedGuard(to, from, next)
-    return
+    if (authStore.authStatus === AuthStatus.Checking) {
+      await authStore.checkAuthStatus()
+    }
+
+    if (authStore.authStatus === AuthStatus.Authenticated) {
+      next({ name: 'misBancos' })
+      return
+    }
+  }
+
+  const requiredRoles = to.meta?.roles as string[] | undefined
+  if (requiredRoles && requiredRoles.length > 0) {
+    if (!hasRequiredRoles(requiredRoles)) {
+      next({ name: 'forbidden' })
+      return
+    }
   }
 
   next()

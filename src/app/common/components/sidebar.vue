@@ -1,8 +1,10 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { useSidebarStore } from '../store/ui/sidebarStore'
+import { useAuthStore } from '@/auth/store/auth.store'
 
 const sidebar = useSidebarStore()
+const authStore = useAuthStore()
 </script>
 
 <template>
@@ -82,7 +84,9 @@ const sidebar = useSidebarStore()
             </a>
           </RouterLink>
         </li>
-        <li>
+        <li
+          v-if="authStore.user?.roles?.some(r => r.nombre === 'Administrador')"
+        >
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'usuarios' }">
             <a
               @click="navigate"
