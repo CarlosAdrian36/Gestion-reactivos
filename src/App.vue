@@ -13,23 +13,7 @@ const authStore = useAuthStore()
 
 const router = useRouter()
 const route = useRoute()
-//detectar cambios en el estado de autenticación
-authStore.$subscribe(
-  (_, state) => {
-    console.log('Estado de autenticación cambiado:', state.authStatus)
-    if (state.authStatus === AuthStatus.Checking) {
-      if (localStorage.getItem('token')) {
-        return authStore.checkAuthStatus()
-      }
-    }
-    if (route.path.includes('/auth') && state.authStatus === AuthStatus.Authenticated) {
-      return router.replace({ name: 'misBancos' })
-    }
-  },
-  {
-    immediate: true,
-  },
-)
+
 watch(
   () => authStore.authStatus,
   (status) => {
@@ -42,6 +26,7 @@ watch(
     }
   },
 )
+
 onMounted(() => {
   authStore.checkAuthStatus()
 })
@@ -56,7 +41,6 @@ onMounted(() => {
     close-button-position="top-left"
   />
   <BaseModal />
-  <!-- <router-view></router-view> -->
   <Fullscreenloaded v-if="authStore.isChecking" />
   <router-view v-else />
   <VueQueryDevtools />

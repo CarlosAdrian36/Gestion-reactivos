@@ -1,8 +1,9 @@
 import LayoutPrincipal from '@/app/layout/layoutPrincipal.vue'
 import { bancoRoutes } from '@/app/routes'
 import { loginRoute } from '@/auth/routes'
-import { useAuthStore } from '@/auth/store/auth.store'
 import { createRouter, createWebHistory } from 'vue-router'
+import { isAuthenticatedGuard } from '@/auth/guards/is-authenticated.guard'
+import { isNotAuthenticatedGuard } from '@/auth/guards/is-not-authenticated.guard'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,6 +49,20 @@ const router = createRouter({
       ],
     },
   ],
+})
+
+router.beforeEach(async (to, from, next) => {
+  if (to.meta?.requiresAuth) {
+    await isAuthenticatedGuard(to, from, next)
+    return
+  }
+
+  if (to.path.startsWith('/auth')) {
+    await isNotAuthenticatedGuard(to, from, next)
+    return
+  }
+
+  next()
 })
 
 export default router

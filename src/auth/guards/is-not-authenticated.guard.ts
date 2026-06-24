@@ -8,11 +8,17 @@ export const isNotAuthenticatedGuard = async (
   next: NavigationGuardNext,
 ) => {
   const authStore = useAuthStore()
-  console.log('!!!!!!!!!!!!!!!!!!!!!!!', to)
-  console.log('!!!!!!!!!!', authStore.authStatus)
-  await authStore.checkAuthStatus()
-  authStore.authStatus === AuthStatus.Authenticated ? next({ name: 'misBancos' }) : next()
-  return
+
+  if (authStore.authStatus === AuthStatus.Checking) {
+    await authStore.checkAuthStatus()
+  }
+
+  if (authStore.authStatus === AuthStatus.Authenticated) {
+    next({ name: 'misBancos' })
+    return
+  }
+
+  next()
 }
 
 export default isNotAuthenticatedGuard
