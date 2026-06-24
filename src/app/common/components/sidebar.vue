@@ -36,7 +36,7 @@ const authStore = useAuthStore()
             </a>
           </RouterLink>
         </li>
-        <li>
+        <!-- <li>
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'proyectos' }">
             <a
               @click="navigate"
@@ -51,7 +51,7 @@ const authStore = useAuthStore()
               <span>Proyectos</span>
             </a>
           </RouterLink>
-        </li>
+        </li> -->
         <li>
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'compartidos' }">
             <a
@@ -84,9 +84,7 @@ const authStore = useAuthStore()
             </a>
           </RouterLink>
         </li>
-        <li
-          v-if="authStore.user?.roles?.some(r => r.nombre === 'Administrador')"
-        >
+        <li v-if="authStore.user?.roles?.some((r) => r.nombre === 'Administrador')">
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'usuarios' }">
             <a
               @click="navigate"

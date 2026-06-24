@@ -4,68 +4,109 @@
     <div>
       <h2 class="text-lg font-bold">
         Compartir banco:
-        <span class="text-primary">Examen Matemáticas 1</span>
+        <span class="text-primary wrap-break-word">{{ banco?.nombre || 'Sin nombre' }}</span>
       </h2>
     </div>
 
     <!-- Búsqueda -->
-    <div class="flex gap-3">
+    <div class="relative">
+      <i
+        class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
+      ></i>
+
       <input
         v-model="busqueda"
         type="text"
-        placeholder="Buscar usuario..."
-        class="input input-bordered w-full max-w-md"
+        placeholder="Buscar usuario por nombre o cuenta..."
+        class="input input-bordered w-full pl-10"
       />
 
-      <button class="btn btn-primary">Buscar</button>
+      <ul
+        v-if="resultados.length"
+        class="absolute z-10 w-full bg-base-100 border border-base-300 rounded-box shadow-xl mt-1 max-h-60 overflow-y-auto"
+      >
+        <li
+          v-for="user in resultados"
+          :key="user.nombreUsuario"
+          class="px-4 py-3 hover:bg-base-200 cursor-pointer transition-colors flex items-center gap-3"
+          @click="seleccionarUsuario(user)"
+        >
+          <div
+            class="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0"
+          >
+            {{ user.identidad.nombre.charAt(0) }}{{ user.identidad.apellidoPaterno.charAt(0) }}
+          </div>
+          <div class="min-w-0">
+            <p class="font-medium truncate">
+              {{ user.identidad.nombre }} {{ user.identidad.apellidoPaterno }}
+              {{ user.identidad.apellidoMaterno }}
+            </p>
+            <p class="text-xs text-base-content/60 truncate">&#64;{{ user.nombreUsuario }}</p>
+          </div>
+        </li>
+      </ul>
     </div>
 
     <!-- Contenido principal -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-108">
       <!-- Resultado -->
       <div class="lg:col-span-8">
-        <h3 class="font-semibold mb-3">Resultado de búsqueda</h3>
+        <h3 class="font-semibold mb-3">
+          {{ usuarioSeleccionado ? 'Usuario seleccionado' : 'Resultado de búsqueda' }}
+        </h3>
 
-        <div class="card bg-base-100 border border-base-300 shadow-sm">
+        <div v-if="usuarioSeleccionado" class="card bg-base-100 border border-base-300 shadow-sm">
           <div class="card-body">
             <div class="flex gap-4">
               <!-- Avatar -->
-              <div class="avatar">
-                <div class="w-22 h-22 rounded-full">
-                  <img src="https://img.daisyui.com/images/profile/demo/distracted1@192.webp" />
-                </div>
+              <div
+                class="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xl font-bold shrink-0"
+              >
+                {{ usuarioSeleccionado.identidad.nombre.charAt(0)
+                }}{{ usuarioSeleccionado.identidad.apellidoPaterno.charAt(0) }}
               </div>
 
               <!-- Datos -->
-              <div class="space-y-1">
-                <h4 class="font-bold text-lg">Ana López Martínez</h4>
+              <div class="space-y-1 min-w-0">
+                <h4 class="font-bold text-lg wrap-break-word">
+                  {{ usuarioSeleccionado.identidad.nombre }}
+                  {{ usuarioSeleccionado.identidad.apellidoPaterno }}
+                  {{ usuarioSeleccionado.identidad.apellidoMaterno }}
+                </h4>
 
                 <p>
-                  <span class="font-medium">Número de cuenta:</span>
-                  20221234
+                  <span class="font-medium">Nombre de usuario:</span>
+                  {{ usuarioSeleccionado.nombreUsuario }}
                 </p>
 
                 <p>
                   <span class="font-medium">Correo:</span>
-                  ana.lopez@institucion.edu.mx
+                  {{ usuarioSeleccionado.correos[0]?.direccion || '—' }}
                 </p>
 
                 <p>
                   <span class="font-medium">Rol en plataforma:</span>
-                  Docente
+                  {{ usuarioSeleccionado.roles[0]?.nombre || '—' }}
                 </p>
 
                 <p>
                   <span class="font-medium">Estatus:</span>
-                  <span class="text-success">Activo</span>
+                  <span :class="usuarioSeleccionado.vigencia ? 'text-success' : 'text-error'">
+                    {{ usuarioSeleccionado.vigencia ? 'Activo' : 'Inactivo' }}
+                  </span>
                 </p>
               </div>
             </div>
           </div>
         </div>
 
+        <div v-else class="flex flex-col items-center justify-center py-12 text-base-content/40">
+          <i class="fa-regular fa-user text-4xl mb-3"></i>
+          <p class="text-sm">Busca y selecciona un usuario para compartir el banco</p>
+        </div>
+
         <!-- Permisos -->
-        <div class="mt-6">
+        <div v-if="usuarioSeleccionado" class="mt-6">
           <h3 class="font-semibold mb-4">Selecciona el nivel de permisos:</h3>
 
           <div class="space-y-5">
@@ -130,25 +171,31 @@
               <div>
                 <p class="text-sm text-base-content/70">Nombre del banco:</p>
 
-                <p class="font-bold">Examen Matemáticas 1</p>
+                <p class="font-bold wrap-break-word">{{ banco?.nombre || 'Sin nombre' }}</p>
               </div>
 
               <div>
                 <p class="text-sm text-base-content/70">Reactivos:</p>
 
-                <p class="font-medium">50</p>
+                <p class="font-medium">{{ banco?.cantidadReactivos ?? 0 }}</p>
               </div>
 
               <div>
                 <p class="text-sm text-base-content/70">Fecha de creación:</p>
 
-                <p class="font-medium">15/05/2025</p>
+                <p class="font-medium">
+                  {{
+                    banco?.fechaCreacion
+                      ? new Date(banco.fechaCreacion).toLocaleDateString('es-ES')
+                      : '—'
+                  }}
+                </p>
               </div>
 
               <div>
                 <p class="text-sm text-base-content/70">Descripción:</p>
 
-                <p>Banco de reactivos para el examen de matemáticas – Unidad 1.</p>
+                <p>{{ banco?.descripcion || 'Sin descripción' }}</p>
               </div>
             </div>
           </div>
@@ -159,8 +206,63 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import type { Banco } from '@/api/bancos/interfaces/banco.interface'
+import type { Cuenta } from '@/auth/interface/user.interface'
+import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
+
+defineProps<{
+  banco?: Banco
+}>()
 
 const busqueda = ref('')
 const permiso = ref('lectura')
+const usuarios = ref<Cuenta[]>([])
+const usuarioSeleccionado = ref<Cuenta | null>(null)
+
+onMounted(async () => {
+  try {
+    usuarios.value = await getUsuariosAction()
+  } catch (error) {
+    console.error('Error al cargar usuarios:', error)
+  }
+})
+
+const resultados = computed(() => {
+  const q = busqueda.value.toLowerCase().trim()
+  if (!q) return []
+
+  const filtrados = usuarios.value.filter(
+    (u) =>
+      u.nombreUsuario.toLowerCase().includes(q) ||
+      u.identidad.nombre.toLowerCase().includes(q) ||
+      u.identidad.apellidoPaterno.toLowerCase().includes(q) ||
+      u.identidad.apellidoMaterno?.toLowerCase().includes(q),
+  )
+
+  filtrados.sort((a, b) => {
+    const aNombre = a.nombreUsuario.toLowerCase()
+    const bNombre = b.nombreUsuario.toLowerCase()
+
+    const prioridad = (nombre: string): number => {
+      if (nombre.startsWith(q)) return 0
+      if (nombre.includes(q)) return 1
+      return 2
+    }
+
+    const aPrioridad = prioridad(aNombre)
+    const bPrioridad = prioridad(bNombre)
+
+    if (aPrioridad !== bPrioridad) return aPrioridad - bPrioridad
+
+    return aNombre.localeCompare(bNombre)
+  })
+
+  return filtrados.slice(0, 10)
+})
+
+function seleccionarUsuario(usuario: Cuenta) {
+  usuarioSeleccionado.value = usuario
+  busqueda.value = ''
+}
 </script>
