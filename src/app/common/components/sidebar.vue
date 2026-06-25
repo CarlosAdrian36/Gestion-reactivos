@@ -1,10 +1,17 @@
 <script setup>
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import { useAuthStore } from '@/auth/store/auth.store'
 
 const sidebar = useSidebarStore()
 const authStore = useAuthStore()
+
+const theme = ref(document.documentElement.getAttribute('data-theme') || 'light')
+
+watch(theme, (val) => {
+  document.documentElement.setAttribute('data-theme', val)
+})
 </script>
 
 <template>
@@ -101,6 +108,50 @@ const authStore = useAuthStore()
           </RouterLink>
         </li>
       </ul>
+
+      <div class="border-t border-primary/10 my-4"></div>
+
+      <div class="px-3">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-(--color-texto) mb-3">
+          Tema
+        </p>
+        <select
+          class="select select-bordered select-sm w-full"
+          v-model="theme"
+        >
+          <option value="light">Claro</option>
+          <option value="dark">Oscuro</option>
+          <option value="cupcake">Cupcake</option>
+          <option value="emerald">Emerald</option>
+          <option value="corporate">Corporate</option>
+          <option value="synthwave">Synthwave</option>
+          <option value="retro">Retro</option>
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="valentine">Valentine</option>
+          <option value="halloween">Halloween</option>
+          <option value="garden">Garden</option>
+          <option value="forest">Forest</option>
+          <option value="aqua">Aqua</option>
+          <option value="lofi">Lofi</option>
+          <option value="pastel">Pastel</option>
+          <option value="fantasy">Fantasy</option>
+          <option value="wireframe">Wireframe</option>
+          <option value="black">Black</option>
+          <option value="luxury">Luxury</option>
+          <option value="dracula">Dracula</option>
+          <option value="cmyk">CMYK</option>
+          <option value="autumn">Autumn</option>
+          <option value="business">Business</option>
+          <option value="acid">Acid</option>
+          <option value="lemonade">Lemonade</option>
+          <option value="night">Night</option>
+          <option value="coffee">Coffee</option>
+          <option value="winter">Winter</option>
+          <option value="dim">Dim</option>
+          <option value="nord">Nord</option>
+          <option value="sunset">Sunset</option>
+        </select>
+      </div>
     </div>
   </aside>
 </template>

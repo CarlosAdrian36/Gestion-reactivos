@@ -35,12 +35,10 @@ const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
 
 const onSubmit = handleSubmit(async () => {
-  console.log('[Login] Enviando login...')
   const result = await authStore.login({
     nombreUsuario: usuario.value,
     password: contrasena.value,
   })
-  console.log('[Login] Resultado:', result)
   if (result.ok) return
 
   if (result.conflict) {
@@ -60,6 +58,7 @@ const onSubmit = handleSubmit(async () => {
         },
         onCancel: () => {
           modal.closeModal()
+          authStore.clearSession()
         },
       },
       [],
