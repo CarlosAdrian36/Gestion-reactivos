@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from 'axios'
+import axios from 'axios'
 
 const isDevelopment = import.meta.env.VITE_STAGE === 'dev'
 
@@ -7,26 +7,20 @@ const apiClient = axios.create({
 })
 // Interceptrors
 apiClient.interceptors.request.use((config) => {
-  console.log('[API Request]', config.method?.toUpperCase(), (config.baseURL ?? '') + (config.url ?? ''))
+  console.log(
+    '[API Request]',
+    config.method?.toUpperCase(),
+    (config.baseURL ?? '') + (config.url ?? ''),
+  )
   if (!config.headers['Token']) {
     const token = localStorage.getItem('token')
 
     if (token) {
       config.headers['Token'] = token
+      console.log('[Interceptor Token]', token ? token.substring(0, 20) + '...' : 'VACÍO')
     }
   }
   return config
 })
-
-apiClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (isAxiosError(error) && error.response?.status === 401) {
-      const { useAuthStore } = await import('@/auth/store/auth.store')
-      useAuthStore().clearSession()
-    }
-    return Promise.reject(error)
-  },
-)
 
 export { apiClient }

@@ -8,6 +8,7 @@ interface DeleteUserResponse {
 export const deleteUser = async (guid: string): Promise<boolean> => {
   try {
     const { data } = await apiClient.delete<DeleteUserResponse>(`/cuentas/${guid}`)
+    console.warn('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     return data.cuentaEliminada
   } catch (error) {
     if (isAxiosError(error)) {

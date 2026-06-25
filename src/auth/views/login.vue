@@ -6,11 +6,8 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { toast } from 'vue-sonner'
 
 import { useAuthStore } from '../store/auth.store'
-import { useModalStore } from '@/common/modals/store/modal.store'
-import SessionConflictModal from '../components/SessionConflictModal.vue'
 
 const authStore = useAuthStore()
-const modal = useModalStore()
 
 const loginSchema = z.object({
   usuario: z.string().min(1, 'El usuario es requerido'),
@@ -40,32 +37,6 @@ const onSubmit = handleSubmit(async () => {
     password: contrasena.value,
   })
   if (result.ok) return
-
-  if (result.conflict) {
-    modal.openModal(
-      SessionConflictModal,
-      {
-        onConfirm: async () => {
-          modal.closeModal()
-          await authStore.logout()
-          const retryResult = await authStore.login({
-            nombreUsuario: usuario.value,
-            password: contrasena.value,
-          })
-          if (!retryResult.ok) {
-            toast.error(retryResult.message ?? 'Error al iniciar sesión')
-          }
-        },
-        onCancel: () => {
-          modal.closeModal()
-          authStore.clearSession()
-        },
-      },
-      [],
-      'glass-modal',
-    )
-    return
-  }
 
   toast.error(result.message ?? 'Credenciales incorrectas')
 })

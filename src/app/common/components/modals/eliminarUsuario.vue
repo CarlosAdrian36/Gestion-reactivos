@@ -22,7 +22,8 @@
         <i class="fa-regular fa-circle-info"></i>
       </div>
       <p class="text-slate-700 text-sm leading-relaxed">
-        Esta acción eliminará el usuario y todos sus datos asociados. Esta acción no se puede deshacer.
+        Esta acción eliminará el usuario y todos sus datos asociados. Esta acción no se puede
+        deshacer.
       </p>
     </div>
   </main>
@@ -48,6 +49,7 @@ const onSubmit = async () => {
   try {
     await deleteUser(props.usuario.guid)
     toast.success('Usuario eliminado correctamente')
+    console.log('hasta aqui va todo bien')
     await queryClient.invalidateQueries({
       queryKey: ['usuarios'],
     })

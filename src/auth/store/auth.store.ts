@@ -35,15 +35,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   console.log('1', authStatus.value)
 
-  const login = async (data: LoginCredentials): Promise<{ ok: boolean; message?: string; conflict?: boolean }> => {
+  const login = async (data: LoginCredentials): Promise<{ ok: boolean; message?: string }> => {
     authStatus.value = AuthStatus.Checking
 
     try {
       const loginResp = await loginAction(data)
       if (!loginResp.ok) {
-        if (loginResp.conflict) {
-          return { ok: false, message: loginResp.message, conflict: true }
-        }
         clearSession()
         return { ok: false, message: loginResp.message }
       }
@@ -123,6 +120,12 @@ export const useAuthStore = defineStore('auth', () => {
       if (!result) {
         clearSession()
       }
+    }
+  })
+
+  watch(token, (newToken) => {
+    if (!newToken && authStatus.value === AuthStatus.Authenticated) {
+      clearSession()
     }
   })
 
