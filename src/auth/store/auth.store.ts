@@ -6,6 +6,7 @@ import { getPerfilAction } from '@/api/usuarios/actions/get-perfil.action'
 import { useLocalStorage } from '@vueuse/core'
 import { logoutApi } from '../api/auth.api'
 import { useModalStore } from '@/common/modals/store/modal.store'
+import { queryClient } from '@/api/queryClient'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')
@@ -34,15 +35,17 @@ export const useAuthStore = defineStore('auth', () => {
 
   console.log('1', authStatus.value)
 
-  const login = async (data: LoginCredentials): Promise<boolean> => {
+  const login = async (data: LoginCredentials): Promise<{ ok: boolean; message?: string; conflict?: boolean }> => {
     authStatus.value = AuthStatus.Checking
 
-    // console.log('Aqui dio click en el login', authStatus.value)
     try {
       const loginResp = await loginAction(data)
       if (!loginResp.ok) {
+        if (loginResp.conflict) {
+          return { ok: false, message: loginResp.message, conflict: true }
+        }
         clearSession()
-        return false
+        return { ok: false, message: loginResp.message }
       }
 
       token.value = loginResp.token
@@ -51,10 +54,10 @@ export const useAuthStore = defineStore('auth', () => {
 
       await loadUserProfile()
 
-      return true
+      return { ok: true }
     } catch (error) {
       clearSession()
-      return false
+      return { ok: false, message: 'Error al conectar con el servidor' }
     }
   }
   const checkAuthStatus = async (): Promise<boolean> => {
@@ -112,6 +115,7 @@ export const useAuthStore = defineStore('auth', () => {
     authStatus.value = AuthStatus.NotAuthenticated
     localStorage.removeItem('token')
     localStorage.removeItem('expiracion')
+    queryClient.clear()
   }
   watch(remainingSeconds, (value) => {
     if (value <= 0 && token.value) {

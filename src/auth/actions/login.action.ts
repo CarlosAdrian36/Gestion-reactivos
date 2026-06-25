@@ -15,11 +15,14 @@ export const loginAction = async (data: LoginCredentials): Promise<LoginSuccess 
       tiempoRestante: response.sesionDTO.tiempoRestante,
     }
   } catch (error) {
-    if (isAxiosError(error) && error.response?.status === 401) {
-      return {
-        ok: false,
-        message: 'Credenciales inválidas',
+    if (isAxiosError(error)) {
+      const status = error.response?.status
+      const detail = error.response?.data?.detail ?? 'Error al iniciar sesión'
+
+      if (status === 409) {
+        return { ok: false, message: detail, conflict: true }
       }
+      return { ok: false, message: detail }
     }
     throw new Error('No se pudo hacer la petición de inicio de sesión')
   }
