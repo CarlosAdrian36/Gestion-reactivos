@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { isAxiosError } from 'axios'
 
 const isDevelopment = import.meta.env.VITE_STAGE === 'dev'
 
@@ -17,5 +17,16 @@ apiClient.interceptors.request.use((config) => {
   }
   return config
 })
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (isAxiosError(error) && error.response?.status === 401) {
+      const { useAuthStore } = await import('@/auth/store/auth.store')
+      useAuthStore().clearSession()
+    }
+    return Promise.reject(error)
+  },
+)
 
 export { apiClient }

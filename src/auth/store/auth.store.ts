@@ -117,9 +117,12 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('expiracion')
     queryClient.clear()
   }
-  watch(remainingSeconds, (value) => {
+  watch(remainingSeconds, async (value) => {
     if (value <= 0 && token.value) {
-      clearSession()
+      const result = await logout()
+      if (!result) {
+        clearSession()
+      }
     }
   })
 

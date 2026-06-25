@@ -286,7 +286,10 @@ function seleccionarUsuario(usuario: Cuenta) {
 
 async function compartir() {
   if (!usuarioSeleccionado.value || !props.banco) {
-    console.warn('[Compartir] usuario o banco es null', { usuario: usuarioSeleccionado.value, banco: props.banco })
+    console.warn('[Compartir] usuario o banco es null', {
+      usuario: usuarioSeleccionado.value,
+      banco: props.banco,
+    })
     return
   }
 
