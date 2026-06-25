@@ -71,12 +71,12 @@
                     </button>
                   </div>
                   <div class="tooltip" data-tip="Editar">
-                    <button class="btn btn-soft btn-info">
+                    <button class="btn btn-soft btn-info" @click="editarUsuario(value)">
                       <i class="fa-regular fa-pen-to-square"></i>
                     </button>
                   </div>
                   <div class="tooltip" data-tip="Eliminar">
-                    <button class="btn btn-soft btn-error">
+                    <button class="btn btn-soft btn-error" @click="eliminarUsuario(value)">
                       <i class="fa-regular fa-trash"></i>
                     </button>
                   </div>
@@ -120,6 +120,8 @@ import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { useQuery } from '@tanstack/vue-query'
 import CrearUsuario from '../common/components/modals/crearUsuario.vue'
+import EliminarUsuario from '../common/components/modals/eliminarUsuario.vue'
+import type { Cuenta } from '@/api/usuarios/interfaces/ususarios.interface'
 
 const { data, isLoading } = useQuery({
   queryKey: ['usuarios'],
@@ -141,6 +143,30 @@ function NuevoUsuario() {
       { label: 'Guardar', variant: 'primary', type: 'submit' },
     ],
     'max-w-5xl',
+  )
+}
+
+function editarUsuario(usuario: Cuenta) {
+  modal.openModal(
+    CrearUsuario,
+    { usuario },
+    [
+      { label: 'Cerrar', variant: 'outline' },
+      { label: 'Guardar', variant: 'primary', type: 'submit' },
+    ],
+    'max-w-5xl',
+  )
+}
+
+function eliminarUsuario(usuario: Cuenta) {
+  modal.openModal(
+    EliminarUsuario,
+    { usuario },
+    [
+      { label: 'Cancelar', variant: 'outline' },
+      { label: 'Eliminar', variant: 'error', type: 'submit' },
+    ],
+    'max-w-md',
   )
 }
 </script>

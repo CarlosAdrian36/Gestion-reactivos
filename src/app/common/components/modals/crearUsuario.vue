@@ -1,5 +1,5 @@
 <template>
-  <h3 class="text-lg font-bold mb-4">Crear usuario</h3>
+  <h3 class="text-lg font-bold mb-4">{{ props.usuario ? 'Editar usuario' : 'Crear usuario' }}</h3>
 
   <div class="grid grid-cols-1 md:grid-cols-6 gap-x-4 gap-y-2">
     <!-- Fila 1 -->
@@ -100,7 +100,8 @@
           v-bind="correoAttrs"
           type="email"
           placeholder=" "
-          class="peer w-full h-12 px-3 leading-5 bg-base-100 border border-neutral-400 rounded-md shadow-sm transition focus:shadow-none focus:border-primary focus:ring-1 focus:ring-primary/40 focus:outline-none"
+          :disabled="!!props.usuario"
+          class="peer w-full h-12 px-3 leading-5 bg-base-100 border border-neutral-400 rounded-md shadow-sm transition focus:shadow-none focus:border-primary focus:ring-1 focus:ring-primary/40 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
         />
 
         <span
@@ -111,7 +112,7 @@
       </label>
 
       <p class="text-error text-sm mt-1 h-5">
-        {{ errors.correo }}
+        {{ props.usuario ? '' : errors.correo }}
       </p>
     </div>
 
@@ -121,7 +122,7 @@
       <label class="form-control w-full">
         <span class="label-text mb-1">Rol</span>
 
-        <select v-model="rol" v-bind="rolAttrs" class="select select-bordered w-full">
+        <select v-model="rol" v-bind="rolAttrs" class="select select-bordered w-full" :disabled="!!props.usuario">
           <option value="">Seleccione un rol</option>
           <option v-for="value in roles" :key="value.rolId" :value="String(value.rolId)">
             {{ value.nombre }}
@@ -188,11 +189,18 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import z from 'zod'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { getRolesAction } from '@/api/usuarios/actions/get-roles.actions'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { saveUser } from '@/api/usuarios/actions/create-users.action'
+import { updateUser } from '@/api/usuarios/actions/update-user.action'
 import type { CreateUserRequest } from '@/api/usuarios/interfaces/createUser.interface'
+import type { UpdateUserRequest } from '@/api/usuarios/interfaces/updateUser.interface'
+import type { Cuenta } from '@/api/usuarios/interfaces/user-response.interface'
+
+const props = defineProps<{
+  usuario?: Cuenta
+}>()
 
 const queryClient = useQueryClient()
 const modal = useModalStore()
@@ -223,15 +231,15 @@ const { handleSubmit, errors, defineField, isSubmitting } = useForm({
   validationSchema: toTypedSchema(usuarioSchema),
 
   initialValues: {
-    nombreUsuario: '',
-    vigencia: false,
-    correo: '',
-    rol: '',
-    nombre: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
-    curp: '',
-    fechaExpiracion: '',
+    nombreUsuario: props.usuario?.nombreUsuario ?? '',
+    vigencia: props.usuario?.vigencia ?? false,
+    correo: props.usuario?.correos?.[0]?.direccion ?? '',
+    rol: props.usuario?.roles?.[0]?.rolId ? String(props.usuario.roles[0].rolId) : '',
+    nombre: props.usuario?.identidad?.nombre ?? '',
+    apellidoPaterno: props.usuario?.identidad?.apellidoPaterno ?? '',
+    apellidoMaterno: props.usuario?.identidad?.apellidoMaterno ?? '',
+    curp: props.usuario?.identidad?.curp ?? '',
+    fechaExpiracion: props.usuario?.fechaExpiracion ?? '',
   },
 })
 
@@ -259,42 +267,54 @@ const {
   refetchOnWindowFocus: true, // refetch al volver a la pestaña
   refetchOnReconnect: true, // refetch al recuperar red
 })
-const createUserMutation = useMutation({
-  mutationFn: saveUser,
+const mutation = useMutation({
+  mutationFn: (data: CreateUserRequest | { guid: string; data: UpdateUserRequest }) => {
+    if ('guid' in data) {
+      return updateUser(data.guid, data.data)
+    }
+    return saveUser(data)
+  },
 })
 
 import { toast } from 'vue-sonner'
 import { useModalStore } from '@/common/modals/store/modal.store'
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const user: CreateUserRequest = {
-      nombreUsuario: values.nombreUsuario,
-      vigencia: values.vigencia,
-      correo: values.correo,
-      rol: values.rol,
-      nombre: values.nombre,
-      apellidoPaterno: values.apellidoPaterno,
-      ...(values.apellidoMaterno && {
-        apellidoMaterno: values.apellidoMaterno,
-      }),
-      ...(values.vigencia &&
-        values.fechaExpiracion && {
-          fechaExpiracion: values.fechaExpiracion,
-        }),
+    if (props.usuario) {
+      const user: UpdateUserRequest = {
+        nombreUsuario: values.nombreUsuario,
+        vigencia: values.vigencia,
+        nombre: values.nombre,
+        apellidoPaterno: values.apellidoPaterno,
+        ...(values.apellidoMaterno && { apellidoMaterno: values.apellidoMaterno }),
+        ...(values.curp && { curp: values.curp }),
+        ...(values.vigencia && values.fechaExpiracion
+          ? { fechaExpiracion: values.fechaExpiracion }
+          : { fechaExpiracion: null }),
+      }
+
+      await mutation.mutateAsync({ guid: props.usuario.guid, data: user })
+      toast.success('Usuario actualizado correctamente')
+    } else {
+      const user: CreateUserRequest = {
+        nombreUsuario: values.nombreUsuario,
+        vigencia: values.vigencia,
+        correo: values.correo,
+        rol: values.rol,
+        nombre: values.nombre,
+        apellidoPaterno: values.apellidoPaterno,
+        ...(values.apellidoMaterno && { apellidoMaterno: values.apellidoMaterno }),
+        ...(values.vigencia && values.fechaExpiracion && { fechaExpiracion: values.fechaExpiracion }),
+      }
+
+      await mutation.mutateAsync(user)
+      toast.success('Usuario creado correctamente')
     }
 
-    const response = await createUserMutation.mutateAsync(user)
-
-    console.log(response.cuenta.guid)
-    await queryClient.invalidateQueries({
-      queryKey: ['usuarios'],
-    })
+    await queryClient.invalidateQueries({ queryKey: ['usuarios'] })
     modal.closeModal()
-    toast.success('Usuario creado correctamente')
-
-    // modal.closeModal()
   } catch (error) {
-    toast.error(error instanceof Error ? error.message : 'Error al crear usuario')
+    toast.error(error instanceof Error ? error.message : 'Error al guardar usuario')
   }
 })
 
