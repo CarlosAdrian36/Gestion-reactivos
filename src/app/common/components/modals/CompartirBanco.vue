@@ -10,9 +10,9 @@
 
     <!-- Búsqueda -->
     <div class="relative">
-      <i
+      <!-- <i
         class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
-      ></i>
+      ></i> -->
 
       <input
         v-model="busqueda"
@@ -51,8 +51,15 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-108">
       <!-- Resultado -->
       <div class="lg:col-span-8">
-        <h3 class="font-semibold mb-3">
-          {{ usuarioSeleccionado ? 'Usuario seleccionado' : 'Resultado de búsqueda' }}
+        <h3 class="font-semibold mb-3 flex items-center justify-between">
+          <span>{{ usuarioSeleccionado ? 'Usuario seleccionado' : 'Resultado de búsqueda' }}</span>
+          <button
+            v-if="usuarioSeleccionado"
+            class="btn btn-ghost btn-xs btn-circle text-base-content/60 hover:text-error"
+            @click="usuarioSeleccionado = null"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
         </h3>
 
         <div v-if="usuarioSeleccionado" class="card bg-base-100 border border-base-300 shadow-sm">
