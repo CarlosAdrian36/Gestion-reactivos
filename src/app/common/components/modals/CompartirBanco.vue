@@ -213,14 +213,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import type { Banco } from '@/api/bancos/interfaces/banco.interface'
-import type { Cuenta } from '@/auth/interface/user.interface'
+import type { Cuenta } from '@/api/usuarios/interfaces/ususarios.interface'
 import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
+import { crearCompartidoAction } from '@/api/bancos/actions/crear-compartido.action'
+import { crearPermisoAction } from '@/api/bancos/actions/crear-permiso.action'
+import { useModalStore } from '@/common/modals/store/modal.store'
+import { toast } from 'vue-sonner'
 
-defineProps<{
+const props = defineProps<{
   banco?: Banco
 }>()
+
+const modal = useModalStore()
 
 const busqueda = ref('')
 const permiso = ref('lectura')
@@ -233,6 +239,11 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error al cargar usuarios:', error)
   }
+  modal.setSubmitFN(compartir)
+})
+
+onUnmounted(() => {
+  modal.setSubmitFN(null)
 })
 
 const resultados = computed(() => {
@@ -271,5 +282,32 @@ const resultados = computed(() => {
 function seleccionarUsuario(usuario: Cuenta) {
   usuarioSeleccionado.value = usuario
   busqueda.value = ''
+}
+
+async function compartir() {
+  if (!usuarioSeleccionado.value || !props.banco) {
+    console.warn('[Compartir] usuario o banco es null', { usuario: usuarioSeleccionado.value, banco: props.banco })
+    return
+  }
+
+  console.log('[Compartir] Enviando:', {
+    bancoId: props.banco.bancoId,
+    nombreUsuario: usuarioSeleccionado.value.nombreUsuario,
+    permiso: permiso.value,
+  })
+
+  try {
+    const { compartido } = await crearCompartidoAction(
+      props.banco.bancoId,
+      usuarioSeleccionado.value.guid,
+    )
+    await crearPermisoAction(props.banco.bancoId, compartido.cuentaId, {
+      edicion: permiso.value === 'edicion',
+    })
+    toast.success('Banco compartido correctamente')
+    modal.closeModal()
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : 'Ocurrió un error al compartir el banco')
+  }
 }
 </script>

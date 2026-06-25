@@ -7,7 +7,7 @@ const apiClient = axios.create({
 })
 // Interceptrors
 apiClient.interceptors.request.use((config) => {
-  // const token = localStorage.getItem('token')
+  console.log('[API Request]', config.method?.toUpperCase(), (config.baseURL ?? '') + (config.url ?? ''))
   if (!config.headers['Token']) {
     const token = localStorage.getItem('token')
 
