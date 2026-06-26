@@ -36,7 +36,7 @@ onMounted(() => {
   <Toaster
     theme="light"
     rich-colors
-    position="bottom-center"
+    position="top-right"
     close-button
     close-button-position="top-left"
   />
