@@ -50,15 +50,16 @@ const onSubmit = async () => {
     await deleteUser(props.usuario.guid)
     toast.success('Usuario eliminado correctamente')
     console.log('hasta aqui va todo bien')
+    modal.closeModal()
     await queryClient.invalidateQueries({
       queryKey: ['usuarios'],
     })
-    modal.closeModal()
   } catch (error) {
     if (isAxiosError(error)) {
       toast.error(error.response?.data?.detail ?? 'Error al eliminar el usuario')
     }
   }
+  console.log('Aqui se tiene que eliminar el usuario')
 }
 
 onMounted(() => {
