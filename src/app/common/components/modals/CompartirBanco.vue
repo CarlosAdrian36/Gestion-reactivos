@@ -218,7 +218,6 @@ import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import type { Cuenta } from '@/api/usuarios/interfaces/ususarios.interface'
 import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
 import { crearCompartidoAction } from '@/api/bancos/actions/crear-compartido.action'
-import { crearPermisoAction } from '@/api/bancos/actions/crear-permiso.action'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { toast } from 'vue-sonner'
 
@@ -303,10 +302,11 @@ async function compartir() {
     const { compartido } = await crearCompartidoAction(
       props.banco.bancoId,
       usuarioSeleccionado.value.guid,
+      {
+        edicion: permiso.value === '',
+      },
     )
-    await crearPermisoAction(props.banco.bancoId, compartido.cuentaId, {
-      edicion: permiso.value === 'edicion',
-    })
+
     toast.success('Banco compartido correctamente')
     modal.closeModal()
   } catch (error) {

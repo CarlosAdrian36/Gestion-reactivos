@@ -1,15 +1,15 @@
 import { apiClient } from '@/api/http'
 import { isAxiosError } from 'axios'
-import type { CrearPermisoRequest, CrearPermisoResponse } from '../interfaces/compartir.interface'
+import type { ActualizarPermisoRequest, ActualizarPermisoResponse } from '../interfaces/compartir.interface'
 
-export const crearPermisoAction = async (
+export const actualizarPermisoAction = async (
   bancoId: number,
-  cuentaId: number,
-  body: CrearPermisoRequest,
-): Promise<CrearPermisoResponse> => {
+  guid: string,
+  body: ActualizarPermisoRequest,
+): Promise<ActualizarPermisoResponse> => {
   try {
-    const { data } = await apiClient.post<CrearPermisoResponse>(
-      `/bancos/${bancoId}/compartidos/${cuentaId}/permisos`,
+    const { data } = await apiClient.put<ActualizarPermisoResponse>(
+      `/bancos/${bancoId}/compartidos/${guid}/permisos`,
       body,
     )
     return data

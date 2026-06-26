@@ -7,6 +7,7 @@ export interface CompartidoBaseDTO {
   bancoId: number
   fechaCreacion: string
   fechaModificacion: string
+  permiso: PermisoDTO
 }
 
 export interface CrearPermisoRequest {
