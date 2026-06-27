@@ -122,7 +122,12 @@
       <label class="form-control w-full">
         <span class="label-text mb-1">Rol</span>
 
-        <select v-model="rol" v-bind="rolAttrs" class="select select-bordered w-full" :disabled="!!props.usuario">
+        <select
+          v-model="rol"
+          v-bind="rolAttrs"
+          class="select select-bordered w-full"
+          :disabled="!!props.usuario"
+        >
           <option value="">Seleccione un rol</option>
           <option v-for="value in roles" :key="value.rolId" :value="String(value.rolId)">
             {{ value.nombre }}
@@ -186,14 +191,19 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted, onUnmounted } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
-import z from 'zod'
-import { onMounted, onUnmounted } from 'vue'
-import { getRolesAction } from '@/api/usuarios/actions/get-roles.actions'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import z from 'zod'
+import { toast } from 'vue-sonner'
+
+import { useModalStore } from '@/common/modals/store/modal.store'
+
+import { getRolesAction } from '@/api/usuarios/actions/get-roles.actions'
 import { saveUser } from '@/api/usuarios/actions/create-users.action'
 import { updateUser } from '@/api/usuarios/actions/update-user.action'
+
 import type { CreateUserRequest } from '@/api/usuarios/interfaces/createUser.interface'
 import type { UpdateUserRequest } from '@/api/usuarios/interfaces/updateUser.interface'
 import type { Cuenta } from '@/api/usuarios/interfaces/user-response.interface'
@@ -267,17 +277,32 @@ const {
   refetchOnWindowFocus: true, // refetch al volver a la pestaña
   refetchOnReconnect: true, // refetch al recuperar red
 })
-const mutation = useMutation({
-  mutationFn: (data: CreateUserRequest | { guid: string; data: UpdateUserRequest }) => {
-    if ('guid' in data) {
-      return updateUser(data.guid, data.data)
-    }
-    return saveUser(data)
+const updateUserMutation = useMutation({
+  mutationFn: ({ guid, data }: { guid: string; data: UpdateUserRequest }) => updateUser(guid, data),
+
+  onSuccess: () => {
+    toast.success('Usuario actualizado correctamente')
+    queryClient.invalidateQueries({ queryKey: ['usuarios'] })
+    modal.closeModal()
+  },
+
+  onError: (error) => {
+    toast.error(error instanceof Error ? error.message : 'Error al actualizar usuario')
   },
 })
+const createUserMutation = useMutation({
+  mutationFn: (data: CreateUserRequest) => saveUser(data),
 
-import { toast } from 'vue-sonner'
-import { useModalStore } from '@/common/modals/store/modal.store'
+  onSuccess: () => {
+    toast.success('Usuario creado correctamente')
+    queryClient.invalidateQueries({ queryKey: ['usuarios'] })
+    modal.closeModal()
+  },
+
+  onError: (error) => {
+    toast.error(error instanceof Error ? error.message : 'Error al crear usuario')
+  },
+})
 const onSubmit = handleSubmit(async (values) => {
   try {
     if (props.usuario) {
@@ -293,8 +318,10 @@ const onSubmit = handleSubmit(async (values) => {
           : { fechaExpiracion: null }),
       }
 
-      await mutation.mutateAsync({ guid: props.usuario.guid, data: user })
-      toast.success('Usuario actualizado correctamente')
+      await updateUserMutation.mutateAsync({
+        guid: props.usuario.guid,
+        data: user,
+      })
     } else {
       const user: CreateUserRequest = {
         nombreUsuario: values.nombreUsuario,
@@ -304,17 +331,16 @@ const onSubmit = handleSubmit(async (values) => {
         nombre: values.nombre,
         apellidoPaterno: values.apellidoPaterno,
         ...(values.apellidoMaterno && { apellidoMaterno: values.apellidoMaterno }),
-        ...(values.vigencia && values.fechaExpiracion && { fechaExpiracion: values.fechaExpiracion }),
+        ...(values.vigencia &&
+          values.fechaExpiracion && {
+            fechaExpiracion: values.fechaExpiracion,
+          }),
       }
 
-      await mutation.mutateAsync(user)
-      toast.success('Usuario creado correctamente')
+      await createUserMutation.mutateAsync(user)
     }
-
-    await queryClient.invalidateQueries({ queryKey: ['usuarios'] })
-    modal.closeModal()
   } catch (error) {
-    toast.error(error instanceof Error ? error.message : 'Error al guardar usuario')
+    console.error(error)
   }
 })
 
