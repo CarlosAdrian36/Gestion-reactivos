@@ -23,7 +23,7 @@ onMounted(async () => {})
           <header class="space-y-4">
             <h1 class="text-3xl md:text-5xl font-semibold wrap-break-word">
               {{}} aqui el nombre
-              <!-- {{ bancoId }} -->
+              {{ bancoId }}
             </h1>
             <p class="text-base-content/70 max-w-2xl text-lg wrap-break-word">
               aqui la descripcion

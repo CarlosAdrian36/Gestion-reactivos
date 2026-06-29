@@ -3,7 +3,7 @@
     <div class="flex flex-row items-center mb-4">
       <i class="fa-regular fa-circle-info text-primary pe-2"></i>
 
-      <h2 class="text-xs font-bold uppercase tracking-widest">Informacion general fghfghfgh</h2>
+      <h2 class="text-xs font-bold uppercase tracking-widest">Informacion general</h2>
     </div>
 
     <div class="space-y-6">
