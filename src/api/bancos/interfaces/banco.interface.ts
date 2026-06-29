@@ -3,16 +3,16 @@ export interface BancoResponse {
 }
 
 export interface Banco {
+  bancoId: number
+  nombre: string
+  descripcion: string
   esProyecto: boolean
   esCompartido: boolean
   cantidadCompartidos: number
   cantidadReactivos: number
   fechaCreacion: string
   fechaModificacion: string
-  bancoId: number
-  // propietarioCuentaId: number
-  nombre: string
-  descripcion: string
+  propietarioCuentaId?: number
 }
 
 export interface CreateBancosResponse {

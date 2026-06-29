@@ -8,7 +8,7 @@
       <p class="text-sm text-base-content/70">Administra carpetas y bancos de reactivos</p>
     </div>
   </div>
-  <pre>{{ data }}</pre>
+  <!-- <pre>{{ data }}</pre> -->
   <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible">
     <div class="overflow-visible">
       <div v-if="isLoading" class="p-6 space-y-3">
@@ -39,7 +39,8 @@
           <tr
             v-for="value in data"
             :key="value.bancoId"
-            class="hover transition-colors cursor-pointers"
+            class="hover transition-colors cursor-pointer"
+            @click="irABanco(value.bancoId)"
           >
             <!-- ICON -->
             <td class="text-center align-middle">
@@ -135,9 +136,20 @@
 <script lang="ts" setup>
 import { getBancosCompartidosAction } from '@/api/bancos/compartidos/actions/get-bancosCompartidos.action'
 import { useQuery } from '@tanstack/vue-query'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const { data, isLoading } = useQuery({
   queryKey: ['Compartidos'],
   queryFn: () => getBancosCompartidosAction(),
 })
+
+function irABanco(bancoId: number) {
+  router.push({
+    name: 'bancoDetalle',
+    params: { id: bancoId },
+    query: { origen: 'compartidos' },
+  })
+}
 </script>

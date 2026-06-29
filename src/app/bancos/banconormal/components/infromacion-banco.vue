@@ -1,3 +1,11 @@
+<script lang="ts" setup>
+import type { Banco } from '@/api/bancos/interfaces/banco.interface'
+
+defineProps<{
+  banco: Banco
+}>()
+</script>
+
 <template>
   <div class="p-6">
     <div class="flex flex-row items-center mb-4">
@@ -13,7 +21,7 @@
             <i class="fa-light fa-list-ol"></i>
           </div>
           <div>
-            <p class="text-xs font-semibold">Numero de Reactivos: 12</p>
+            <p class="text-xs font-semibold">Numero de Reactivos: {{ banco.cantidadReactivos }}</p>
           </div>
         </div>
       </div>
@@ -33,7 +41,14 @@
             <i class="fa-light fa-calendar-circle-plus"></i>
           </div>
           <div>
-            <p class="text-xs font-semibold">Fecha de creacion: 21321</p>
+            <p class="text-xs font-semibold">
+              Fecha de creacion:
+              {{
+                new Date(banco.fechaCreacion).toLocaleDateString('es-ES', {
+                  dateStyle: 'medium',
+                })
+              }}
+            </p>
           </div>
         </div>
       </div>
@@ -43,7 +58,14 @@
             <i class="fa-light fa-calendar-lines-pen"></i>
           </div>
           <div>
-            <p class="text-xs font-semibold">Fecha de modificacion</p>
+            <p class="text-xs font-semibold">
+              Fecha de modificacion :
+              {{
+                new Date(banco.fechaModificacion).toLocaleDateString('es-ES', {
+                  dateStyle: 'medium',
+                })
+              }}
+            </p>
           </div>
         </div>
       </div>

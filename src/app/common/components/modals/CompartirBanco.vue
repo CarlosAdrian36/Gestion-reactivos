@@ -292,18 +292,12 @@ async function compartir() {
     return
   }
 
-  console.log('[Compartir] Enviando:', {
-    bancoId: props.banco.bancoId,
-    nombreUsuario: usuarioSeleccionado.value.nombreUsuario,
-    permiso: permiso.value,
-  })
-
   try {
     const { compartido } = await crearCompartidoAction(
       props.banco.bancoId,
       usuarioSeleccionado.value.guid,
       {
-        edicion: permiso.value === '',
+        permitirEdicion: permiso.value === 'edicion',
       },
     )
 

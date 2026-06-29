@@ -1,7 +1,3 @@
-export interface CrearCompartidoResponse {
-  compartido: CompartidoBaseDTO
-}
-
 export interface CompartidoBaseDTO {
   cuentaId: number
   bancoId: number
@@ -10,11 +6,28 @@ export interface CompartidoBaseDTO {
   permiso: PermisoDTO
 }
 
+export interface CrearCompartidoRequest {
+  permitirEdicion: boolean
+}
+
+export interface CrearCompartidoResponse {
+  compartido: CompartidoBaseDTO
+}
+
 export interface CrearPermisoRequest {
   edicion: boolean
 }
 
 export interface CrearPermisoResponse {
+  permiso: PermisoDTO
+}
+
+export interface ActualizarPermisoRequest {
+  compartidoId: number
+  edicion: boolean
+}
+
+export interface ActualizarPermisoResponse {
   permiso: PermisoDTO
 }
 
