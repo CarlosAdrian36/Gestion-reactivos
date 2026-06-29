@@ -22,14 +22,14 @@ onMounted(async () => {})
         <div class="min-w-0 lg:col-span-8 flex flex-col gap-10">
           <header class="space-y-4">
             <h1 class="text-3xl md:text-5xl font-semibold wrap-break-word">
-              <!-- {{ bancoStore.selectedBanco?.nombre }} -->
+              {{}} aqui el nombre
               {{ bancoId }}
             </h1>
             <p class="text-base-content/70 max-w-2xl text-lg wrap-break-word">
-              <!-- {{ bancoStore.selectedBanco?.descripcion }} -->
+              aqui la descripcion
             </p>
 
-            <div class="flex flex-wrap gap-3 pt-4">
+            <!-- <div class="flex flex-wrap gap-3 pt-4">
               <button class="btn btn-outline btn-sm md:btn-md rounded-full">
                 <i class="fa-solid fa-users"></i>
                 Miembros
@@ -42,7 +42,7 @@ onMounted(async () => {})
                 <i class="fa-solid fa-paper-plane-top"></i>
                 Solicitar Revisión
               </button>
-            </div>
+            </div> -->
           </header>
 
           <section class="card bg-base-100 shadow-sm border border-base-300 overflow-hidden">
@@ -59,7 +59,7 @@ onMounted(async () => {})
                 <InfromacionBanco />
               </div>
 
-              <div class="p-6">
+              <!-- <div class="p-6">
                 <div class="flex flex-row items-center mb-4">
                   <i class="fa-regular fa-comment-plus text-primary pe-2"></i>
                   <h2 class="text-xs font-bold uppercase tracking-widest">
@@ -70,11 +70,11 @@ onMounted(async () => {})
                   class="textarea textarea-bordered w-full h-24"
                   placeholder="Escribe aquí..."
                 ></textarea>
-              </div>
+              </div> -->
             </div>
           </section>
 
-          <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="card bg-base-100 border border-base-300 shadow-sm">
               <div class="card-body p-5">
                 <div class="flex items-center gap-3">
@@ -94,10 +94,10 @@ onMounted(async () => {})
                 </div>
               </div>
             </div>
-          </section>
+          </section> -->
         </div>
 
-        <aside class="lg:col-span-4 mt-12 lg:mt-0">
+        <!-- <aside class="lg:col-span-4 mt-12 lg:mt-0">
           <div class="sticky py-1 flex flex-col gap-6">
             <div class="card bg-base-100 shadow-xl p-8 border border-base-300">
               <h3 class="text-2xl font-bold mb-10">Flujo de trabajo</h3>
@@ -172,7 +172,7 @@ onMounted(async () => {})
               </div>
             </div>
           </div>
-        </aside>
+        </aside> -->
       </div>
     </main>
   </div>
