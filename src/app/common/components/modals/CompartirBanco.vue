@@ -220,6 +220,7 @@ import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
 import { crearCompartidoAction } from '@/api/bancos/actions/crear-compartido.action'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { toast } from 'vue-sonner'
+import { useQueryClient } from '@tanstack/vue-query'
 
 const props = defineProps<{
   banco?: Banco
@@ -282,6 +283,7 @@ function seleccionarUsuario(usuario: Cuenta) {
   usuarioSeleccionado.value = usuario
   busqueda.value = ''
 }
+const queryClient = useQueryClient()
 
 async function compartir() {
   if (!usuarioSeleccionado.value || !props.banco) {
@@ -300,9 +302,12 @@ async function compartir() {
         permitirEdicion: permiso.value === 'edicion',
       },
     )
+    await queryClient.invalidateQueries({
+      queryKey: ['items-unificados'],
+    })
+    modal.closeModal()
 
     toast.success('Banco compartido correctamente')
-    modal.closeModal()
   } catch (error) {
     toast.error(error instanceof Error ? error.message : 'Ocurrió un error al compartir el banco')
   }

@@ -30,7 +30,7 @@
 
             <th class="w-52 text-center">Última modificación</th>
 
-            <th class="w-40 text-center">Compartido</th>
+            <!-- <th class="w-40 text-center">Compartido</th> -->
 
             <th class="w-32 text-center">Acciones</th>
           </tr>

@@ -6,7 +6,7 @@
     </div>
 
     <div class="space-y-4">
-      <div class="flex items-center justify-between">
+      <!-- <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="avatar">
             <div class="w-8 h-8 rounded-full">
@@ -21,7 +21,7 @@
         <button class="hover:text-primary transition-colors text-slate-400">
           <i class="fa-regular fa-gear"></i>
         </button>
-      </div>
+      </div> -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="avatar">
@@ -31,7 +31,10 @@
           </div>
           <div>
             <p class="text-xs font-semibold">Jorge Rodriguez</p>
-            <p class="text-[10px] text-slate-500">Editor</p>
+            <select v-model="permiso" class="select select-xs select-bordered mt-1 w-28">
+              <option value="editor">Editor</option>
+              <option value="lector">Solo lectura</option>
+            </select>
           </div>
         </div>
         <button class="cursor-pointer w-4 h-4 hover:text-error transition-colors text-slate-400">
@@ -55,10 +58,15 @@
         </button>
       </div>
     </div>
-    <button
+    <!-- <button
       class="btn btn-dash btn-block hover:border-primary hover:text-primary hover:bg-base-100 btn-sm rounded-lg border-dashed border-slate-300"
     >
       Compartir
-    </button>
+    </button> -->
   </div>
 </template>
+<script lang="ts" setup>
+import { ref } from 'vue'
+
+const permiso = ref('editor')
+</script>
