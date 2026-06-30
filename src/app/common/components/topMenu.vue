@@ -72,7 +72,7 @@ function cerrarSesion() {
 
         <i v-else class="fa-solid fa-arrow-right-from-line text-sm"></i>
       </button>
-      <span class="countdown font-mono text-4xl">
+      <!-- <span class="countdown font-mono text-4xl">
         <span
           :style="{ '--value': authStore.minutes, '--digits': 2 }"
           aria-live="polite"
@@ -88,7 +88,7 @@ function cerrarSesion() {
           aria-label="segundos"
           >{{ authStore.seconds }}</span
         >
-      </span>
+      </span> -->
     </div>
 
     <!-- RIGHT -->

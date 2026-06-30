@@ -185,7 +185,7 @@ const { data, isLoading } = useQuery({
 
             <template v-else>
               <div class="p-6 h-full flex flex-col">
-                <ListaCompartidos :banco-id="data.banco.bancoId" />
+                <ListaCompartidos :banco="data.banco" />
               </div>
             </template>
           </div>

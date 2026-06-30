@@ -39,6 +39,7 @@ onMounted(() => {
     position="top-right"
     close-button
     close-button-position="top-left"
+    :expand="true"
   />
   <BaseModal />
   <Fullscreenloaded v-if="authStore.isChecking" />

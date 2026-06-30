@@ -28,14 +28,13 @@
       >
         <div class="flex items-center gap-3">
           <div
-            class="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold"
+            class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-base font-bold"
           >
-            {{ value.identidad.nombre.charAt(0).toUpperCase() }}
-            {{ value.identidad.apellidoPaterno.charAt(0).toUpperCase() }}
+            {{ value.identidad.nombre.charAt(0).toUpperCase()
+            }}{{ value.identidad.apellidoPaterno.charAt(0).toUpperCase() }}
           </div>
 
           <div>
-            fsdf
             <p class="text-xs font-semibold">
               {{ value.identidad.nombre }}
               {{ value.identidad.apellidoPaterno }}
@@ -53,7 +52,11 @@
           </div>
         </div>
 
-        <button class="cursor-pointer text-slate-400 hover:text-error transition-colors">
+        <button
+          class="cursor-pointer text-slate-400 hover:text-error transition-colors"
+          @click="quitarCompartido(value.idCuenta)"
+          :disabled="eliminarMutation.isPending.value"
+        >
           <i class="fa-regular fa-user-minus"></i>
         </button>
       </div>
@@ -63,6 +66,7 @@
     <div class="pt-5 mt-auto">
       <button
         class="btn btn-dash btn-block btn-sm rounded-lg border-dashed hover:border-primary hover:text-primary hover:bg-base-100"
+        @click.stop="Compartirbanco(banco)"
       >
         Compartir
       </button>
@@ -74,36 +78,100 @@ import { getListaPersonasCompartidas } from '@/api/bancos/compartidos/actions/ge
 import { useQuery } from '@tanstack/vue-query'
 
 const props = defineProps<{
-  bancoId: number
+  banco: any
 }>()
 
 const { data } = useQuery({
-  queryKey: ['ListaPersonasCompartidas', props.bancoId],
-  queryFn: () => getListaPersonasCompartidas(String(props.bancoId)),
+  queryKey: ['ListaPersonasCompartidas', props.banco.bancoId],
+  queryFn: () => getListaPersonasCompartidas(String(props.banco.bancoId)),
 })
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { actualizarPermiso } from '@/api/bancos/compartidos/actions/update-permisos.action'
+import { eliminarCompartido } from '@/api/bancos/compartidos/actions/delete-compartido.action'
+import { toast } from 'vue-sonner'
+import type { Banco } from '@/api/bancos/interfaces/banco.interface'
+import { useModalStore } from '@/common/modals/store/modal.store'
+import CompartirBanco from '@/app/common/components/modals/CompartirBanco.vue'
 
 const queryClient = useQueryClient()
 
 const mutation = useMutation({
   mutationFn: ({ idCuenta, edicion }: { idCuenta: string; edicion: boolean }) =>
-    actualizarPermiso(props.bancoId, idCuenta, {
+    actualizarPermiso(props.banco.bancoId, idCuenta, {
       edicion,
     }),
 
   onSuccess: () => {
     queryClient.invalidateQueries({
-      queryKey: ['ListaPersonasCompartidas', props.bancoId],
+      queryKey: ['ListaPersonasCompartidas', props.banco.bancoId],
     })
   },
 })
 
 const cambiarPermiso = (idCuenta: string, permiso: string) => {
-  mutation.mutate({
-    idCuenta,
-    edicion: permiso === 'editor',
-  })
+  toast.promise(
+    mutation.mutateAsync({
+      idCuenta,
+      edicion: permiso === 'editor',
+    }),
+    {
+      loading: 'Actualizando permiso...',
+      success: 'Permiso actualizado.',
+      error: 'No fue posible actualizar el permiso.',
+    },
+  )
+}
+
+const eliminarMutation = useMutation({
+  mutationFn: (idCuenta: string) => eliminarCompartido(props.banco.bancoId, idCuenta),
+
+  onSuccess: () => {
+    // toast.success('Usuario eliminado correctamente')
+
+    queryClient.invalidateQueries({
+      queryKey: ['ListaPersonasCompartidas', props.banco.bancoId],
+    })
+  },
+
+  onError: () => {
+    toast.error('No fue posible eliminar al usuario')
+  },
+})
+
+const quitarCompartido = (idCuenta: string) => {
+  toast.promise(
+    (async () => {
+      await eliminarMutation.mutateAsync(idCuenta)
+
+      await queryClient.invalidateQueries({
+        queryKey: ['ListaPersonasCompartidas', props.banco.bancoId],
+      })
+    })(),
+    {
+      loading: 'Eliminando usuario...',
+      success: 'Usuario eliminado correctamente.',
+      error: 'No fue posible eliminar al usuario.',
+    },
+  )
+}
+function closeDropdown() {
+  ;(document.activeElement as HTMLElement)?.blur()
+}
+const modal = useModalStore()
+async function Compartirbanco(Banco: Banco) {
+  closeDropdown()
+  modal.openModal(
+    CompartirBanco,
+    // console.log('Seejecuto el; invalidteSds!!!!!!!!!!!'),
+    {
+      banco: Banco,
+    },
+    [
+      { label: 'Cerrar', variant: 'outline' },
+      { label: 'Compartir', variant: 'primary', type: 'submit' },
+    ],
+    'max-w-5xl',
+  )
 }
 </script>

@@ -305,6 +305,10 @@ async function compartir() {
     await queryClient.invalidateQueries({
       queryKey: ['items-unificados'],
     })
+    await queryClient.invalidateQueries({
+      queryKey: ['ListaPersonasCompartidas'],
+      exact: false,
+    })
     modal.closeModal()
 
     toast.success('Banco compartido correctamente')
