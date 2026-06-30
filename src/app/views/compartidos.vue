@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-start gap-4">
-    <i class="fa-regular fa-share-nodes text-5xl mt-1"></i>
+    <!-- <i class="fa-regular fa-share-nodes text-5xl mt-1"></i> -->
 
     <div>
       <h1 class="text-2xl font-bold">Gestión de Bancos Compartidos</h1>

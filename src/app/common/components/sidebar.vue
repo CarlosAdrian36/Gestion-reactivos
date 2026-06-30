@@ -75,7 +75,7 @@ watch(theme, (val) => {
             </a>
           </RouterLink>
         </li>
-        <li>
+        <!-- <li>
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'recursos' }">
             <a
               @click="navigate"
@@ -90,7 +90,7 @@ watch(theme, (val) => {
               <span>Recursos</span>
             </a>
           </RouterLink>
-        </li>
+        </li> -->
         <li v-if="authStore.user?.roles?.some((r) => r.nombre === 'Administrador')">
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'usuarios' }">
             <a
@@ -115,10 +115,7 @@ watch(theme, (val) => {
         <p class="text-[11px] font-bold uppercase tracking-widest text-(--color-texto) mb-3">
           Tema
         </p>
-        <select
-          class="select select-bordered select-sm w-full"
-          v-model="theme"
-        >
+        <select class="select select-bordered select-sm w-full" v-model="theme">
           <option value="light">Claro</option>
           <option value="dark">Oscuro</option>
           <option value="cupcake">Cupcake</option>

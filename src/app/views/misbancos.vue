@@ -17,6 +17,7 @@ import eliminarBanco from '../common/components/modals/eliminarBanco.vue'
 
 import { useModalStore } from '@/common/modals/store/modal.store'
 import type { ItemUnificado } from '../unifiacados/interface/item-unificado.interface'
+import CompartirBanco from '../common/components/modals/CompartirBanco.vue'
 
 const modal = useModalStore()
 
@@ -70,7 +71,7 @@ function EliminarBanco(Banco: ItemUnificado) {
 function Compartirbanco(Banco: ItemUnificado) {
   closeDropdown()
   modal.openModal(
-    Compartirbanco,
+    CompartirBanco,
     { banco: Banco.original },
     [
       { label: 'Cerrar', variant: 'outline' },
