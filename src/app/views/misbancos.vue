@@ -315,18 +315,18 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
                         Compartir
                       </a>
                     </li>
-
+                    <!-- 
                     <li>
                       <a>
                         <i class="fa-regular fa-copy"></i>
                         Copiar
                       </a>
-                    </li>
+                    </li> -->
                     <li v-if="value.tipo !== 'carpeta'">
                       <div class="dropdown">
                         <div tabindex="0" role="button" class="m-1">
                           <i class="fa-regular fa-folder"></i>
-                          Mover a
+                          Mover a carpeta
                         </div>
                         <ul
                           tabindex="-1"

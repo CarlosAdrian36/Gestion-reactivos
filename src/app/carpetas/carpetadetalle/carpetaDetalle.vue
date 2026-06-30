@@ -166,12 +166,12 @@
                         </a>
                       </li>
 
-                      <li>
+                      <!-- <li>
                         <a>
                           <i class="fa-regular fa-copy"></i>
                           Copiar
                         </a>
-                      </li>
+                      </li> -->
                       <li>
                         <div class="dropdown">
                           <div tabindex="0" role="button" class="m-1">

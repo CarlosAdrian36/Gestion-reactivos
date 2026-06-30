@@ -52,14 +52,16 @@ onMounted(async () => {
 
           <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <dt class="text-xs text-base-content/60 uppercase tracking-wider">Nombre de usuario</dt>
+              <dt class="text-xs text-base-content/60 uppercase tracking-wider">
+                Nombre de usuario
+              </dt>
               <dd class="mt-1 font-medium">{{ authStore.user.nombreUsuario }}</dd>
             </div>
-            <div>
+            <!-- <div>
               <dt class="text-xs text-base-content/60 uppercase tracking-wider">CURP</dt>
               <dd class="mt-1 font-medium">{{ authStore.user.identidad.curp || '—' }}</dd>
-            </div>
-            <div>
+            </div> -->
+            <!-- <div>
               <dt class="text-xs text-base-content/60 uppercase tracking-wider">Vigencia</dt>
               <dd class="mt-1">
                 <span
@@ -69,11 +71,9 @@ onMounted(async () => {
                   {{ authStore.user.vigencia ? 'Activa' : 'Inactiva' }}
                 </span>
               </dd>
-            </div>
+            </div> -->
             <div>
-              <dt class="text-xs text-base-content/60 uppercase tracking-wider">
-                Cuenta académica
-              </dt>
+              <dt class="text-xs text-base-content/60 uppercase tracking-wider">Área académica</dt>
               <dd class="mt-1">
                 <span
                   class="badge"

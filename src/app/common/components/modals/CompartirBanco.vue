@@ -95,13 +95,13 @@
                   <span class="font-medium">Rol en plataforma:</span>
                   {{ usuarioSeleccionado.roles[0]?.nombre || '—' }}
                 </p>
-
+                <!-- 
                 <p>
                   <span class="font-medium">Estatus:</span>
                   <span :class="usuarioSeleccionado.vigencia ? 'text-success' : 'text-error'">
                     {{ usuarioSeleccionado.vigencia ? 'Activo' : 'Inactivo' }}
                   </span>
-                </p>
+                </p> -->
               </div>
             </div>
           </div>

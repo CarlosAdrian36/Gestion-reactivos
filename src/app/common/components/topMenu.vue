@@ -124,7 +124,7 @@ function cerrarSesion() {
             </RouterLink>
           </li>
 
-          <li>
+          <!-- <li>
             <a class="text-sm">
               <i class="fa-regular fa-gear"></i>
               Configuración
@@ -136,7 +136,7 @@ function cerrarSesion() {
               <i class="fa-solid fa-key"></i>
               Actualizar contraseña
             </a>
-          </li>
+          </li> -->
 
           <div class="divider my-1"></div>
 

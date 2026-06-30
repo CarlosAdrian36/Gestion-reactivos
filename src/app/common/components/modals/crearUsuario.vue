@@ -142,7 +142,7 @@
 
     <div class="md:col-span-3"></div>
     <!-- Fila 3 -->
-    <div class="md:col-span-3">
+    <!-- <div class="md:col-span-3">
       <div class="flex items-center gap-3 h-12">
         <span class="font-medium">Caducidad de la cuenta</span>
 
@@ -155,7 +155,7 @@
       </div>
 
       <div class="h-5"></div>
-    </div>
+    </div> -->
 
     <div class="md:col-span-3">
       <Transition

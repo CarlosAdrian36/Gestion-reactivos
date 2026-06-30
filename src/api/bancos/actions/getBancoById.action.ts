@@ -1,9 +1,9 @@
 import { apiClient } from '@/api/http'
-import type { CreateBancosResponse } from '../interfaces/banco.interface'
+import type { BancoByID } from '../interfaces/bancoById.interface'
 
-export const getBancoById = async (bancoId: string): Promise<CreateBancosResponse> => {
+export const getBancoById = async (bancoId: string): Promise<BancoByID> => {
   try {
-    const { data } = await apiClient.get<CreateBancosResponse>(`/bancos/${bancoId}`)
+    const { data } = await apiClient.get<BancoByID>(`/bancos/${bancoId}`)
     console.log(data)
     return data
   } catch (error) {
