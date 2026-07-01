@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import { useAuthStore } from '@/auth/store/auth.store'
+import { AuthStatus } from '../../../auth/interface/auth-status.enum'
 
 const sidebar = useSidebarStore()
 const authStore = useAuthStore()
@@ -20,7 +21,7 @@ watch(theme, (val) => {
     :class="sidebar.isOpen ? 'w-64' : 'w-0 '"
   >
     <div
-      class="flex flex-col gap-1 p-4 transition-opacity duration-200"
+      class="flex h-full flex-col p-4 transition-opacity duration-200"
       :class="sidebar.isOpen ? 'opacity-100' : 'opacity-0 '"
     >
       <p class="px-3 text-[11px] font-bold uppercase tracking-widest text-(--color-texto) mb-2">
@@ -148,6 +149,39 @@ watch(theme, (val) => {
           <option value="nord">Nord</option>
           <option value="sunset">Sunset</option>
         </select>
+      </div>
+
+      <div class="mt-auto pt-6">
+        <div class="rounded-xl border border-base-300 bg-base-200 p-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-content font-bold text-lg"
+            >
+              {{ authStore.user.identidad.nombre.charAt(0).toUpperCase()
+              }}{{ authStore.user.identidad.apellidoPaterno.charAt(0) }}
+              <!-- {{ authStore.user?.nombre?.charAt(0).toUpperCase() }} -->
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <p class="truncate font-semibold">
+                {{ authStore.user.identidad.nombre }}
+                {{ authStore.user.identidad.apellidoPaterno }}
+                {{ authStore.user.identidad.apellidoMaterno }}
+              </p>
+
+              <p class="truncate text-sm opacity-70">@{{ authStore.user.nombreUsuario }}</p>
+              <div class="mt-2 flex flex-col gap-1">
+                <span
+                  v-for="rol in authStore.user.roles"
+                  :key="rol.id"
+                  class="badge badge-soft badge-primary badge-sm self-start"
+                >
+                  {{ rol.nombre }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </aside>
