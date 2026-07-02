@@ -7,7 +7,7 @@ import { useAuthStore } from '@/auth/store/auth.store.ts'
 import 'slot-text/style.css'
 import { SlotText } from 'slot-text/vue'
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const sidebar = useSidebarStore()
 const modal = useModalStore()
@@ -26,6 +26,38 @@ function cerrarSesion() {
     },
   ]) // Abre el modal de cerrar sesión
 }
+
+import { toast } from 'vue-sonner'
+
+const copied = ref(false)
+
+const copyToken = async () => {
+  if (!authStore.token) return
+
+  try {
+    await navigator.clipboard.writeText(authStore.token)
+
+    copied.value = true
+
+    setTimeout(() => {
+      copied.value = false
+    }, 3000)
+  } catch {
+    toast.error('No se pudo copiar el token')
+  }
+}
+
+const displayedToken = computed(() => {
+  if (!authStore.token) return ''
+
+  const maxLength = 35
+
+  if (authStore.token.length <= maxLength) {
+    return authStore.token
+  }
+
+  return authStore.token.slice(0, maxLength) + '...'
+})
 </script>
 
 <template>
@@ -95,6 +127,24 @@ function cerrarSesion() {
       </span>
     </div>
 
+    <div class="ml-6 flex flex-col">
+      <span class="mb-1 text-xs font-semibold uppercase tracking-wide text-base-content/60">
+        Token
+      </span>
+
+      <button
+        @click="copyToken"
+        :title="authStore.token"
+        class="btn btn-sm h-10 w-82 justify-between border border-base-300 bg-base-100"
+      >
+        <SlotText :text="copied ? '¡Copiado!' : displayedToken" class="font-mono text-xs" />
+        <label class="swap swap-rotate" :class="{ 'swap-active': copied }">
+          <i class="swap-off fa-regular fa-copy text-sm"></i>
+
+          <i class="swap-on fa-regular fa-circle-check text-success text-sm"></i>
+        </label>
+      </button>
+    </div>
     <!-- RIGHT -->
     <div class="navbar-end gap-2">
       <!-- AVATAR -->
