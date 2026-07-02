@@ -48,7 +48,6 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = loginResp.token
       authStatus.value = AuthStatus.Authenticated
       expiracion.value = Date.now() + loginResp.tiempoRestante * 1000
-
       await loadUserProfile()
 
       return { ok: true }
@@ -66,7 +65,6 @@ export const useAuthStore = defineStore('auth', () => {
         return false
       }
       authStatus.value = AuthStatus.Authenticated
-
       await loadUserProfile()
 
       return true
@@ -113,6 +111,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('token')
     localStorage.removeItem('expiracion')
     queryClient.clear()
+    user.value = null
   }
   watch(remainingSeconds, async (value) => {
     if (value <= 0 && token.value) {

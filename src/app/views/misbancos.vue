@@ -145,10 +145,7 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
     </div>
 
     <!-- TABLA -->
-    <div
-      v-if="!isMobile"
-      class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible"
-    >
+    <div v-if="!isMobile" class="app-card border border-base-300 bg-base-100 overflow-visible">
       <!-- LOADING -->
       <div class="overflow-visible">
         <div v-if="isLoading" class="p-6 space-y-3">

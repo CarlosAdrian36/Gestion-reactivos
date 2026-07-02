@@ -3,7 +3,11 @@ import { useModalStore } from '@/common/modals/store/modal.store.ts'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import CerrarSesion from './modals/cerrarSesion.vue'
 import { useAuthStore } from '@/auth/store/auth.store.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+
+import 'slot-text/style.css'
+import { SlotText } from 'slot-text/vue'
+
+import { ref } from 'vue'
 
 const sidebar = useSidebarStore()
 const modal = useModalStore()
@@ -72,7 +76,7 @@ function cerrarSesion() {
 
         <i v-else class="fa-solid fa-arrow-right-from-line text-sm"></i>
       </button>
-      <!-- <span class="countdown font-mono text-4xl">
+      <span class="countdown font-mono text-4xl">
         <span
           :style="{ '--value': authStore.minutes, '--digits': 2 }"
           aria-live="polite"
@@ -88,7 +92,7 @@ function cerrarSesion() {
           aria-label="segundos"
           >{{ authStore.seconds }}</span
         >
-      </span> -->
+      </span>
     </div>
 
     <!-- RIGHT -->
@@ -151,3 +155,10 @@ function cerrarSesion() {
     </div>
   </header>
 </template>
+<style scoped>
+.copied-msg {
+  margin-left: 8px;
+  color: green;
+  font-size: 0.9rem;
+}
+</style>

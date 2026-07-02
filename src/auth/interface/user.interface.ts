@@ -13,6 +13,7 @@ export interface Cuenta {
   organizacion: Organizacion
   fechaCreacion: string
   fechaModificacion: string
+  activacion: Activacion
 }
 
 export interface Correo {
@@ -42,4 +43,10 @@ export interface Role {
   nombre: string
   fechaCreacion: string
   fechaModificacion: string
+}
+export interface Activacion {
+  activa: boolean
+  fechaActivacion: string | null
+  tiempoRestanteSolicitud: number
+  fechaSolicitud: string | null
 }

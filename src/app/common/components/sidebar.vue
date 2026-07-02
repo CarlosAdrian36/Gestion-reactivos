@@ -151,7 +151,7 @@ watch(theme, (val) => {
         </select>
       </div>
 
-      <div class="mt-auto pt-6">
+      <div v-if="authStore.user" class="mt-auto pt-6">
         <div class="rounded-xl border border-base-300 bg-base-200 p-4">
           <div class="flex items-center gap-3">
             <div
@@ -159,7 +159,6 @@ watch(theme, (val) => {
             >
               {{ authStore.user.identidad.nombre.charAt(0).toUpperCase()
               }}{{ authStore.user.identidad.apellidoPaterno.charAt(0) }}
-              <!-- {{ authStore.user?.nombre?.charAt(0).toUpperCase() }} -->
             </div>
 
             <div class="min-w-0 flex-1">
@@ -181,6 +180,18 @@ watch(theme, (val) => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div v-else class="mt-auto pt-6">
+        <div class="flex w-52 flex-col gap-4">
+          <div class="flex items-center gap-4">
+            <div class="skeleton h-16 w-16 shrink-0 rounded-full"></div>
+            <div class="flex flex-col gap-4">
+              <div class="skeleton h-4 w-20"></div>
+              <div class="skeleton h-4 w-28"></div>
+            </div>
+          </div>
+          <div class="skeleton h-32 w-full"></div>
         </div>
       </div>
     </div>

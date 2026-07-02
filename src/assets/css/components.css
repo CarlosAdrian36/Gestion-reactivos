@@ -1,0 +1,63 @@
+/* ===========================
+   Cards
+=========================== */
+
+[data-theme='light'] .app-card {
+  @apply rounded-2xl  shadow-sm;
+}
+
+/* ===========================
+   Inputs
+=========================== */
+
+[data-theme='light'] .app-input {
+  @apply rounded-xl;
+}
+
+/* ===========================
+   Selects
+=========================== */
+
+[data-theme='light'] .app-select {
+  @apply rounded-xl;
+}
+
+/* ===========================
+   Botones
+=========================== */
+
+[data-theme='light'] .app-btn {
+  @apply rounded-xl;
+}
+
+/* ===========================
+   Textareas
+=========================== */
+
+[data-theme='light'] .app-textarea {
+  @apply rounded-xl;
+}
+
+/* ===========================
+   Modales
+=========================== */
+
+[data-theme='light'] .app-modal {
+  @apply rounded-2xl;
+}
+
+/* ===========================
+   Dropdowns
+=========================== */
+
+[data-theme='light'] .app-dropdown {
+  @apply rounded-2xl shadow-lg;
+}
+
+/* ===========================
+   Badges
+=========================== */
+
+[data-theme='light'] .app-badge {
+  @apply rounded-lg;
+}
