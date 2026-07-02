@@ -1,8 +1,10 @@
 <template>
   <div class="flex flex-col h-full">
     <div class="flex flex-row items-center mb-4">
-      <i class="fa-regular fa-ballot-check text-primary pe-2"></i>
-      <h2 class="text-xs font-bold uppercase tracking-widest">Listado de Reactivos</h2>
+      <button class="btn btn-ghost btn-sm gap-2 px-3 py-2 rounded-lg hover:bg-base-200">
+        <i class="fa-regular fa-ballot-check text-primary pe-2"></i>
+        <h2 class="text-xs font-bold uppercase tracking-widest">Listado de Reactivos</h2>
+      </button>
     </div>
 
     <!-- Contenido -->
