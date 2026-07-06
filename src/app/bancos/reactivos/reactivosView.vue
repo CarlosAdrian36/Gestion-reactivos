@@ -89,7 +89,7 @@ function fmtDate(iso: string): string {
                 <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm"
                 >
-                  <i class="fa-regular fa-upload text-[14px]"></i>
+                  <i class="fa-regular fa-trash"></i>
                   Eliminar
                 </button>
               </div>
