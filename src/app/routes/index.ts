@@ -11,5 +11,12 @@ export const bancoRoutes: RouteRecordRaw[] = [
     path: 'banco/:id',
     name: 'bancoDetalle',
     component: () => import('@/app/bancos/bancodetalle/bancoMenu.vue'),
+    meta: { sidebar: 'default' },
+  },
+  {
+    path: 'banco/:id/reactivos',
+    name: 'reactivosList',
+    component: () => import('@/app/bancos/reactivos/reactivosView.vue'),
+    meta: { sidebar: 'reactivos' },
   },
 ]
