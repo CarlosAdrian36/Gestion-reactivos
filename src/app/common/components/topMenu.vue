@@ -13,18 +13,17 @@ const sidebar = useSidebarStore()
 const modal = useModalStore()
 const authStore = useAuthStore()
 function cerrarSesion() {
-  // Lógica para cerrar sesión, como limpiar tokens, redirigir a la página de login, etc.
   modal.openModal(CerrarSesion, {}, [
     { label: 'Cerrar', variant: 'outline' },
     {
       label: 'Salir',
       variant: 'error',
       action: () => {
-        modal.closeModal() // Cierra el modal
-        authStore.logout() // Llama a la función de logout del store de autenticación
+        modal.closeModal()
+        authStore.logout()
       },
     },
-  ]) // Abre el modal de cerrar sesión
+  ])
 }
 
 import { toast } from 'vue-sonner'

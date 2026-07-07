@@ -1,10 +1,29 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import { useAuthStore } from '@/auth/store/auth.store'
+import { useModalStore } from '@/common/modals/store/modal.store'
+import CerrarSesion from './modals/cerrarSesion.vue'
 
+const router = useRouter()
 const sidebar = useSidebarStore()
 const authStore = useAuthStore()
+const modal = useModalStore()
+
+function cerrarSesion() {
+  modal.openModal(CerrarSesion, {}, [
+    { label: 'Cerrar', variant: 'outline' },
+    {
+      label: 'Salir',
+      variant: 'error',
+      action: () => {
+        modal.closeModal()
+        authStore.logout()
+      },
+    },
+  ])
+}
 
 const theme = ref(document.documentElement.getAttribute('data-theme') || 'light')
 
@@ -140,7 +159,10 @@ const initials = computed(() => {
       <div v-if="authStore.user" class="mt-auto px-3 pb-3 w-full">
         <template v-if="sidebar.isOpen">
           <div class="rounded-2xl border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
-            <div class="flex items-center gap-3 mb-4">
+            <div
+              class="flex items-center gap-3 mb-4 cursor-pointer"
+              @click="router.push({ name: 'perfil' })"
+            >
               <div
                 class="size-10 shrink-0 rounded-full bg-base-300 flex items-center justify-center border border-base-300"
               >
@@ -149,7 +171,6 @@ const initials = computed(() => {
               <div class="min-w-0">
                 <p class="text-xs font-bold text-base-content truncate">
                   {{ authStore.user.identidad.nombre }}
-                  <!-- {{ authStore.user.identidad.apellidoPaterno }} -->
                 </p>
                 <p class="text-[10px] text-base-content/60 truncate">
                   {{ authStore.user.roles?.[0]?.nombre || '@' + authStore.user.nombreUsuario }}
@@ -157,7 +178,7 @@ const initials = computed(() => {
               </div>
             </div>
             <button
-              @click="authStore.logout()"
+              @click="cerrarSesion()"
               class="w-full flex items-center justify-center gap-2 py-2 text-[11px] font-bold text-error hover:bg-error/10 rounded-lg transition-colors"
             >
               <i class="fa-regular fa-right-from-bracket text-sm"></i>
@@ -174,6 +195,7 @@ const initials = computed(() => {
           >
             <div
               class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-content font-bold text-xs shadow-sm cursor-pointer transition-transform hover:scale-105 overflow-hidden leading-none"
+              @click="router.push({ name: 'perfil' })"
             >
               {{ initials }}
             </div>
