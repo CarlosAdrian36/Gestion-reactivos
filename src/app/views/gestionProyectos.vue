@@ -47,7 +47,7 @@ const goToItem = (item: Banco) => {
     </div>
 
     <!-- TABLA -->
-    <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible">
+    <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-visible">
       <!-- LOADING -->
       <div class="overflow-x-auto">
         <div v-if="loading" class="p-6 space-y-3">

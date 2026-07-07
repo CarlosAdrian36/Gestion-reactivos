@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl max-auto px-4">
+  <div class="max-w-7xl mx-auto px-4">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
       <div>
         <h1 class="text-2xl font-bold">Gestión de Usuarios</h1>
@@ -14,7 +14,7 @@
         </button>
       </div>
     </div>
-    <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible">
+    <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-visible">
       <div class="overflow-visible">
         <div v-if="isLoading" class="p-6 space-y-3">
           <div class="skeleton h-14 w-full"></div>
@@ -27,7 +27,7 @@
           <!-- HEAD -->
           <thead class="bg-base-200">
             <tr>
-              <th class="w-40 text-center align-middle">ID de ususario</th>
+              <th class="w-40 text-center align-middle">Usuario</th>
 
               <th class="w-40 text-center align-middle">Nombre</th>
 

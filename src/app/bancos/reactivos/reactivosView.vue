@@ -60,7 +60,7 @@ function fmtDate(iso: string): string {
 
         <!-- Detail Card -->
         <div
-          class="bg-base-100 rounded-2xl shadow-soft border border-base-300 flex flex-col min-h-150"
+          class="bg-base-100 rounded-box border border-base-300 flex flex-col min-h-150"
         >
           <!-- Card Header -->
           <div class="px-8 pt-8 pb-0">

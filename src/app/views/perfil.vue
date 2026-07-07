@@ -25,7 +25,7 @@ onMounted(async () => {
     </div>
 
     <template v-else>
-      <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
+      <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
         <div class="p-6">
           <div class="flex items-center gap-4 mb-6">
             <div
@@ -46,7 +46,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
+      <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
         <div class="p-6">
           <h3 class="font-semibold mb-4">Información general</h3>
 
@@ -87,7 +87,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
+      <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
         <div class="p-6">
           <h3 class="font-semibold mb-4">Correos electrónicos</h3>
 
@@ -104,7 +104,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
+      <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
         <div class="p-6">
           <h3 class="font-semibold mb-4">Roles</h3>
 

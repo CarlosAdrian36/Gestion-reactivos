@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible">
+      <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-visible">
         <div class="overflow-visible">
           <div v-if="isLoading" class="p-6 space-y-3">
             <div class="skeleton h-14 w-full"></div>

@@ -1,15 +1,13 @@
 <template>
-  <div class="flex items-start gap-4">
-    <!-- <i class="fa-regular fa-share-nodes text-5xl mt-1"></i> -->
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+      <div>
+        <h1 class="text-2xl font-bold">Gestión de Bancos Compartidos</h1>
 
-    <div>
-      <h1 class="text-2xl font-bold">Gestión de Bancos Compartidos</h1>
-
-      <p class="text-sm text-base-content/70">Administra carpetas y bancos de reactivos</p>
+        <p class="text-sm text-base-content/70">Administra carpetas y bancos de reactivos</p>
+      </div>
     </div>
-  </div>
-  <!-- <pre>{{ data }}</pre> -->
-  <div class="rounded-2xl border border-base-300 bg-base-100 shadow-sm overflow-visible">
+  <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-visible">
     <div class="overflow-visible">
       <div v-if="isLoading" class="p-6 space-y-3">
         <div class="skeleton h-14 w-full"></div>
@@ -130,6 +128,7 @@
         </tbody>
       </table>
     </div>
+  </div>
   </div>
 </template>
 

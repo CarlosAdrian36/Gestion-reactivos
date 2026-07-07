@@ -158,7 +158,7 @@ const initials = computed(() => {
       <!-- User card -->
       <div v-if="authStore.user" class="mt-auto px-3 pb-3 w-full">
         <template v-if="sidebar.isOpen">
-          <div class="rounded-2xl border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
+          <div class="rounded-box border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
             <div
               class="flex items-center gap-3 mb-4 cursor-pointer"
               @click="router.push({ name: 'perfil' })"
@@ -204,7 +204,7 @@ const initials = computed(() => {
       </div>
       <div v-else class="mt-auto px-3 pb-3 w-full">
         <template v-if="sidebar.isOpen">
-          <div class="rounded-2xl border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
+          <div class="rounded-box border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
             <div class="flex items-center gap-3 mb-4">
               <div class="skeleton size-10 shrink-0 rounded-full"></div>
               <div class="flex flex-col gap-2 flex-1">
