@@ -1,9 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, watch, computed } from 'vue'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import { useAuthStore } from '@/auth/store/auth.store'
-import { AuthStatus } from '../../../auth/interface/auth-status.enum'
 
 const sidebar = useSidebarStore()
 const authStore = useAuthStore()
@@ -13,106 +11,93 @@ const theme = ref(document.documentElement.getAttribute('data-theme') || 'light'
 watch(theme, (val) => {
   document.documentElement.setAttribute('data-theme', val)
 })
+
+const initials = computed(() => {
+  if (!authStore.user) return ''
+  const id = authStore.user.identidad
+  return (id.nombre.charAt(0) + id.apellidoPaterno.charAt(0)).toUpperCase()
+})
 </script>
 
 <template>
   <aside
     class="bg-base-100 border-r border-primary/10 transition-all duration-300 overflow-y-auto fixed lg:static top-16 left-0 h-[calc(100vh-4rem)] z-40"
-    :class="sidebar.isOpen ? 'w-64' : 'w-0 '"
+    :class="sidebar.isOpen ? 'w-64' : 'w-16'"
   >
     <div
-      class="flex h-full flex-col p-4 transition-opacity duration-200"
-      :class="sidebar.isOpen ? 'opacity-100' : 'opacity-0 '"
+      class="flex h-full flex-col transition-all duration-200"
+      :class="sidebar.isOpen ? 'p-4 items-stretch' : 'p-2 items-center'"
     >
-      <p class="px-3 text-[11px] font-bold uppercase tracking-widest text-(--color-texto) mb-2">
+      <!-- Navigation label -->
+      <p
+        v-show="sidebar.isOpen"
+        class="px-3 text-[11px] font-bold uppercase tracking-widest text-(--color-texto) mb-2 w-full"
+      >
         Navegación
       </p>
-      <ul class="flex flex-col gap-1">
+
+      <!-- Nav items -->
+      <ul class="flex flex-col gap-1 w-full">
         <li>
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'misBancos' }">
             <a
               @click="navigate"
               :class="[
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                'flex items-center transition-colors rounded-lg font-medium',
+                sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
                 isActive
                   ? 'bg-primary-content text-primary'
                   : 'text-(--color-texto) hover:bg-base-200',
               ]"
+              :title="!sidebar.isOpen ? 'Bancos' : undefined"
             >
               <i class="fa-regular fa-file-lines text-xl"></i>
-              <span>Bancos</span>
+              <span v-show="sidebar.isOpen">Bancos</span>
             </a>
           </RouterLink>
         </li>
-        <!-- <li>
-          <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'proyectos' }">
-            <a
-              @click="navigate"
-              :class="[
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary-content text-primary'
-                  : 'text-(--color-texto) hover:bg-base-200',
-              ]"
-            >
-              <i class="fa-regular fa-briefcase text-xl"></i>
-              <span>Proyectos</span>
-            </a>
-          </RouterLink>
-        </li> -->
         <li>
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'compartidos' }">
             <a
               @click="navigate"
               :class="[
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                'flex items-center transition-colors rounded-lg font-medium',
+                sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
                 isActive
                   ? 'bg-primary-content text-primary'
                   : 'text-(--color-texto) hover:bg-base-200',
               ]"
+              :title="!sidebar.isOpen ? 'Compartidos' : undefined"
             >
               <i class="fa-regular fa-share-nodes text-xl"></i>
-              <span>Compartidos</span>
+              <span v-show="sidebar.isOpen">Compartidos</span>
             </a>
           </RouterLink>
         </li>
-        <!-- <li>
-          <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'recursos' }">
-            <a
-              @click="navigate"
-              :class="[
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary-content text-primary'
-                  : 'text-(--color-texto) hover:bg-base-200',
-              ]"
-            >
-              <i class="fa-solid fa-bookmark text-xl"></i>
-              <span>Recursos</span>
-            </a>
-          </RouterLink>
-        </li> -->
         <li v-if="authStore.user?.roles?.some((r) => r.nombre === 'Administrador')">
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'usuarios' }">
             <a
               @click="navigate"
               :class="[
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                'flex items-center transition-colors rounded-lg font-medium',
+                sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
                 isActive
                   ? 'bg-primary-content text-primary'
                   : 'text-(--color-texto) hover:bg-base-200',
               ]"
+              :title="!sidebar.isOpen ? 'Usuarios' : undefined"
             >
               <i class="fa-regular fa-user text-xl"></i>
-              <span>Usuarios</span>
+              <span v-show="sidebar.isOpen">Usuarios</span>
             </a>
           </RouterLink>
         </li>
       </ul>
 
-      <div class="border-t border-primary/10 my-4"></div>
+      <div v-show="sidebar.isOpen" class="border-t border-primary/10 my-4 w-full"></div>
 
-      <div class="px-3">
+      <!-- Theme selector -->
+      <div v-show="sidebar.isOpen" class="px-3 w-full">
         <p class="text-[11px] font-bold uppercase tracking-widest text-(--color-texto) mb-3">
           Tema
         </p>
@@ -151,48 +136,68 @@ watch(theme, (val) => {
         </select>
       </div>
 
-      <div v-if="authStore.user" class="mt-auto pt-6">
-        <div class="rounded-xl border border-base-300 bg-base-200 p-4">
-          <div class="flex items-center gap-3">
-            <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-content font-bold text-lg"
-            >
-              {{ authStore.user.identidad.nombre.charAt(0).toUpperCase()
-              }}{{ authStore.user.identidad.apellidoPaterno.charAt(0) }}
-            </div>
-
-            <div class="min-w-0 flex-1">
-              <p class="truncate font-semibold">
-                {{ authStore.user.identidad.nombre }}
-                {{ authStore.user.identidad.apellidoPaterno }}
-                {{ authStore.user.identidad.apellidoMaterno }}
-              </p>
-
-              <p class="truncate text-sm opacity-70">@{{ authStore.user.nombreUsuario }}</p>
-              <div class="mt-2 flex flex-col gap-1">
-                <span
-                  v-for="rol in authStore.user.roles"
-                  :key="rol.id"
-                  class="badge badge-soft badge-primary badge-sm self-start"
-                >
-                  {{ rol.nombre }}
-                </span>
+      <!-- User card -->
+      <div v-if="authStore.user" class="mt-auto px-3 pb-3 w-full">
+        <template v-if="sidebar.isOpen">
+          <div class="rounded-2xl border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="size-10 shrink-0 rounded-full bg-base-300 flex items-center justify-center border border-base-300"
+              >
+                <span class="text-xs font-bold text-base-content">{{ initials }}</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-base-content truncate">
+                  {{ authStore.user.identidad.nombre }}
+                  <!-- {{ authStore.user.identidad.apellidoPaterno }} -->
+                </p>
+                <p class="text-[10px] text-base-content/60 truncate">
+                  {{ authStore.user.roles?.[0]?.nombre || '@' + authStore.user.nombreUsuario }}
+                </p>
               </div>
             </div>
+            <button
+              @click="authStore.logout()"
+              class="w-full flex items-center justify-center gap-2 py-2 text-[11px] font-bold text-error hover:bg-error/10 rounded-lg transition-colors"
+            >
+              <i class="fa-regular fa-right-from-bracket text-sm"></i>
+              Cerrar Sesión
+            </button>
           </div>
-        </div>
-      </div>
-      <div v-else class="mt-auto pt-6">
-        <div class="flex w-52 flex-col gap-4">
-          <div class="flex items-center gap-4">
-            <div class="skeleton h-16 w-16 shrink-0 rounded-full"></div>
-            <div class="flex flex-col gap-4">
-              <div class="skeleton h-4 w-20"></div>
-              <div class="skeleton h-4 w-28"></div>
+        </template>
+        <template v-else>
+          <div
+            class="flex justify-center"
+            :title="
+              authStore.user.identidad.nombre + ' ' + authStore.user.identidad.apellidoPaterno
+            "
+          >
+            <div
+              class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-content font-bold text-xs shadow-sm cursor-pointer transition-transform hover:scale-105 overflow-hidden leading-none"
+            >
+              {{ initials }}
             </div>
           </div>
-          <div class="skeleton h-32 w-full"></div>
-        </div>
+        </template>
+      </div>
+      <div v-else class="mt-auto px-3 pb-3 w-full">
+        <template v-if="sidebar.isOpen">
+          <div class="rounded-2xl border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="skeleton size-10 shrink-0 rounded-full"></div>
+              <div class="flex flex-col gap-2 flex-1">
+                <div class="skeleton h-3 w-20"></div>
+                <div class="skeleton h-2 w-28"></div>
+              </div>
+            </div>
+            <div class="skeleton h-8 w-full rounded-lg"></div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="flex justify-center">
+            <div class="skeleton size-9 shrink-0 rounded-full"></div>
+          </div>
+        </template>
       </div>
     </div>
   </aside>
