@@ -59,56 +59,74 @@ const initials = computed(() => {
       <ul class="flex flex-col gap-1 w-full">
         <li>
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'misBancos' }">
-            <a
-              @click="navigate"
-              :class="[
-                'flex items-center transition-colors rounded-lg font-medium',
-                sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
-                isActive
-                  ? 'bg-primary-content text-primary'
-                  : 'text-(--color-texto) hover:bg-base-200',
-              ]"
-              :title="!sidebar.isOpen ? 'Bancos' : undefined"
-            >
-              <i class="fa-regular fa-file-lines text-xl"></i>
-              <span v-show="sidebar.isOpen">Bancos</span>
-            </a>
+            <div class="relative">
+              <div
+                v-if="isActive"
+                class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-full"
+              ></div>
+              <a
+                @click="navigate"
+                :class="[
+                  'flex items-center transition-colors rounded-lg font-medium border',
+                  sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
+                  isActive
+                    ? 'bg-primary/5 border-primary/20 text-primary'
+                    : 'border-transparent text-(--color-texto) hover:bg-base-200',
+                ]"
+                :title="!sidebar.isOpen ? 'Bancos' : undefined"
+              >
+                <i class="fa-regular fa-file-lines text-xl"></i>
+                <span v-show="sidebar.isOpen">Bancos</span>
+              </a>
+            </div>
           </RouterLink>
         </li>
         <li>
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'compartidos' }">
-            <a
-              @click="navigate"
-              :class="[
-                'flex items-center transition-colors rounded-lg font-medium',
-                sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
-                isActive
-                  ? 'bg-primary-content text-primary'
-                  : 'text-(--color-texto) hover:bg-base-200',
-              ]"
-              :title="!sidebar.isOpen ? 'Compartidos' : undefined"
-            >
-              <i class="fa-regular fa-share-nodes text-xl"></i>
-              <span v-show="sidebar.isOpen">Compartidos</span>
-            </a>
+            <div class="relative">
+              <div
+                v-if="isActive"
+                class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-full"
+              ></div>
+              <a
+                @click="navigate"
+                :class="[
+                  'flex items-center transition-colors rounded-lg font-medium border',
+                  sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
+                  isActive
+                    ? 'bg-primary/5 border-primary/20 text-primary'
+                    : 'border-transparent text-(--color-texto) hover:bg-base-200',
+                ]"
+                :title="!sidebar.isOpen ? 'Compartidos' : undefined"
+              >
+                <i class="fa-regular fa-share-nodes text-xl"></i>
+                <span v-show="sidebar.isOpen">Compartidos</span>
+              </a>
+            </div>
           </RouterLink>
         </li>
         <li v-if="authStore.user?.roles?.some((r) => r.nombre === 'Administrador')">
           <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'usuarios' }">
-            <a
-              @click="navigate"
-              :class="[
-                'flex items-center transition-colors rounded-lg font-medium',
-                sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
-                isActive
-                  ? 'bg-primary-content text-primary'
-                  : 'text-(--color-texto) hover:bg-base-200',
-              ]"
-              :title="!sidebar.isOpen ? 'Usuarios' : undefined"
-            >
-              <i class="fa-regular fa-user text-xl"></i>
-              <span v-show="sidebar.isOpen">Usuarios</span>
-            </a>
+            <div class="relative">
+              <div
+                v-if="isActive"
+                class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-full"
+              ></div>
+              <a
+                @click="navigate"
+                :class="[
+                  'flex items-center transition-colors rounded-lg font-medium border',
+                  sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
+                  isActive
+                    ? 'bg-primary/5 border-primary/20 text-primary'
+                    : 'border-transparent text-(--color-texto) hover:bg-base-200',
+                ]"
+                :title="!sidebar.isOpen ? 'Usuarios' : undefined"
+              >
+                <i class="fa-regular fa-user text-xl"></i>
+                <span v-show="sidebar.isOpen">Usuarios</span>
+              </a>
+            </div>
           </RouterLink>
         </li>
       </ul>
