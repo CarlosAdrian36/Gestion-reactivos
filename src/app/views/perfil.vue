@@ -1,11 +1,54 @@
 <script lang="ts" setup>
 import { useAuthStore } from '@/auth/store/auth.store'
 import { useModalStore } from '@/common/modals/store/modal.store'
-import { onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import cambiarContrasenaModal from '@/app/common/components/modals/cambiarContrasenaModal.vue'
 
 const authStore = useAuthStore()
 const modal = useModalStore()
+
+const themes = [
+  { value: 'light', label: 'Claro' },
+  { value: 'dark', label: 'Oscuro' },
+  { value: 'cupcake', label: 'Cupcake' },
+  { value: 'emerald', label: 'Emerald' },
+  { value: 'corporate', label: 'Corporate' },
+  { value: 'synthwave', label: 'Synthwave' },
+  { value: 'retro', label: 'Retro' },
+  { value: 'cyberpunk', label: 'Cyberpunk' },
+  { value: 'valentine', label: 'Valentine' },
+  { value: 'halloween', label: 'Halloween' },
+  { value: 'garden', label: 'Garden' },
+  { value: 'forest', label: 'Forest' },
+  { value: 'aqua', label: 'Aqua' },
+  { value: 'lofi', label: 'Lofi' },
+  { value: 'pastel', label: 'Pastel' },
+  { value: 'fantasy', label: 'Fantasy' },
+  { value: 'wireframe', label: 'Wireframe' },
+  { value: 'black', label: 'Black' },
+  { value: 'luxury', label: 'Luxury' },
+  { value: 'dracula', label: 'Dracula' },
+  { value: 'cmyk', label: 'CMYK' },
+  { value: 'autumn', label: 'Autumn' },
+  { value: 'business', label: 'Business' },
+  { value: 'acid', label: 'Acid' },
+  { value: 'lemonade', label: 'Lemonade' },
+  { value: 'night', label: 'Night' },
+  { value: 'coffee', label: 'Coffee' },
+  { value: 'winter', label: 'Winter' },
+  { value: 'dim', label: 'Dim' },
+  { value: 'nord', label: 'Nord' },
+  { value: 'sunset', label: 'Sunset' },
+]
+
+const temaActual = ref(
+  localStorage.getItem('theme') || document.documentElement.getAttribute('data-theme') || 'light',
+)
+
+watch(temaActual, (val) => {
+  document.documentElement.setAttribute('data-theme', val)
+  localStorage.setItem('theme', val)
+})
 
 function abrirCambiarContrasena() {
   modal.openModal(
@@ -19,6 +62,7 @@ function abrirCambiarContrasena() {
 }
 
 onMounted(async () => {
+  document.documentElement.setAttribute('data-theme', temaActual.value)
   if (!authStore.user) {
     await authStore.loadUserProfile()
   }
@@ -144,6 +188,37 @@ onMounted(async () => {
             <i class="fa-regular fa-lock"></i>
             Cambiar contraseña
           </button>
+        </div>
+      </div>
+
+      <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
+        <div class="p-6">
+          <h3 class="font-semibold mb-4">Tema</h3>
+          <p class="text-sm text-base-content/60 mb-4">
+            Selecciona un tema para la interfaz. Los cambios se aplican en tiempo real.
+          </p>
+          <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+            <button
+              v-for="t in themes"
+              :key="t.value"
+              @click="temaActual = t.value"
+              class="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border text-xs font-medium transition-all cursor-pointer"
+              :class="
+                temaActual === t.value
+                  ? 'bg-primary/5 border-primary/20 text-primary'
+                  : 'border-base-300 text-base-content/70 hover:bg-base-200 hover:border-base-content/20'
+              "
+            >
+              <div
+                class="w-full h-1.5 rounded-full"
+                :class="{
+                  'bg-primary': temaActual === t.value,
+                  'bg-base-300': temaActual !== t.value,
+                }"
+              ></div>
+              <span class="leading-tight text-center">{{ t.label }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </template>
