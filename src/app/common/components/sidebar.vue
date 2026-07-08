@@ -179,7 +179,7 @@ const initials = computed(() => {
             </div>
             <button
               @click="cerrarSesion()"
-              class="w-full flex items-center justify-center gap-2 py-2 text-[11px] font-bold text-error hover:bg-error/10 rounded-lg transition-colors"
+              class="w-full btn btn-ghost flex items-center justify-center gap-2 py-2 text-[11px] font-bold text-error hover:bg-error/10 rounded-lg transition-colors"
             >
               <i class="fa-regular fa-right-from-bracket text-sm"></i>
               Cerrar Sesión

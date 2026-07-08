@@ -24,10 +24,10 @@
   </dialog>
 </template>
 <script setup lang="ts">
+import type { ModalButton } from '@/common/modals/interface/modalButton.interface'
+import { useModalStore } from '@/common/modals/store/modal.store'
 import { storeToRefs } from 'pinia'
 import { onMounted, onBeforeUnmount } from 'vue'
-import { useModalStore } from '@/app/store/modal.store'
-import type { ModalButton } from '../interface/Modalbutton.interface'
 
 const modal = useModalStore()
 const { isOpen, component, props, buttons } = storeToRefs(modal)

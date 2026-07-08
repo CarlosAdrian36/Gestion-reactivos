@@ -2,7 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useBancoStore } from '../store/bancos.store'
 import { storeToRefs } from 'pinia'
-import type { Banco } from '../interface/bancoInterface'
+import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import router from '@/router'
 
 const bancoStore = useBancoStore()
@@ -15,7 +15,7 @@ onMounted(async () => {
 })
 const goToItem = (item: Banco) => {
   if (item.esProyecto === true) {
-    router.push({ name: 'bancoDetalle', params: { id: item.id } })
+    router.push({ name: 'bancoDetalle', params: { id: item.bancoId } })
   } else {
     // Si es carpeta, podrías navegar a una vista de carpeta o expandirla
     // router.push({ name: 'detalleCarpeta', params: { id: item.id } })
@@ -78,7 +78,7 @@ const goToItem = (item: Banco) => {
           <tbody v-if="bancos.length">
             <tr
               v-for="value in bancoStore.proyectos"
-              :key="value.id"
+              :key="value.bancoId"
               class="hover transition-colors cursor-pointer"
               @click="goToItem(value)"
             >
@@ -109,7 +109,7 @@ const goToItem = (item: Banco) => {
               <!-- CONTENT -->
               <td class="text-center align-middle">
                 <div class="flex justify-center">
-                  <div class="badge badge-ghost">{{ value.reactivos }} reactivos</div>
+                  <div class="badge badge-ghost">{{ value.cantidadReactivos }} reactivos</div>
                 </div>
               </td>
 

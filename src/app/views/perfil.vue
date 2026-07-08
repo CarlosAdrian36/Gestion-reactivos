@@ -1,8 +1,22 @@
 <script lang="ts" setup>
 import { useAuthStore } from '@/auth/store/auth.store'
+import { useModalStore } from '@/common/modals/store/modal.store'
 import { onMounted } from 'vue'
+import cambiarContrasenaModal from '@/app/common/components/modals/cambiarContrasenaModal.vue'
 
 const authStore = useAuthStore()
+const modal = useModalStore()
+
+function abrirCambiarContrasena() {
+  modal.openModal(
+    cambiarContrasenaModal,
+    {},
+    [
+      { label: 'Cancelar', variant: 'outline' },
+      { label: 'Cambiar contraseña', variant: 'primary', type: 'submit' },
+    ],
+  )
+}
 
 onMounted(async () => {
   if (!authStore.user) {
@@ -117,6 +131,19 @@ onMounted(async () => {
               {{ rol.nombre }}
             </span>
           </div>
+        </div>
+      </div>
+
+      <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
+        <div class="p-6">
+          <h3 class="font-semibold mb-4">Seguridad</h3>
+          <p class="text-sm text-base-content/60 mb-4">
+            Actualiza la contraseña de tu cuenta.
+          </p>
+          <button class="btn btn-primary" @click="abrirCambiarContrasena">
+            <i class="fa-regular fa-lock"></i>
+            Cambiar contraseña
+          </button>
         </div>
       </div>
     </template>

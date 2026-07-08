@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-autopx-4">
+  <div class="max-w-7xl mx-auto px-4">
     <div v-if="isLoading">
       <div class="skeleton h-8 w-64 mb-4"></div>
       <div class="skeleton h-14 w-full"></div>
@@ -39,7 +39,7 @@
             <div class="skeleton h-16 w-full"></div>
           </div>
 
-          <div v-else class="table table-fixed w-full block overflow-x-auto whitespace-nowrap">
+          <table v-else class="table table-fixed w-full block overflow-x-auto whitespace-nowrap">
             <!-- HEAD -->
             <thead class="bg-base-200">
               <tr>
@@ -62,6 +62,7 @@
                 v-for="value in BancosCarpeta"
                 :key="value.bancoId"
                 class="hover transition-colors cursor-pointer hover:bg-base-300"
+                @click="irADetalle(value)"
               >
                 <!-- ICON -->
                 <td class="text-center align-middle">
@@ -286,7 +287,7 @@
                 </td>
               </tr>
             </tbody>
-          </div>
+          </table>
         </div>
       </div>
     </div>
@@ -298,7 +299,7 @@ import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import NuevoBanco from '@/app/common/components/modals/nuevoBanco.vue'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import eliminarBanco from '@/app/common/components/modals/eliminarBanco.vue'
 import { getCarpetaById } from '@/api/carpetas/actions/getById-carpeta.action'
@@ -310,6 +311,7 @@ import { moveCarpetaRaiz } from '@/api/carpetas/actions/move-carpeta-raiz.action
 
 const modal = useModalStore()
 const route = useRoute()
+const router = useRouter()
 
 const carpetaIdNumber = Number(route.params.id)
 const { data: BancosCarpeta, isLoading: isLoadingBancosCarpetas } = useQuery({
@@ -333,6 +335,9 @@ const { data: carpetax, isLoading: isLoadingInformacionCarpeta } = useQuery({
 const isLoading = computed(() => {
   return isLoadingBancosCarpetas.value || isLoadingInformacionCarpeta.value
 })
+function irADetalle(banco: Banco) {
+  router.push({ name: 'bancoDetalle', params: { id: banco.bancoId } })
+}
 function abrirModalBanco(banco?: Banco, carpetaId?: number) {
   console.warn('este es el id', banco?.bancoId)
   modal.openModal(NuevoBanco, { carpetaId, banco }, [
