@@ -1,8 +1,12 @@
 <script setup lang="ts">
-//   import { ref } from 'vue'
+import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
+import { solicitarCambioContrasena } from '../actions'
+
+const enviado = ref(false)
+const errorMensaje = ref('')
 
 const correoSchema = z.object({
   username: z.string().min(1, 'El usuario es requerido'),
@@ -20,8 +24,17 @@ const { handleSubmit, errors, meta, isSubmitting, defineField } = useForm<Correo
 const [username, usernameAttributes] = defineField('username')
 const [correo, correoAttributes] = defineField('correo')
 
-const onSubmit = handleSubmit((formValues) => {
-  console.log('Formulario válido:', formValues)
+const onSubmit = handleSubmit(async (formValues) => {
+  errorMensaje.value = ''
+  const result = await solicitarCambioContrasena({
+    nombreUsuario: formValues.username,
+    correoElectronico: formValues.correo,
+  })
+  if (result.ok) {
+    enviado.value = true
+  } else {
+    errorMensaje.value = result.message ?? 'Error al solicitar el cambio de contraseña'
+  }
 })
 </script>
 
@@ -56,8 +69,21 @@ const onSubmit = handleSubmit((formValues) => {
         </div>
       </div>
 
+      <!-- Mensaje de exito -->
+      <div v-if="enviado" class="text-center space-y-4">
+        <div class="flex justify-center">
+          <div class="size-16 rounded-full bg-success/20 flex items-center justify-center">
+            <i class="fa-regular fa-envelope text-3xl text-success"></i>
+          </div>
+        </div>
+        <h2 class="text-xl font-bold text-base-content/70">Correo enviado</h2>
+        <p class="text-sm text-base-content/50">
+          Revisa tu correo electrónico para seguir con los pasos.
+        </p>
+      </div>
+
       <!-- FORM -->
-      <form @submit.prevent="onSubmit" novalidate class="space-y-6">
+      <form v-if="!enviado" @submit.prevent="onSubmit" novalidate class="space-y-6">
         <!-- Usuario -->
         <div>
           <label class="block text-sm font-medium text-base-content/70 mb-2"> Usuario </label>
@@ -116,6 +142,16 @@ const onSubmit = handleSubmit((formValues) => {
               {{ errors.correo }}
             </span>
           </div>
+        </div>
+
+        <!-- Error del servidor -->
+        <div
+          v-if="errorMensaje"
+          class="p-3 rounded-xl bg-error/10 border border-error/30 text-error text-sm text-center"
+        >
+          Las credenciales proporcionadas no son válidas. Por favor, verifica tu usuario y correo
+          electrónico e intenta nuevamente.
+          <!-- {{ errorMensaje }} -->
         </div>
 
         <!-- Button -->
