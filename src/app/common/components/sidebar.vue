@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import { useAuthStore } from '@/auth/store/auth.store'
@@ -29,6 +29,14 @@ const initials = computed(() => {
   if (!authStore.user) return ''
   const id = authStore.user.identidad
   return (id.nombre.charAt(0) + id.apellidoPaterno.charAt(0)).toUpperCase()
+})
+
+const temaOscuro = ref(localStorage.getItem('theme') === 'night')
+
+watch(temaOscuro, (val) => {
+  const tema = val ? 'night' : 'light'
+  document.documentElement.setAttribute('data-theme', tema)
+  localStorage.setItem('theme', tema)
 })
 </script>
 
@@ -62,7 +70,9 @@ const initials = computed(() => {
                 @click="navigate"
                 :class="[
                   'flex items-center transition-colors rounded-lg font-medium border',
-                  sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
+                  sidebar.isOpen
+                    ? 'gap-3 px-3 py-2.5 text-sm'
+                    : 'gap-0 p-2.5 justify-center text-xl',
                   isActive
                     ? 'bg-primary/5 border-primary/20 text-primary'
                     : 'border-transparent text-(--color-texto) hover:bg-base-200',
@@ -86,7 +96,9 @@ const initials = computed(() => {
                 @click="navigate"
                 :class="[
                   'flex items-center transition-colors rounded-lg font-medium border',
-                  sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
+                  sidebar.isOpen
+                    ? 'gap-3 px-3 py-2.5 text-sm'
+                    : 'gap-0 p-2.5 justify-center text-xl',
                   isActive
                     ? 'bg-primary/5 border-primary/20 text-primary'
                     : 'border-transparent text-(--color-texto) hover:bg-base-200',
@@ -110,7 +122,9 @@ const initials = computed(() => {
                 @click="navigate"
                 :class="[
                   'flex items-center transition-colors rounded-lg font-medium border',
-                  sidebar.isOpen ? 'gap-3 px-3 py-2.5 text-sm' : 'gap-0 p-2.5 justify-center text-xl',
+                  sidebar.isOpen
+                    ? 'gap-3 px-3 py-2.5 text-sm'
+                    : 'gap-0 p-2.5 justify-center text-xl',
                   isActive
                     ? 'bg-primary/5 border-primary/20 text-primary'
                     : 'border-transparent text-(--color-texto) hover:bg-base-200',
@@ -127,14 +141,28 @@ const initials = computed(() => {
 
       <div v-show="sidebar.isOpen" class="border-t border-primary/10 my-4 w-full"></div>
 
-      <!-- User card -->
-      <div v-if="authStore.user" class="mt-auto px-3 pb-3 w-full">
+      <!-- Acciones (tema + cerrar sesion) + User card -->
+      <div v-if="authStore.user" class="mt-auto px-3 pb-3 w-full space-y-0.5">
         <template v-if="sidebar.isOpen">
-          <div class="rounded-box border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
-            <div
-              class="flex items-center gap-3 mb-4 cursor-pointer"
-              @click="router.push({ name: 'perfil' })"
-            >
+          <button
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-(--color-texto) hover:bg-base-200"
+            @click="temaOscuro = !temaOscuro"
+          >
+            <i class="fa-solid fa-circle-half-stroke text-xl"></i>
+            <span>{{ temaOscuro ? 'Modo claro' : 'Modo oscuro' }}</span>
+          </button>
+          <button
+            @click="cerrarSesion()"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-error hover:bg-error/10"
+          >
+            <i class="fa-regular fa-right-from-bracket text-xl"></i>
+            <span>Cerrar sesión</span>
+          </button>
+          <div
+            class="rounded-box border border-base-300 bg-base-200 dark:bg-base-300/30 p-4 cursor-pointer"
+            @click="router.push({ name: 'perfil' })"
+          >
+            <div class="flex items-center gap-3">
               <div
                 class="size-10 shrink-0 rounded-full bg-base-300 flex items-center justify-center border border-base-300"
               >
@@ -149,22 +177,25 @@ const initials = computed(() => {
                 </p>
               </div>
             </div>
-            <button
-              @click="cerrarSesion()"
-              class="w-full btn btn-ghost flex items-center justify-center gap-2 py-2 text-[11px] font-bold text-error hover:bg-error/10 rounded-lg transition-colors"
-            >
-              <i class="fa-regular fa-right-from-bracket text-sm"></i>
-              Cerrar Sesión
-            </button>
           </div>
         </template>
         <template v-else>
-          <div
-            class="flex justify-center"
-            :title="
-              authStore.user.identidad.nombre + ' ' + authStore.user.identidad.apellidoPaterno
-            "
-          >
+          <div class="flex flex-col items-center gap-3">
+            <button
+              class="flex size-9 items-center justify-center rounded-lg text-base-content/60 hover:text-base-content hover:bg-base-200 transition-colors"
+              :title="temaOscuro ? 'Modo claro' : 'Modo oscuro'"
+              @click="temaOscuro = !temaOscuro"
+            >
+              <!-- <i class="fa-sharp fa-solid fa-circle-half-stroke text-lg"></i> -->
+              <i class="fa-solid fa-circle-half-stroke text-lg"></i>
+            </button>
+            <button
+              class="flex size-9 items-center justify-center rounded-lg text-error/60 hover:text-error hover:bg-error/10 transition-colors"
+              title="Cerrar sesión"
+              @click="cerrarSesion()"
+            >
+              <i class="fa-regular fa-right-from-bracket text-lg"></i>
+            </button>
             <div
               class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-content font-bold text-xs shadow-sm cursor-pointer transition-transform hover:scale-105 overflow-hidden leading-none"
               @click="router.push({ name: 'perfil' })"
@@ -177,19 +208,20 @@ const initials = computed(() => {
       <div v-else class="mt-auto px-3 pb-3 w-full">
         <template v-if="sidebar.isOpen">
           <div class="rounded-box border border-base-300 bg-base-200 dark:bg-base-300/30 p-4">
-            <div class="flex items-center gap-3 mb-4">
+            <div class="flex items-center gap-3">
               <div class="skeleton size-10 shrink-0 rounded-full"></div>
               <div class="flex flex-col gap-2 flex-1">
                 <div class="skeleton h-3 w-20"></div>
                 <div class="skeleton h-2 w-28"></div>
               </div>
             </div>
-            <div class="skeleton h-8 w-full rounded-lg"></div>
           </div>
         </template>
         <template v-else>
-          <div class="flex justify-center">
-            <div class="skeleton size-9 shrink-0 rounded-full"></div>
+          <div class="flex flex-col items-center gap-3">
+            <div class="skeleton size-9 rounded-lg"></div>
+            <div class="skeleton size-9 rounded-lg"></div>
+            <div class="skeleton size-9 rounded-full"></div>
           </div>
         </template>
       </div>

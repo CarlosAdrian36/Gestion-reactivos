@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useSidebarStore } from '@/app/common/store/ui/sidebarStore'
+import { ref } from 'vue'
 import { useReactivosMock } from '@/api/bancos/composable/useReactivosMock'
 import { useReactivosStore } from './reactivosStore'
 
-const sidebar = useSidebarStore()
+const abierto = ref(true)
 const { data: reactivos } = useReactivosMock()
 const { selectedReactivo, select } = useReactivosStore()
 
@@ -31,11 +31,23 @@ function fmtDate(iso: string): string {
 
 <template>
   <aside
-    class="bg-base-100 border-r border-base-300 transition-all duration-300 shrink-0 h-full flex flex-col"
-    :class="sidebar.isOpen ? 'w-96' : 'w-0'"
+    class="bg-base-200 border-r border-base-300 transition-all duration-300 shrink-0 h-full flex flex-col relative"
+    :class="abierto ? 'w-96' : 'w-0'"
   >
+    <!-- Collapse toggle -->
+    <button
+      class="hover: cursor-pointer absolute -right-5 top-1/2 -translate-y-1/2 z-10 size-9 rounded-full border-2 border-base-300 bg-base-100 flex items-center justify-center transition-all"
+      @click="abierto = !abierto"
+    >
+      <i
+        :class="
+          abierto ? 'fa-regular fa-chevron-left text-sm' : 'fa-regular fa-chevron-right text-sm'
+        "
+      ></i>
+    </button>
+
     <!-- Scrollable list -->
-    <div class="flex-1 overflow-y-auto p-3 space-y-1" :class="sidebar.isOpen ? 'block' : 'hidden'">
+    <div class="flex-1 overflow-y-auto p-3 space-y-1" :class="abierto ? 'block' : 'hidden'">
       <template v-if="reactivos && reactivos.length > 0">
         <div
           v-for="r in reactivos"
@@ -82,7 +94,7 @@ function fmtDate(iso: string): string {
     </div>
 
     <!-- Fixed bottom button -->
-    <div class="p-3 border-t border-base-300" :class="sidebar.isOpen ? 'block' : 'hidden'">
+    <div class="p-3 border-t border-base-300" :class="abierto ? 'block' : 'hidden'">
       <button
         class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-content text-sm font-bold hover:bg-primary-dark transition-colors"
       >

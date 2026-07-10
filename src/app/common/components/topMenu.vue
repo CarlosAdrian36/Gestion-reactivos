@@ -83,8 +83,11 @@ const displayedToken = computed(() => {
         </svg>
       </button>
 
-      <!-- BRAND -->
-      <div class="flex items-center gap-3">
+      <!-- BRAND (click to toggle nav sidebar) -->
+      <div
+        class="flex items-center gap-3 cursor-pointer"
+        @click="sidebar.toggleSidebar()"
+      >
         <div
           class="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center"
         >
@@ -97,16 +100,6 @@ const displayedToken = computed(() => {
           <p class="text-xs text-base-content/60">Sistema de gestión</p>
         </div>
       </div>
-
-      <!-- SIDEBAR TOGGLE -->
-      <button
-        class="btn btn-ghost btn-sm btn-circle swap swap-rotate hover:bg-base-200 transition-all"
-        @click="sidebar.toggleSidebar()"
-      >
-        <i v-if="sidebar.isOpen" class="fa-solid fa-arrow-left-from-line text-sm"></i>
-
-        <i v-else class="fa-solid fa-arrow-right-from-line text-sm"></i>
-      </button>
       <span class="countdown font-mono text-4xl">
         <span
           :style="{ '--value': authStore.minutes, '--digits': 2 }"
