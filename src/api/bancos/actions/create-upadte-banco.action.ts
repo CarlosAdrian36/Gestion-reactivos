@@ -5,7 +5,7 @@ import type { CreateUpdateBancoRequest } from '../interfaces/create-update-banco
 
 export const saveBancoAction = async (
   banco: CreateUpdateBancoRequest,
-  bancoId?: number,
+  bancoId?: string,
 ): Promise<Banco> => {
   try {
     if (bancoId) {

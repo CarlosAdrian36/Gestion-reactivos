@@ -3,7 +3,7 @@ export interface BancoResponse {
 }
 
 export interface Banco {
-  bancoId: number
+  idBanco: string
   nombre: string
   descripcion: string
   esProyecto: boolean
@@ -12,7 +12,28 @@ export interface Banco {
   cantidadReactivos: number
   fechaCreacion: string
   fechaModificacion: string
-  propietarioCuentaId?: number
+  propietario: Propietario
+  idiomas: Idioma[]
+  permiso: Permiso
+}
+
+export interface Propietario {
+  idCuenta: string
+  nombre: string
+  apellidoPaterno: string
+  apellidoMaterno: string
+}
+
+export interface Idioma {
+  idiomaId: number
+  descripcion: string
+}
+
+export interface Permiso {
+  fechaCreacion: string
+  fechaModificacion: string
+  lectura: boolean
+  escritura: boolean
 }
 
 export interface CreateBancosResponse {

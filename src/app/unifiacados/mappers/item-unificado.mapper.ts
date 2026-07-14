@@ -3,7 +3,7 @@ import type { ItemUnificado } from '../interface/item-unificado.interface'
 import type { Carpeta } from '@/api/carpetas/interfaces/carpeta.interface'
 
 export const mapBanco = (banco: Banco): ItemUnificado => ({
-  id: banco.bancoId,
+  id: banco.idBanco,
   tipo: 'banco',
   nombre: banco.nombre,
   descripcion: banco.descripcion,
@@ -12,15 +12,16 @@ export const mapBanco = (banco: Banco): ItemUnificado => ({
   esProyecto: banco.esProyecto,
   cantidadCompartidos: banco.cantidadCompartidos,
   cantidadReactivos: banco.cantidadReactivos,
-  propietarioCuentaId: banco.propietarioCuentaId,
+  propietario: banco.propietario,
   original: banco,
 })
 
 export const mapCarpeta = (carpeta: Carpeta): ItemUnificado => ({
-  id: carpeta.carpetaId,
+  id: carpeta.idCarpeta,
   tipo: 'carpeta',
   nombre: carpeta.nombre,
   fechaModificacion: carpeta.fechaModificacion,
   cantidadBancos: carpeta.cantidadBancos,
+  propietario: carpeta.propietario,
   original: carpeta,
 })

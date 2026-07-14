@@ -66,7 +66,7 @@ import { isAxiosError } from 'axios'
 
 const props = defineProps<{
   banco?: Banco
-  carpetaId?: number
+  carpetaId?: string
 }>()
 
 const modal = useModalStore()
@@ -102,7 +102,7 @@ const [descripcion, descripcionAttrs] = defineField('descripcion')
 const onSubmit = handleSubmit(async (values) => {
   console.warn(props.carpetaId)
   try {
-    await saveBancoAction({ ...values, carpetaId: props.carpetaId }, props.banco?.bancoId)
+    await saveBancoAction({ ...values, idCarpeta: props.carpetaId }, props.banco?.idBanco)
 
     toast.success(props.banco ? 'Banco Actualizado correctamente' : 'Banco creado correctamente')
     if (props.carpetaId) {

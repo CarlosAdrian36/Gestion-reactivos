@@ -1,9 +1,12 @@
+import type { Propietario } from '@/api/bancos/interfaces/banco.interface'
+
 export interface Carpeta {
-  carpetaId: number
+  idCarpeta: string
   nombre: string
   cantidadBancos: number
   fechaCreacion: string
   fechaModificacion: string
+  propietario: Propietario
 }
 export interface getCarpetasResponse {
   carpetas: Carpeta[]

@@ -50,7 +50,7 @@ const props = defineProps<{
 const onSubmit = async () => {
   console.error(props.carpetaId)
   try {
-    await deleteBanco(props.banco.bancoId)
+    await deleteBanco(props.banco.idBanco)
     toast.success('Se elimino el banco correctamente')
     if (props.carpetaId) {
       console.log(props.carpetaId)

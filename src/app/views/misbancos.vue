@@ -106,7 +106,7 @@ const carpetasFiltradas = computed(() => {
   )
 })
 const queryClient = useQueryClient()
-const moverBanco = async (carpetaId: number, bancoId: number) => {
+const moverBanco = async (carpetaId: string, bancoId: string) => {
   try {
     const rep = await moveBancoCarpeta(carpetaId, bancoId)
     if (rep.bancoAgregado === true) {
@@ -212,7 +212,8 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
                     class="text-sm text-base-content/60 truncate mt-1"
                     :title="value.descripcion"
                   >
-                    {{ value.descripcion }}
+                    <!-- {{ value.descripcion }} -->
+                    {{ value.id }}
                   </p>
                 </div>
               </td>
@@ -266,7 +267,7 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
 
                     <span class="ml-2">
                       {{ value.cantidadCompartidos }}
-                      {{ value.id === 1 ? 'usuario' : 'usuarios' }}
+                      {{ value.cantidadCompartidos === 1 ? 'usuario' : 'usuarios' }}
                     </span>
                   </div>
 
@@ -350,9 +351,9 @@ const moverBanco = async (carpetaId: number, bancoId: number) => {
                             No se encontraron carpetas
                           </li>
                           <!-- RESULTADOS -->
-                          <li v-for="carpeta in carpetasFiltradas" :key="carpeta.carpetaId">
+                          <li v-for="carpeta in carpetasFiltradas" :key="carpeta.idCarpeta">
                             <a
-                              @click="moverBanco(carpeta.carpetaId, value.id)"
+                              @click="moverBanco(carpeta.idCarpeta, value.id)"
                               class="flex items-center justify-between"
                             >
                               <span class="truncate max-w-45" :title="carpeta.nombre">
