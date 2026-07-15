@@ -98,7 +98,7 @@ import { getBancoById } from '@/api/bancos/actions/getBancoById.action'
 
 const route = useRoute()
 
-const bancoId = String(route.params.id)
+const bancoId = route.params.id as string
 
 const esOrigenCompartidos = computed(() => route.query.origen === 'compartidos')
 
@@ -124,22 +124,19 @@ const { data, isLoading } = useQuery({
         </div>
       </template>
 
-      <template v-else-if="data?.banco">
+      <template v-else-if="data">
         <!-- Encabezado -->
         <header class="mb-8">
           <div class="flex items-center gap-3 flex-wrap">
             <h1 class="text-4xl font-bold wrap-break-word">
-              {{ data.banco.nombre }}
+              {{ data.nombre }}
             </h1>
 
-            <div class="badge badge-primary badge-outline">#{{ data.banco.bancoId }}</div>
+            <div class="badge badge-primary badge-outline">#{{ data.idBanco }}</div>
           </div>
 
-          <p
-            v-if="data.banco.descripcion"
-            class="mt-3 text-base-content/70 max-w-3xl leading-relaxed"
-          >
-            {{ data.banco.descripcion }}
+          <p v-if="data.descripcion" class="mt-3 text-base-content/70 max-w-3xl leading-relaxed">
+            {{ data.descripcion }}
           </p>
         </header>
 
@@ -166,15 +163,15 @@ const { data, isLoading } = useQuery({
                   <div
                     class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold"
                   >
-                    {{ data.banco.identidad.nombre.charAt(0).toUpperCase() }}
-                    {{ data.banco.identidad.apellidoPaterno.charAt(0).toUpperCase() }}
+                    {{ data.propietario.nombre.charAt(0).toUpperCase() }}
+                    {{ data.propietario.apellidoPaterno.charAt(0).toUpperCase() }}
                   </div>
 
                   <div>
                     <p class="font-semibold">
-                      {{ data.banco.identidad.nombre }}
-                      {{ data.banco.identidad.apellidoPaterno }}
-                      {{ data.banco.identidad.apellidoMaterno }}
+                      {{ data.propietario.nombre }}
+                      {{ data.propietario.apellidoPaterno }}
+                      {{ data.propietario.apellidoMaterno }}
                     </p>
 
                     <span class="badge badge-primary badge-sm mt-1"> Propietario </span>
@@ -185,7 +182,7 @@ const { data, isLoading } = useQuery({
 
             <template v-else>
               <div class="p-6 h-full flex flex-col">
-                <ListaCompartidos :banco="data.banco" />
+                <ListaCompartidos :banco="data" />
               </div>
             </template>
           </div>

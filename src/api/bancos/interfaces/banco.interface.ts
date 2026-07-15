@@ -33,7 +33,7 @@ export interface Permiso {
   fechaCreacion: string
   fechaModificacion: string
   lectura: boolean
-  escritura: boolean
+  edicion: boolean
 }
 
 export interface CreateBancosResponse {

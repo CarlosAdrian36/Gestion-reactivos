@@ -223,7 +223,7 @@ import { toast } from 'vue-sonner'
 import { useQueryClient } from '@tanstack/vue-query'
 
 const props = defineProps<{
-  banco?: Banco
+  banco: Banco
 }>()
 
 const modal = useModalStore()
@@ -289,19 +289,20 @@ async function compartir() {
   if (!usuarioSeleccionado.value || !props.banco) {
     console.warn('[Compartir] usuario o banco es null', {
       usuario: usuarioSeleccionado.value,
-      banco: props.banco,
+      banco: props.banco.idBanco,
     })
     return
   }
 
   try {
     const { compartido } = await crearCompartidoAction(
-      props.banco.bancoId,
-      usuarioSeleccionado.value.guid,
+      props.banco.idBanco,
+      usuarioSeleccionado.value.idCuenta,
       {
         permitirEdicion: permiso.value === 'edicion',
       },
     )
+
     await queryClient.invalidateQueries({
       queryKey: ['items-unificados'],
     })

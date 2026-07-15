@@ -3,15 +3,11 @@ export interface ListaPersonasCompartidas {
 }
 
 export interface Compartido {
-  permiso: Permiso
-  identidad: Identidad
-  bancoId: number
+  idBanco: string
   idCuenta: string
   fechaCreacion: string
   fechaModificacion: string
-}
-
-export interface Identidad {
+  permiso: Permiso
   nombre: string
   apellidoPaterno: string
   apellidoMaterno: string

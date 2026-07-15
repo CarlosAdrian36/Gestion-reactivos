@@ -2,9 +2,9 @@
   <div class="flex flex-col h-full">
     <div class="flex flex-row items-center mb-4">
       <button
-          class="btn btn-ghost btn-sm gap-2 px-3 py-2 rounded-lg hover:bg-base-200"
-          @click="irAListado"
-        >
+        class="btn btn-ghost btn-sm gap-2 px-3 py-2 rounded-lg hover:bg-base-200"
+        @click="irAListado"
+      >
         <i class="fa-regular fa-ballot-check text-primary pe-2"></i>
         <h2 class="text-xs font-bold uppercase tracking-widest">Listado de Reactivos</h2>
       </button>
@@ -12,7 +12,7 @@
 
     <!-- Contenido -->
     <div class="grow overflow-y-auto max-h-80 pr-2 space-y-2">
-      <div v-if="banco.banco.cantidadReactivos === 0">
+      <div v-if="banco.cantidadReactivos === 0">
         <div
           class="size-20 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-5"
         >
@@ -42,10 +42,10 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import type { BancoByID } from '@/api/bancos/interfaces/bancoById.interface'
+import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 
 const props = defineProps<{
-  banco: BancoByID
+  banco: Banco
 }>()
 
 const router = useRouter()
@@ -53,7 +53,7 @@ const router = useRouter()
 function irAListado() {
   router.push({
     name: 'reactivosList',
-    params: { id: props.banco.banco.bancoId },
+    params: { id: props.banco.idBanco },
   })
 }
 </script>

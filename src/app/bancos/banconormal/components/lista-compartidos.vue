@@ -30,15 +30,15 @@
           <div
             class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-base font-bold"
           >
-            {{ value.identidad.nombre.charAt(0).toUpperCase()
-            }}{{ value.identidad.apellidoPaterno.charAt(0).toUpperCase() }}
+            {{ value.nombre.charAt(0).toUpperCase()
+            }}{{ value.apellidoPaterno.charAt(0).toUpperCase() }}
           </div>
 
           <div>
             <p class="text-xs font-semibold">
-              {{ value.identidad.nombre }}
-              {{ value.identidad.apellidoPaterno }}
-              {{ value.identidad.apellidoMaterno }}
+              {{ value.nombre }}
+              {{ value.apellidoPaterno }}
+              {{ value.apellidoMaterno }}
             </p>
 
             <select
@@ -78,12 +78,12 @@ import { getListaPersonasCompartidas } from '@/api/bancos/compartidos/actions/ge
 import { useQuery } from '@tanstack/vue-query'
 
 const props = defineProps<{
-  banco: any
+  banco: Banco
 }>()
 
 const { data } = useQuery({
-  queryKey: ['ListaPersonasCompartidas', props.banco.bancoId],
-  queryFn: () => getListaPersonasCompartidas(String(props.banco.bancoId)),
+  queryKey: ['ListaPersonasCompartidas', props.banco.idBanco],
+  queryFn: () => getListaPersonasCompartidas(props.banco.idBanco),
 })
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -98,13 +98,13 @@ const queryClient = useQueryClient()
 
 const mutation = useMutation({
   mutationFn: ({ idCuenta, edicion }: { idCuenta: string; edicion: boolean }) =>
-    actualizarPermiso(props.banco.bancoId, idCuenta, {
+    actualizarPermiso(props.banco.idBanco, idCuenta, {
       edicion,
     }),
 
   onSuccess: () => {
     queryClient.invalidateQueries({
-      queryKey: ['ListaPersonasCompartidas', props.banco.bancoId],
+      queryKey: ['ListaPersonasCompartidas', props.banco.idBanco],
     })
   },
 })
@@ -124,13 +124,13 @@ const cambiarPermiso = (idCuenta: string, permiso: string) => {
 }
 
 const eliminarMutation = useMutation({
-  mutationFn: (idCuenta: string) => eliminarCompartido(props.banco.bancoId, idCuenta),
+  mutationFn: (idCuenta: string) => eliminarCompartido(props.banco.idBanco, idCuenta),
 
   onSuccess: () => {
     // toast.success('Usuario eliminado correctamente')
 
     queryClient.invalidateQueries({
-      queryKey: ['ListaPersonasCompartidas', props.banco.bancoId],
+      queryKey: ['ListaPersonasCompartidas', props.banco.idBanco],
     })
   },
 
@@ -145,7 +145,7 @@ const quitarCompartido = (idCuenta: string) => {
       await eliminarMutation.mutateAsync(idCuenta)
 
       await queryClient.invalidateQueries({
-        queryKey: ['ListaPersonasCompartidas', props.banco.bancoId],
+        queryKey: ['ListaPersonasCompartidas', props.banco.idBanco],
       })
     })(),
     {

@@ -1,15 +1,18 @@
 import { apiClient } from '@/api/http'
 import { isAxiosError } from 'axios'
-import type { CrearCompartidoRequest, CrearCompartidoResponse } from '../interfaces/compartir.interface'
+import type {
+  CrearCompartidoRequest,
+  CrearCompartidoResponse,
+} from '../interfaces/compartir.interface'
 
 export const crearCompartidoAction = async (
-  bancoId: number,
+  IdBanco: string,
   guid: string,
   body: CrearCompartidoRequest,
 ): Promise<CrearCompartidoResponse> => {
   try {
     const { data } = await apiClient.post<CrearCompartidoResponse>(
-      `/bancos/${bancoId}/compartidos/${guid}`,
+      `/bancos/${IdBanco}/compartidos/${guid}`,
       body,
     )
     return data

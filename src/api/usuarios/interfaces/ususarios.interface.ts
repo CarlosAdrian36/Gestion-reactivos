@@ -3,7 +3,7 @@ export interface Usuario {
 }
 
 export interface Cuenta {
-  guid: string
+  idCuenta: string
   nombreUsuario: string
   esCuentaAcademica: boolean
   vigencia: boolean

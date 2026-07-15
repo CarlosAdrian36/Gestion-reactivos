@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import type { BancoByID } from '@/api/bancos/interfaces/bancoById.interface'
+import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 
 defineProps<{
-  banco: BancoByID
+  banco: Banco
 }>()
 </script>
 
@@ -21,9 +21,7 @@ defineProps<{
             <i class="fa-light fa-list-ol"></i>
           </div>
           <div>
-            <p class="text-xs font-semibold">
-              Numero de Reactivos: {{ banco.banco.cantidadReactivos }}
-            </p>
+            <p class="text-xs font-semibold">Numero de Reactivos: {{ banco.cantidadReactivos }}</p>
           </div>
         </div>
       </div>
@@ -34,9 +32,9 @@ defineProps<{
           </div>
           <div>
             <p class="text-xs font-semibold">
-              Propietario del banco: {{ banco.banco.identidad.nombre }}
-              {{ banco.banco.identidad.apellidoPaterno }}
-              {{ banco.banco.identidad.apellidoMaterno }}
+              Propietario del banco: {{ banco.propietario.nombre }}
+              {{ banco.propietario.apellidoPaterno }}
+              {{ banco.propietario.apellidoMaterno }}
             </p>
           </div>
         </div>
@@ -50,7 +48,7 @@ defineProps<{
             <p class="text-xs font-semibold">
               Fecha de creacion:
               {{
-                new Date(banco.banco.fechaCreacion).toLocaleDateString('es-ES', {
+                new Date(banco.fechaCreacion).toLocaleDateString('es-ES', {
                   dateStyle: 'medium',
                 })
               }}
@@ -67,7 +65,7 @@ defineProps<{
             <p class="text-xs font-semibold">
               Fecha de modificacion :
               {{
-                new Date(banco.banco.fechaModificacion).toLocaleDateString('es-ES', {
+                new Date(banco.fechaModificacion).toLocaleDateString('es-ES', {
                   dateStyle: 'medium',
                 })
               }}
