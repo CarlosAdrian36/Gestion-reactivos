@@ -60,7 +60,7 @@
               <!-- <pre>{{ data }}</pre> -->
               <tr
                 v-for="value in BancosCarpeta"
-                :key="value.bancoId"
+                :key="value.idBanco"
                 class="hover transition-colors cursor-pointer hover:bg-base-300"
                 @click="irADetalle(value)"
               >
@@ -133,7 +133,7 @@
 
                       <span class="ml-2">
                         {{ value.cantidadCompartidos }}
-                        {{ value.bancoId === 1 ? 'usuario' : 'usuarios' }}
+                        {{ value.cantidadCompartidos === 1 ? 'usuario' : 'usuarios' }}
                       </span>
                     </div>
                   </div>
@@ -167,12 +167,6 @@
                         </a>
                       </li>
 
-                      <!-- <li>
-                        <a>
-                          <i class="fa-regular fa-copy"></i>
-                          Copiar
-                        </a>
-                      </li> -->
                       <li>
                         <div class="dropdown">
                           <div tabindex="0" role="button" class="m-1">
@@ -204,17 +198,17 @@
                               No se encontraron carpetas
                             </li>
                             <!-- RESULTADOS -->
-                            <li v-for="carpeta in carpetasFiltradas" :key="carpeta.carpetaId">
+                            <li v-for="carpeta in carpetasFiltradas" :key="carpeta.idCarpeta">
                               <a
                                 :class="{
                                   'pointer-events-none opacity-50 ':
-                                    carpetax?.carpetaId === carpeta.carpetaId,
+                                    carpetax?.idCarpeta === carpeta.idCarpeta,
                                 }"
                                 @click="
                                   moverCarpetaACarpeta(
-                                    carpetax?.carpetaId!,
-                                    value.bancoId,
-                                    carpeta.carpetaId,
+                                    carpetax?.idCarpeta!,
+                                    value.idBanco,
+                                    carpeta.idCarpeta,
                                   )
                                 "
                                 class="flex items-center justify-between"
@@ -227,25 +221,28 @@
                                   }}
                                 </span>
                                 <i
-                                  v-if="carpetax?.carpetaId === carpeta.carpetaId"
+                                  v-if="carpetax?.idCarpeta === carpeta.idCarpeta"
                                   class="fa-solid fa-check text-success"
                                 ></i>
                                 <i v-else class="fa-regular fa-folder text-warning"></i>
                               </a>
                             </li>
+                            <div class="divider"></div>
                             <li>
                               <a
-                                @click="moveRaiz(carpetax?.carpetaId!, value.bancoId)"
+                                @click="moveRaiz(carpetax?.idCarpeta!, value.idBanco)"
                                 class="flex items-center justify-between"
                               >
                                 Sin carpeta
+
+                                <i class="fa-regular fa-folder-minus"></i>
                               </a>
                             </li>
                           </ul>
                         </div>
                       </li>
 
-                      <div class="divider my-1"></div>
+                      <div class="divider"></div>
 
                       <li>
                         <a @click="Eliminar(value, carpetaIdNumber)" class="text-error">
@@ -313,7 +310,7 @@ const modal = useModalStore()
 const route = useRoute()
 const router = useRouter()
 
-const carpetaIdNumber = Number(route.params.id)
+const carpetaIdNumber = route.params.id as string
 const { data: BancosCarpeta, isLoading: isLoadingBancosCarpetas } = useQuery({
   queryKey: ['bancos-carpeta', carpetaIdNumber],
   queryFn: () => getBancoCarpetaAction(carpetaIdNumber),
@@ -336,17 +333,17 @@ const isLoading = computed(() => {
   return isLoadingBancosCarpetas.value || isLoadingInformacionCarpeta.value
 })
 function irADetalle(banco: Banco) {
-  router.push({ name: 'bancoDetalle', params: { id: banco.bancoId } })
+  router.push({ name: 'bancoDetalle', params: { id: banco.idBanco } })
 }
-function abrirModalBanco(banco?: Banco, carpetaId?: number) {
-  console.warn('este es el id', banco?.bancoId)
+function abrirModalBanco(banco?: Banco, carpetaId?: string) {
+  console.warn('este es el id', banco?.idBanco)
   modal.openModal(NuevoBanco, { carpetaId, banco }, [
     { label: 'Cerrar', variant: 'outline' },
     { label: 'Guardar', variant: 'primary', type: 'submit' },
   ])
 }
 
-function Eliminar(Banco: Banco, carpetaId?: number) {
+function Eliminar(Banco: Banco, carpetaId?: string) {
   closeDropdown()
   modal.openModal(eliminarBanco, { banco: Banco, carpetaId }, [
     { label: 'Cerrar', variant: 'outline' },
@@ -359,7 +356,7 @@ function closeDropdown() {
 
 const { data: carpetas, isLoading: isLoadingCarpeta } = useCarpetas()
 const queryClient = useQueryClient()
-const moveRaiz = async (C: number, B: number) => {
+const moveRaiz = async (C: string, B: string) => {
   const carpetaOrigen = C.toString()
   const BancoMove = B.toString()
   try {
@@ -379,7 +376,7 @@ const moveRaiz = async (C: number, B: number) => {
   }
 }
 
-const moverCarpetaACarpeta = async (carpetaId: number, bancoId: number, destino: number) => {
+const moverCarpetaACarpeta = async (carpetaId: string, bancoId: string, destino: string) => {
   // const carpetaOrigen = carpetaId.toString()
   const banco = bancoId.toString()
   const DestinoC = destino.toString()
@@ -407,7 +404,7 @@ const moverCarpetaACarpeta = async (carpetaId: number, bancoId: number, destino:
 const busquedaCarpeta = ref('')
 
 const carpetasFiltradas = computed(() => {
-  console.warn(carpetax.value?.carpetaId)
+  console.warn(carpetax.value?.idCarpeta)
   if (!carpetas.value) return []
 
   return carpetas.value.filter((carpeta) =>
