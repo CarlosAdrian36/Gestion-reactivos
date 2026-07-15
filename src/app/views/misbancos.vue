@@ -212,8 +212,8 @@ const moverBanco = async (carpetaId: string, bancoId: string) => {
                     class="text-sm text-base-content/60 truncate mt-1"
                     :title="value.descripcion"
                   >
-                    <!-- {{ value.descripcion }} -->
-                    {{ value.id }}
+                    {{ value.descripcion }}
+                    <!-- {{ value.id }} -->
                   </p>
                 </div>
               </td>
