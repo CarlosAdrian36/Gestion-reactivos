@@ -96,6 +96,7 @@ function fmtDate(iso: string): string {
     <!-- Fixed bottom button -->
     <div class="p-3 border-t border-base-300" :class="abierto ? 'block' : 'hidden'">
       <button
+        @click=""
         class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-content text-sm font-bold hover:bg-primary-dark transition-colors"
       >
         <i class="fa-regular fa-plus text-[18px]"></i>
