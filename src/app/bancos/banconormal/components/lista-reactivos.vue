@@ -34,6 +34,7 @@
     <!-- Botón -->
     <button
       class="btn btn-dash btn-block hover:border-primary hover:text-primary hover:bg-base-100 btn-sm rounded-lg border-dashed border-slate-300 mt-auto"
+      @click="irACrear"
     >
       Crear Reactivo
     </button>
@@ -53,6 +54,13 @@ const router = useRouter()
 function irAListado() {
   router.push({
     name: 'reactivosList',
+    params: { id: props.banco.idBanco },
+  })
+}
+
+function irACrear() {
+  router.push({
+    name: 'crearReactivo',
     params: { id: props.banco.idBanco },
   })
 }

@@ -1,7 +1,28 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useReactivosMock } from '@/api/bancos/composable/useReactivosMock'
 import { useReactivosStore } from './reactivosStore'
+import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
+
+const route = useRoute()
+const router = useRouter()
+const bancoId = route.params.id as string
+
+function irACrear() {
+  router.push({
+    name: 'crearReactivo',
+    params: { id: bancoId },
+  })
+}
+
+function seleccionarReactivo(r: Reactivo) {
+  select(r)
+  router.push({
+    name: 'reactivosList',
+    params: { id: bancoId },
+  })
+}
 
 const abierto = ref(true)
 const { data: reactivos } = useReactivosMock()
@@ -52,7 +73,7 @@ function fmtDate(iso: string): string {
         <div
           v-for="r in reactivos"
           :key="r.IDReactivo"
-          @click="select(r)"
+          @click="seleccionarReactivo(r)"
           class="group relative flex flex-col p-4 rounded-lg cursor-pointer border transition-all"
           :class="
             selectedReactivo?.IDReactivo === r.IDReactivo
@@ -96,8 +117,8 @@ function fmtDate(iso: string): string {
     <!-- Fixed bottom button -->
     <div class="p-3 border-t border-base-300" :class="abierto ? 'block' : 'hidden'">
       <button
-        @click=""
-        class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-content text-sm font-bold hover:bg-primary-dark transition-colors"
+        @click="irACrear"
+        class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-content text-sm font-bold hover:bg-primary-dark transition-colors cursor-pointer hover:scale-102 overflow-hidden leading-none"
       >
         <i class="fa-regular fa-plus text-[18px]"></i>
         Crear Reactivo

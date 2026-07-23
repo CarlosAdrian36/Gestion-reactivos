@@ -59,9 +59,7 @@ function fmtDate(iso: string): string {
         </div>
 
         <!-- Detail Card -->
-        <div
-          class="bg-base-100 rounded-box border border-base-300 flex flex-col min-h-150"
-        >
+        <div class="bg-base-100 rounded-box border border-base-300 flex flex-col min-h-150">
           <!-- Card Header -->
           <div class="px-8 pt-8 pb-0">
             <div class="flex justify-between items-start mb-6">
@@ -247,9 +245,9 @@ function fmtDate(iso: string): string {
           >
             <i class="fa-regular fa-hand-pointer text-4xl"></i>
           </div>
-          <h3 class="font-bold text-lg text-base-content">Select a reactivo</h3>
+          <h3 class="font-bold text-lg text-base-content">Selecciona un reactivo</h3>
           <p class="text-sm text-base-content/60 mt-2">
-            Choose a reactivo from the sidebar to view its details.
+            Elige un reactivo de la barra lateral para ver sus detalles.
           </p>
         </div>
       </div>

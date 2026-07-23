@@ -4,7 +4,7 @@
     <div class="flex flex-row items-center mb-4">
       <i class="fa-regular fa-user-gear text-primary pe-2"></i>
 
-      <h2 class="text-xs font-bold uppercase tracking-widest">Banco Compartido</h2>
+      <h2 class="text-xs font-bold uppercase tracking-widest">Compartido con</h2>
     </div>
 
     <!-- Lista -->
