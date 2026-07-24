@@ -142,7 +142,7 @@ function fmtDate(iso: string): string {
                 class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
               >
                 <i class="fa-regular fa-file-lines text-[14px]"></i>
-                Description
+                Descripción / Enunciado
               </h3>
               <div class="bg-base-200 rounded-xl p-6">
                 <p class="text-lg text-base-content leading-relaxed">
