@@ -10,17 +10,47 @@ import RelacionalForm from './forms/RelacionalForm.vue'
 const route = useRoute()
 const bancoId = route.params.id as string
 
-type TipoReactivo = 'opcion-multiple' | 'respuesta-multiple' | 'verdadero-falso' | 'pregunta-abierta' | 'relacional'
+type TipoReactivo =
+  | 'opcion-multiple'
+  | 'respuesta-multiple'
+  | 'verdadero-falso'
+  | 'pregunta-abierta'
+  | 'relacional'
 
 const paso = ref<'grid' | 'formulario'>('grid')
 const tipoSeleccionado = ref<TipoReactivo | null>(null)
 
 const tipos = [
-  { id: 'opcion-multiple' as TipoReactivo, nombre: 'Opción Múltiple', descripcion: 'Seleccionar una opción correcta entre varias', icono: 'fa-regular fa-list-check' },
-  { id: 'respuesta-multiple' as TipoReactivo, nombre: 'Respuesta Múltiple', descripcion: 'Seleccionar varias opciones correctas', icono: 'fa-regular fa-rectangle-list' },
-  { id: 'verdadero-falso' as TipoReactivo, nombre: 'Verdadero/Falso', descripcion: 'Determinar si una afirmación es verdadera o falsa', icono: 'fa-regular fa-toggle-on' },
-  { id: 'pregunta-abierta' as TipoReactivo, nombre: 'Pregunta Abierta', descripcion: 'Respuesta libre y abierta', icono: 'fa-regular fa-file-lines' },
-  { id: 'relacional' as TipoReactivo, nombre: 'Relacional', descripcion: 'Relacionar elementos de dos columnas', icono: 'fa-regular fa-arrow-right-arrow-left' },
+  {
+    id: 'opcion-multiple' as TipoReactivo,
+    nombre: 'Opción Múltiple',
+    descripcion: 'Seleccionar una opción correcta entre varias',
+    icono: 'fa-regular fa-list-check',
+  },
+  {
+    id: 'respuesta-multiple' as TipoReactivo,
+    nombre: 'Respuesta Múltiple',
+    descripcion: 'Seleccionar varias opciones correctas',
+    icono: 'fa-regular fa-rectangle-list',
+  },
+  {
+    id: 'verdadero-falso' as TipoReactivo,
+    nombre: 'Verdadero/Falso',
+    descripcion: 'Determinar si una afirmación es verdadera o falsa',
+    icono: 'fa-regular fa-toggle-on',
+  },
+  {
+    id: 'pregunta-abierta' as TipoReactivo,
+    nombre: 'Pregunta Abierta',
+    descripcion: 'Respuesta libre y abierta',
+    icono: 'fa-regular fa-file-lines',
+  },
+  {
+    id: 'relacional' as TipoReactivo,
+    nombre: 'Relacional',
+    descripcion: 'Relacionar elementos de dos columnas',
+    icono: 'fa-regular fa-arrow-right-arrow-left',
+  },
 ]
 
 function seleccionarTipo(tipo: TipoReactivo) {
@@ -75,26 +105,14 @@ function guardar(data: Record<string, unknown>) {
         Volver a tipos
       </button>
 
-      <OpcionMultipleForm
-        v-if="tipoSeleccionado === 'opcion-multiple'"
-        @guardar="guardar"
-      />
+      <OpcionMultipleForm v-if="tipoSeleccionado === 'opcion-multiple'" @guardar="guardar" />
       <RespuestaMultipleForm
         v-else-if="tipoSeleccionado === 'respuesta-multiple'"
         @guardar="guardar"
       />
-      <VerdaderoFalsoForm
-        v-else-if="tipoSeleccionado === 'verdadero-falso'"
-        @guardar="guardar"
-      />
-      <PreguntaAbiertaForm
-        v-else-if="tipoSeleccionado === 'pregunta-abierta'"
-        @guardar="guardar"
-      />
-      <RelacionalForm
-        v-else-if="tipoSeleccionado === 'relacional'"
-        @guardar="guardar"
-      />
+      <VerdaderoFalsoForm v-else-if="tipoSeleccionado === 'verdadero-falso'" @guardar="guardar" />
+      <PreguntaAbiertaForm v-else-if="tipoSeleccionado === 'pregunta-abierta'" @guardar="guardar" />
+      <RelacionalForm v-else-if="tipoSeleccionado === 'relacional'" @guardar="guardar" />
     </div>
   </div>
 </template>

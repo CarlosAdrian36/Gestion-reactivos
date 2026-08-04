@@ -28,6 +28,7 @@
 
       <div v-else>
         <!-- Lista de reactivos -->
+        aqui hay reactivos
       </div>
     </div>
 
