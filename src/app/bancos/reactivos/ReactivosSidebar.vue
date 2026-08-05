@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useReactivosMock } from '@/api/bancos/composable/useReactivosMock'
+import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useReactivosStore } from './reactivosStore'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 
@@ -25,7 +25,7 @@ function seleccionarReactivo(r: Reactivo) {
 }
 
 const abierto = ref(true)
-const { data: reactivos } = useReactivosMock()
+const { data: reactivos, isLoading } = useReactivos(bancoId)
 const { selectedReactivo, select } = useReactivosStore()
 
 const nivelColor: Record<string, string> = {
@@ -69,38 +69,50 @@ function fmtDate(iso: string): string {
 
     <!-- Scrollable list -->
     <div class="flex-1 overflow-y-auto p-3 space-y-1" :class="abierto ? 'block' : 'hidden'">
-      <template v-if="reactivos && reactivos.length > 0">
+      <template v-if="isLoading">
+        <div v-for="i in 4" :key="i" class="p-4 rounded-lg border border-base-300 space-y-2">
+          <div class="skeleton h-4 w-24"></div>
+          <div class="skeleton h-3 w-full"></div>
+          <div class="skeleton h-3 w-2/3"></div>
+        </div>
+      </template>
+      <template v-else-if="reactivos && reactivos.length > 0">
         <div
           v-for="r in reactivos"
-          :key="r.IDReactivo"
+          :key="r.idReactivo"
           @click="seleccionarReactivo(r)"
           class="group relative flex flex-col p-4 rounded-lg cursor-pointer border transition-all"
           :class="
-            selectedReactivo?.IDReactivo === r.IDReactivo
+            selectedReactivo?.idReactivo === r.idReactivo
               ? 'bg-primary/5 border-primary/20'
               : 'border-transparent hover:bg-white hover:border-base-300 hover:shadow-sm'
           "
         >
           <div
-            v-if="selectedReactivo?.IDReactivo === r.IDReactivo"
+            v-if="selectedReactivo?.idReactivo === r.idReactivo"
             class="absolute left-0 top-3 bottom-3 w-1 bg-primary rounded-r-full"
           ></div>
           <div class="flex justify-between items-start mb-1">
-            <span class="font-bold text-sm text-base-content">#{{ r.IDReactivo }}</span>
+            <span class="font-bold text-sm text-base-content">#{{ r.posicion }}</span>
             <span
+              v-if="r.subTema.descripcion !== 'Sin SubTema'"
               class="text-xs font-medium text-base-content/60 bg-base-200 px-2 py-0.5 rounded-full"
             >
-              {{ r.SubTema.Descripcion }}
+              {{ r.subTema.descripcion }}
             </span>
           </div>
-          <p class="text-sm text-base-content/80 line-clamp-2 mb-2 leading-relaxed">
-            {{ r.Descripcion }}
-          </p>
+          <div
+            class="text-sm text-base-content/80 mb-2 leading-relaxed [&_p]:inline [&_p]:m-0"
+            v-html="r.descripcion.slice(0, 50)"
+          ></div>
+
           <div class="flex items-center gap-2 mt-auto">
-            <span :class="nivelColor[r.NivelCognitivo.Descripcion] || 'badge badge-outline'">
-              {{ r.NivelCognitivo.Descripcion }}
-            </span>
-            <span class="text-[10px] text-base-content/40">{{ fmtDate(r.FechaModificacion) }}</span>
+            <div v-if="r.nivelCognitivo.descripcion !== 'SinNivel'" class="flex items-center gap-2">
+              <span :class="nivelColor[r.nivelCognitivo.descripcion] || 'badge badge-outline'">
+                {{ r.nivelCognitivo.descripcion }}
+              </span>
+            </div>
+            <span class="text-[10px] text-base-content/40">{{ fmtDate(r.fechaModificacion) }}</span>
           </div>
         </div>
       </template>

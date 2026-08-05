@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { useReactivosMock } from '@/api/bancos/composable/useReactivosMock'
+import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useReactivosStore } from './reactivosStore'
 
 const route = useRoute()
 const bancoId = String(route.params.id)
-const { isLoading } = useReactivosMock()
+const { isLoading } = useReactivos(bancoId)
 const { selectedReactivo } = useReactivosStore()
 
 const idiomas: Record<number, string> = {
@@ -15,10 +15,11 @@ const idiomas: Record<number, string> = {
 }
 
 const tipoReactivo: Record<number, string> = {
-  1: 'Multiple Choice',
-  2: 'True/False',
-  3: 'Open Answer',
-  4: 'Matching',
+  1: 'Opción Múltiple',
+  2: 'Respuesta Múltiple',
+  3: 'Verdadero / Falso',
+  4: 'Pregunta Abierta',
+  5: 'Relacional',
 }
 
 function fmtDate(iso: string): string {
@@ -54,7 +55,7 @@ function fmtDate(iso: string): string {
                 >Banco Detalle</RouterLink
               >
             </li>
-            <li class="text-base-content/60">#{{ selectedReactivo.IDReactivo }}</li>
+            <li class="text-base-content/60">#{{ selectedReactivo.idReactivo }}</li>
           </ul>
         </div>
 
@@ -64,17 +65,23 @@ function fmtDate(iso: string): string {
           <div class="px-8 pt-8 pb-0">
             <div class="flex justify-between items-start mb-6">
               <div>
-                <h1 class="text-2xl font-bold text-base-content tracking-tight mb-1">
-                  #{{ selectedReactivo.IDReactivo }}:
-                  {{ selectedReactivo.Descripcion.slice(0, 50) }}...
-                </h1>
+                <!-- <h1 class="text-2xl font-bold text-base-content tracking-tight mb-1">
+                  #{{ selectedReactivo.posicion }}:
+                  {{ selectedReactivo.descripcion.slice(0, 50) }}...
+                </h1> -->
+                <div
+                  class="text-2xl font-bold text-base-content tracking-tight mb-1 [&_p]:inline [&_p]:m-0"
+                >
+                  #{{ selectedReactivo.posicion }}:
+                  <span v-html="selectedReactivo.descripcion"></span>
+                </div>
                 <div class="flex items-center gap-3 text-xs text-base-content/60">
                   <span class="flex items-center gap-1">
                     <i class="fa-regular fa-code-branch text-[14px]"></i>
-                    v{{ selectedReactivo.Version }}
+                    v{{ selectedReactivo.version }}
                   </span>
                   <span class="w-1 h-1 rounded-full bg-base-300"></span>
-                  <span>{{ tipoReactivo[selectedReactivo.TipoReactivoId] || 'Unknown' }}</span>
+                  <span>{{ tipoReactivo[selectedReactivo.tipoReactivoId] || 'Unknown' }}</span>
                 </div>
               </div>
               <div class="flex gap-2">
@@ -98,20 +105,20 @@ function fmtDate(iso: string): string {
               <div class="flex gap-6">
                 <button
                   :class="
-                    idiomas[selectedReactivo.IdiomaId] === 'Original (EN)'
+                    idiomas[selectedReactivo.idioma.idiomaId] === 'Original (EN)'
                       ? 'relative px-1 pb-4 text-sm font-bold text-primary'
                       : 'group relative px-1 pb-4 text-sm font-medium text-base-content/60 hover:text-base-content transition-colors'
                   "
                 >
                   <span class="flex items-center gap-2">Original (EN)</span>
                   <span
-                    v-if="idiomas[selectedReactivo.IdiomaId] === 'Original (EN)'"
+                    v-if="idiomas[selectedReactivo.idioma.idiomaId] === 'Original (EN)'"
                     class="absolute bottom-0 left-0 w-full h-0.5 bg-primary"
                   ></span>
                 </button>
                 <button
                   :class="
-                    idiomas[selectedReactivo.IdiomaId] === 'v1: Es-MX'
+                    idiomas[selectedReactivo.idioma.idiomaId] === 'v1: Es-MX'
                       ? 'relative px-1 pb-4 text-sm font-bold text-primary'
                       : 'group relative px-1 pb-4 text-sm font-medium text-base-content/60 hover:text-base-content transition-colors'
                   "
@@ -121,7 +128,7 @@ function fmtDate(iso: string): string {
                     <span class="w-2 h-2 rounded-full bg-amber-400"></span>
                   </span>
                   <span
-                    v-if="idiomas[selectedReactivo.IdiomaId] === 'v1: Es-MX'"
+                    v-if="idiomas[selectedReactivo.idioma.idiomaId] === 'v1: Es-MX'"
                     class="absolute bottom-0 left-0 w-full h-0.5 bg-primary"
                   ></span>
                 </button>
@@ -146,7 +153,7 @@ function fmtDate(iso: string): string {
               </h3>
               <div class="bg-base-200 rounded-xl p-6">
                 <p class="text-lg text-base-content leading-relaxed">
-                  {{ selectedReactivo.Descripcion }}
+                  {{ selectedReactivo.descripcion }}
                 </p>
               </div>
             </div>
@@ -163,10 +170,10 @@ function fmtDate(iso: string): string {
                 </h3>
                 <div class="bg-base-200 rounded-xl p-4">
                   <p class="font-semibold text-base-content">
-                    {{ selectedReactivo.NivelCognitivo.Descripcion }}
+                    {{ selectedReactivo.nivelCognitivo.descripcion }}
                   </p>
                   <p class="text-xs text-base-content/60 mt-1">
-                    ID: {{ selectedReactivo.NivelCognitivo.NivelCognitivoId }}
+                    ID: {{ selectedReactivo.nivelCognitivo.nivelCognitivoId }}
                   </p>
                 </div>
               </div>
@@ -181,10 +188,10 @@ function fmtDate(iso: string): string {
                 </h3>
                 <div class="bg-base-200 rounded-xl p-4">
                   <p class="font-semibold text-base-content">
-                    {{ selectedReactivo.SubTema.Descripcion }}
+                    {{ selectedReactivo.subTema.descripcion }}
                   </p>
                   <p class="text-xs text-base-content/60 mt-1">
-                    ID: {{ selectedReactivo.SubTema.SubTemaId }}
+                    ID: {{ selectedReactivo.subTema.subTemaId }}
                   </p>
                 </div>
               </div>
@@ -200,19 +207,19 @@ function fmtDate(iso: string): string {
                   <span
                     class="px-2 py-0.5 bg-base-300 rounded text-base-content font-mono font-medium"
                   >
-                    v{{ selectedReactivo.Version }}
+                    v{{ selectedReactivo.version }}
                   </span>
                 </div>
                 <div class="flex flex-col gap-1">
                   <span class="uppercase tracking-wider font-semibold">Type</span>
                   <span class="px-2 py-0.5 bg-base-300 rounded text-base-content font-medium">
-                    {{ tipoReactivo[selectedReactivo.TipoReactivoId] || 'Unknown' }}
+                    {{ tipoReactivo[selectedReactivo.tipoReactivoId] || 'Unknown' }}
                   </span>
                 </div>
                 <div class="flex flex-col gap-1">
                   <span class="uppercase tracking-wider font-semibold">Language</span>
                   <span class="px-2 py-0.5 bg-base-300 rounded text-base-content font-medium">
-                    {{ idiomas[selectedReactivo.IdiomaId] || 'Unknown' }}
+                    {{ idiomas[selectedReactivo.idioma.idiomaId] || 'Unknown' }}
                   </span>
                 </div>
               </div>
@@ -220,13 +227,13 @@ function fmtDate(iso: string): string {
                 <div class="text-right">
                   <p class="text-[10px] uppercase tracking-wider text-base-content/40">Created</p>
                   <p class="text-base-content font-medium">
-                    {{ fmtDate(selectedReactivo.FechaCreacion) }}
+                    {{ fmtDate(selectedReactivo.fechaCreacion) }}
                   </p>
                 </div>
                 <div class="text-right">
                   <p class="text-[10px] uppercase tracking-wider text-base-content/40">Modified</p>
                   <p class="text-base-content font-medium">
-                    {{ fmtDate(selectedReactivo.FechaModificacion) }}
+                    {{ fmtDate(selectedReactivo.fechaModificacion) }}
                   </p>
                 </div>
               </div>

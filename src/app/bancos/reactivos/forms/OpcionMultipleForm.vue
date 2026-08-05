@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { z } from 'zod'
+import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
+
+const props = defineProps<{
+  guardandoPregunta?: boolean
+  guardandoRespuestas?: boolean
+}>()
 
 const emit = defineEmits<{
   guardar: [data: Record<string, unknown>]
@@ -12,6 +19,15 @@ const opciones = ref([
   { texto: '', correcta: false },
 ])
 
+const opcionesSchema = z.array(
+  z.object({
+    texto: z.string().trim().min(1, 'La respuesta debe tener al menos 1 carácter'),
+    correcta: z.boolean(),
+  }),
+)
+
+const erroresOpciones = ref<string[]>([])
+
 function agregarOpcion() {
   if (opciones.value.length < 26) {
     opciones.value.push({ texto: '', correcta: false })
@@ -21,9 +37,7 @@ function agregarOpcion() {
 function quitarOpcion(index: number) {
   if (opciones.value.length > 2) {
     opciones.value.splice(index, 1)
-    // if (!opciones.value.some((o) => o.correcta)) {
-    //   opciones.value[0]!.correcta = true
-    // }
+    erroresOpciones.value.splice(index, 1)
   }
 }
 
@@ -42,9 +56,22 @@ function guardarPregunta() {
     pregunta: pregunta.value,
   })
 }
+
 function guardarRespuesta() {
+  const result = opcionesSchema.safeParse(opciones.value)
+  if (!result.success) {
+    const errores = opciones.value.map(() => '')
+    for (const issue of result.error.issues) {
+      const idx = issue.path[0] as number
+      errores[idx] = issue.message
+    }
+    erroresOpciones.value = errores
+    toast.error('Cada respuesta debe tener al menos 1 carácter')
+    return
+  }
+  erroresOpciones.value = []
   emit('guardar', {
-    opciones: opciones.value.map((o) => ({ texto: o.texto, correcta: o.correcta })),
+    opciones: result.data.map((o) => ({ texto: o.texto, correcta: o.correcta })),
   })
 }
 
@@ -88,7 +115,14 @@ const opcionConfig = {
       <label class="label font-semibold">Pregunta</label>
       <FroalaEditor v-model="pregunta" :config="preguntaConfig" />
       <div class="flex gap-3 pt-4">
-        <button class="btn btn-primary" @click="guardarPregunta">Guardar</button>
+        <button
+          class="btn btn-primary"
+          :disabled="props.guardandoPregunta"
+          @click="guardarPregunta"
+        >
+          <span v-if="props.guardandoPregunta" class="loading loading-spinner"></span>
+          {{ props.guardandoPregunta ? 'Guardando...' : 'Guardar' }}
+        </button>
       </div>
     </div>
 
@@ -122,6 +156,9 @@ const opcionConfig = {
               placeholderText: `Opción ${String.fromCharCode(65 + index)}`,
             }"
           />
+          <p v-if="erroresOpciones[index]" class="text-error text-xs mt-1">
+            {{ erroresOpciones[index] }}
+          </p>
         </div>
         <button
           v-if="opciones.length > 2"
@@ -134,7 +171,14 @@ const opcionConfig = {
     </div>
 
     <div class="flex gap-3 pt-4">
-      <button class="btn btn-primary" @click="guardarRespuesta">Guardar</button>
+      <button
+        class="btn btn-primary"
+        :disabled="props.guardandoRespuestas"
+        @click="guardarRespuesta"
+      >
+        <span v-if="props.guardandoRespuestas" class="loading loading-spinner"></span>
+        {{ props.guardandoRespuestas ? 'Guardando...' : 'Guardar' }}
+      </button>
     </div>
   </div>
 </template>
