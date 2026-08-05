@@ -47,7 +47,7 @@ const props = defineProps<{
 
 const onSubmit = async () => {
   try {
-    await deleteUser(props.usuario.guid)
+    await deleteUser(props.usuario.idCuenta)
     toast.success('Usuario eliminado correctamente')
     console.log('hasta aqui va todo bien')
     modal.closeModal()

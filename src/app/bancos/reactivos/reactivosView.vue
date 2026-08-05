@@ -23,7 +23,7 @@ const tipoReactivo: Record<number, string> = {
 }
 
 function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
+  return new Date(iso).toLocaleDateString('es-MX', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -65,15 +65,11 @@ function fmtDate(iso: string): string {
           <div class="px-8 pt-8 pb-0">
             <div class="flex justify-between items-start mb-6">
               <div>
-                <!-- <h1 class="text-2xl font-bold text-base-content tracking-tight mb-1">
-                  #{{ selectedReactivo.posicion }}:
-                  {{ selectedReactivo.descripcion.slice(0, 50) }}...
-                </h1> -->
                 <div
                   class="text-2xl font-bold text-base-content tracking-tight mb-1 [&_p]:inline [&_p]:m-0"
                 >
                   #{{ selectedReactivo.posicion }}:
-                  <span v-html="selectedReactivo.descripcion"></span>
+                  <span v-html="selectedReactivo.descripcion.slice(0, 50) + '...'"></span>
                 </div>
                 <div class="flex items-center gap-3 text-xs text-base-content/60">
                   <span class="flex items-center gap-1">
@@ -85,14 +81,20 @@ function fmtDate(iso: string): string {
                 </div>
               </div>
               <div class="flex gap-2">
+                <!-- <button
+                  class="btn btn-xs btn-ghost gap-1.5 text-xs font-medium hover:bg-base-200 transition-colors"
+                >
+                  <i class="fa-regular fa-pen-to-square text-[12px]"></i>
+                  Editar
+                </button> -->
                 <button
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content hover:bg-base-200 transition-colors"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content hover:bg-base-200 transition-colors cursor-pointer"
                 >
                   <i class="fa-regular fa-pen-to-square text-[14px]"></i>
                   Editar
                 </button>
                 <button
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm cursor-pointer"
                 >
                   <i class="fa-regular fa-trash"></i>
                   Eliminar
@@ -101,7 +103,7 @@ function fmtDate(iso: string): string {
             </div>
 
             <!-- Tabs -->
-            <div class="w-full border-b border-base-300">
+            <!-- <div class="w-full border-b border-base-300">
               <div class="flex gap-6">
                 <button
                   :class="
@@ -133,12 +135,12 @@ function fmtDate(iso: string): string {
                   ></span>
                 </button>
                 <button
-                  class="ml-auto px-2 pb-4 text-base-content/60 hover:text-primary transition-colors"
+                  class="ml-auto px-2 pb-4 text-base-content/60 hover:text-primary transition-colors cursor-pointer"
                 >
                   <i class="fa-regular fa-circle-plus text-[20px]"></i>
                 </button>
               </div>
-            </div>
+            </div> -->
           </div>
 
           <!-- Content Area -->
@@ -152,9 +154,10 @@ function fmtDate(iso: string): string {
                 Descripción / Enunciado
               </h3>
               <div class="bg-base-200 rounded-xl p-6">
-                <p class="text-lg text-base-content leading-relaxed">
-                  {{ selectedReactivo.descripcion }}
-                </p>
+                <div
+                  class="text-lg text-base-content leading-relaxed [&_p]:m-0"
+                  v-html="selectedReactivo.descripcion"
+                ></div>
               </div>
             </div>
 
