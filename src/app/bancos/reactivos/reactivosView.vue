@@ -204,7 +204,7 @@ function fmtDate(iso: string): string {
             <div
               class="pt-6 border-t border-base-300 flex items-center justify-between text-xs text-base-content/60"
             >
-              <div class="flex gap-6">
+              <!-- <div class="flex gap-6">
                 <div class="flex flex-col gap-1">
                   <span class="uppercase tracking-wider font-semibold">Version</span>
                   <span
@@ -225,7 +225,7 @@ function fmtDate(iso: string): string {
                     {{ idiomas[selectedReactivo.idioma.idiomaId] || 'Unknown' }}
                   </span>
                 </div>
-              </div>
+              </div> -->
               <div class="flex items-center gap-4">
                 <div class="text-right">
                   <p class="text-[10px] uppercase tracking-wider text-base-content/40">Created</p>
@@ -243,7 +243,7 @@ function fmtDate(iso: string): string {
             </div>
           </div>
         </div>
-        <div class="h-10"></div>
+        <!-- <div class="h-10"></div> -->
       </div>
     </template>
 

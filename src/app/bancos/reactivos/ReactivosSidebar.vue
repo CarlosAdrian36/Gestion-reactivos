@@ -103,13 +103,13 @@ function fmtDate(iso: string): string {
           </div>
           <div
             class="text-sm text-base-content/80 mb-2 leading-relaxed [&_p]:inline [&_p]:m-0"
-            v-html="r.descripcion.slice(0, 50)"
+            v-html="r.descripcion"
           ></div>
 
           <div class="flex items-center gap-2 mt-auto">
             <div v-if="r.nivelCognitivo.descripcion !== 'SinNivel'" class="flex items-center gap-2">
               <span :class="nivelColor[r.nivelCognitivo.descripcion] || 'badge badge-outline'">
-                {{ r.nivelCognitivo.descripcion }}
+                {{ r.nivelCognitivo.descripcion.slice(0, 1) }}
               </span>
             </div>
             <span class="text-[10px] text-base-content/40">{{ fmtDate(r.fechaModificacion) }}</span>

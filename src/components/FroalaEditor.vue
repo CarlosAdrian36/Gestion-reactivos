@@ -3,7 +3,7 @@ import { ref, onMounted, onBeforeUnmount, watch, shallowRef } from 'vue'
 import FroalaEditor from 'froala-editor'
 import 'froala-editor/css/froala_editor.pkgd.min.css'
 import 'froala-editor/css/froala_style.min.css'
-
+import 'froala-editor/js/plugins/lists.min.js'
 const props = defineProps<{
   modelValue?: string
   config?: Record<string, unknown>
