@@ -15,9 +15,11 @@
             'btn-error': btn.variant === 'error',
             'btn-outline': btn.variant === 'outline' || !btn.variant,
           }"
+          :disabled="isSubmitting || btn.disabled"
           @click="handleButtonClick(btn)"
         >
-          {{ btn.label }}
+          <span v-if="isSubmitting && btn.type === 'submit'" class="loading loading-spinner loading-sm"></span>
+          {{ isSubmitting && btn.type === 'submit' ? btn.loadingLabel ?? btn.label : btn.label }}
         </button>
       </div>
     </div>
@@ -25,20 +27,26 @@
 </template>
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useModalStore } from './store/modal.store'
 import type { ModalButton } from './interface/modalButton.interface'
 
 const modal = useModalStore()
 const { isOpen, component, props, buttons, submitFN, modalClass } = storeToRefs(modal)
 
+const isSubmitting = ref(false)
+
 async function handleButtonClick(btn: ModalButton) {
-  if (btn.disabled) return
+  if (btn.disabled || isSubmitting.value) return
 
   // Solo dispara submit si el botón lo dice
   if (btn.type === 'submit') {
-    console.log('Ejecutando Submit')
-    await submitFN.value?.()
+    isSubmitting.value = true
+    try {
+      await submitFN.value?.()
+    } finally {
+      isSubmitting.value = false
+    }
     return
   }
 

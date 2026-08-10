@@ -182,7 +182,7 @@ watch(temaOscuro, (val) => {
         <template v-else>
           <div class="flex flex-col items-center gap-3">
             <button
-              class="flex size-9 items-center justify-center rounded-lg text-base-content/60 hover:text-base-content hover:bg-base-200 transition-colors btn"
+              class="flex size-9 items-center justify-center rounded-lg text-base-content/60 hover:text-base-content hover:bg-base-200 transition-colors hover:cursor-pointer"
               :title="temaOscuro ? 'Modo claro' : 'Modo oscuro'"
               @click="temaOscuro = !temaOscuro"
             >
@@ -190,7 +190,7 @@ watch(temaOscuro, (val) => {
               <i class="fa-solid fa-circle-half-stroke text-lg"></i>
             </button>
             <button
-              class="flex size-9 items-center justify-center rounded-lg text-error/60 hover:text-error hover:bg-error/10 transition-colors btn"
+              class="flex size-9 items-center justify-center rounded-lg text-error/60 hover:text-error hover:bg-error/10 transition-colors hover:cursor-pointer"
               title="Cerrar sesión"
               @click="cerrarSesion()"
             >

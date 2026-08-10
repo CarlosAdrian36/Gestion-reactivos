@@ -4,4 +4,5 @@ export interface ModalButton {
   type?: 'button' | 'submit'
   action?: () => void
   disabled?: boolean
+  loadingLabel?: string
 }

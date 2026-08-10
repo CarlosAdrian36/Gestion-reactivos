@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useReactivosStore } from './reactivosStore'
@@ -107,7 +107,10 @@ function fmtDate(iso: string): string {
           ></div>
 
           <div class="flex items-center gap-2 mt-auto">
-            <div v-if="r.nivelCognitivo.descripcion !== 'SinNivel'" class="flex items-center gap-2">
+            <div
+              v-if="r.nivelCognitivo.descripcion !== 'Sin Nivel'"
+              class="flex items-center gap-2"
+            >
               <span :class="nivelColor[r.nivelCognitivo.descripcion] || 'badge badge-outline'">
                 {{ r.nivelCognitivo.descripcion.slice(0, 1) }}
               </span>
