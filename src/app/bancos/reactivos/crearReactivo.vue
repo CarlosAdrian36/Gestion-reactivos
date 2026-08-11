@@ -1,21 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { toast } from 'vue-sonner'
-import { getBancoById } from '@/api/bancos/actions/getBancoById.action'
-import { crearReactivoAction } from '@/api/bancos/actions/crear-reactivo.action'
-import { crearRespuestaAction } from '@/api/bancos/actions/crear-respuesta.action'
-import type { CrearReactivoRequest } from '@/api/bancos/interfaces/crear-reactivo.interface'
+import { ref } from 'vue'
 import OpcionMultipleForm from './forms/OpcionMultipleForm.vue'
 import RespuestaMultipleForm from './forms/RespuestaMultipleForm.vue'
 import VerdaderoFalsoForm from './forms/VerdaderoFalsoForm.vue'
 import PreguntaAbiertaForm from './forms/PreguntaAbiertaForm.vue'
 import RelacionalForm from './forms/RelacionalForm.vue'
-
-const route = useRoute()
-const queryClient = useQueryClient()
-const bancoId = route.params.id as string
 
 type TipoReactivo =
   | 'opcion-multiple'
@@ -24,70 +13,8 @@ type TipoReactivo =
   | 'pregunta-abierta'
   | 'relacional'
 
-const tipoReactivoIds: Record<TipoReactivo, number> = {
-  'opcion-multiple': 1,
-  'respuesta-multiple': 2,
-  'verdadero-falso': 3,
-  'pregunta-abierta': 4,
-  relacional: 5,
-}
-
 const paso = ref<'grid' | 'formulario'>('grid')
 const tipoSeleccionado = ref<TipoReactivo | null>(null)
-const idiomaId = ref(1)
-const reactivoCreado = ref<{ idReactivo: string } | null>(null)
-
-onMounted(async () => {
-  try {
-    const banco = await getBancoById(bancoId)
-    idiomaId.value = banco.idiomas[0]?.idiomaId ?? 1
-  } catch {
-    idiomaId.value = 1
-  }
-})
-
-const crearReactivoMutation = useMutation({
-  mutationFn: (body: CrearReactivoRequest) => crearReactivoAction(bancoId, body),
-  onSuccess: (data) => {
-    reactivoCreado.value = data.reactivo
-    toast.success('Reactivo creado. Ahora guarda las respuestas.')
-    queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
-  },
-  onError: (error) => {
-    toast.error(error instanceof Error ? error.message : 'Error al crear el reactivo')
-  },
-})
-
-const crearRespuestasMutation = useMutation({
-  mutationFn: async ({
-    reactivoId,
-    opciones,
-  }: {
-    reactivoId: string
-    opciones: { texto: string; correcta: boolean }[]
-  }) => {
-    const enviadas: boolean[] = []
-    for (let i = 0; i < opciones.length; i++) {
-      const opcion = opciones[i]!
-      if (opcion.texto.trim().length === 0) continue
-      const res = await crearRespuestaAction(bancoId, reactivoId, {
-        idiomaId: idiomaId.value,
-        posicion: i,
-        esCorrecta: opcion.correcta,
-        respuesta: opcion.texto,
-      })
-      enviadas.push(res.respuestaCreada)
-    }
-    return enviadas
-  },
-  onSuccess: (enviadas) => {
-    toast.success(`${enviadas.length} respuesta(s) guardada(s) correctamente`)
-    queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
-  },
-  onError: (error) => {
-    toast.error(error instanceof Error ? error.message : 'Error al guardar las respuestas')
-  },
-})
 
 const tipos = [
   {
@@ -131,40 +58,6 @@ function volverAGrid() {
   paso.value = 'grid'
   tipoSeleccionado.value = null
 }
-
-function guardar(data: Record<string, unknown>) {
-  if (!tipoSeleccionado.value) return
-
-  if ('pregunta' in data) {
-    const pregunta = data.pregunta as string
-    if (!pregunta.trim()) {
-      toast.error('La pregunta no puede estar vacía')
-      return
-    }
-    crearReactivoMutation.mutate({
-      idiomaId: idiomaId.value,
-      nivelCognitivoId: 1,
-      subTemaId: 1,
-      tipoReactivoId: tipoReactivoIds[tipoSeleccionado.value],
-      descripcion: pregunta,
-    })
-    return
-  }
-
-  if ('opciones' in data) {
-    if (!reactivoCreado.value) {
-      toast.error('Primero guarda la pregunta')
-      return
-    }
-    crearRespuestasMutation.mutate({
-      reactivoId: reactivoCreado.value.idReactivo,
-      opciones: (data.opciones as { texto: string; correcta: boolean }[]).map((o) => ({
-        texto: o.texto,
-        correcta: o.correcta,
-      })),
-    })
-  }
-}
 </script>
 
 <template>
@@ -201,19 +94,11 @@ function guardar(data: Record<string, unknown>) {
         Volver a tipos
       </button>
 
-      <OpcionMultipleForm
-        v-if="tipoSeleccionado === 'opcion-multiple'"
-        :guardando-pregunta="crearReactivoMutation.isPending.value"
-        :guardando-respuestas="crearRespuestasMutation.isPending.value"
-        @guardar="guardar"
-      />
-      <RespuestaMultipleForm
-        v-else-if="tipoSeleccionado === 'respuesta-multiple'"
-        @guardar="guardar"
-      />
-      <VerdaderoFalsoForm v-else-if="tipoSeleccionado === 'verdadero-falso'" @guardar="guardar" />
-      <PreguntaAbiertaForm v-else-if="tipoSeleccionado === 'pregunta-abierta'" @guardar="guardar" />
-      <RelacionalForm v-else-if="tipoSeleccionado === 'relacional'" @guardar="guardar" />
+      <OpcionMultipleForm v-if="tipoSeleccionado === 'opcion-multiple'" />
+      <RespuestaMultipleForm v-else-if="tipoSeleccionado === 'respuesta-multiple'" />
+      <VerdaderoFalsoForm v-else-if="tipoSeleccionado === 'verdadero-falso'" />
+      <PreguntaAbiertaForm v-else-if="tipoSeleccionado === 'pregunta-abierta'" />
+      <RelacionalForm v-else-if="tipoSeleccionado === 'relacional'" />
     </div>
   </div>
 </template>

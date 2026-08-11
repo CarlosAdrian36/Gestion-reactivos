@@ -164,7 +164,7 @@ function fmtDate(iso: string): string {
             <!-- Details Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Cognitive Level -->
-              <div class="space-y-2">
+              <!-- <div class="space-y-2">
                 <h3
                   class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
                 >
@@ -179,10 +179,10 @@ function fmtDate(iso: string): string {
                     ID: {{ selectedReactivo.nivelCognitivo.nivelCognitivoId }}
                   </p>
                 </div>
-              </div>
+              </div> -->
 
               <!-- Subject -->
-              <div class="space-y-2">
+              <!-- <div class="space-y-2">
                 <h3
                   class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
                 >
@@ -197,7 +197,7 @@ function fmtDate(iso: string): string {
                     ID: {{ selectedReactivo.subTema.subTemaId }}
                   </p>
                 </div>
-              </div>
+              </div> -->
             </div>
 
             <!-- Metadata Footer -->

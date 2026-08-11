@@ -1,19 +1,32 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
+import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
 
-const emit = defineEmits<{
-  guardar: [data: Record<string, unknown>]
-}>()
+const route = useRoute()
+const bancoId = route.params.id as string
+const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas } =
+  useGuardarReactivo(bancoId, TIPO_REACTIVO.verdaderoFalso)
 
 const pregunta = ref('')
 const respuestaCorrecta = ref<boolean | null>(null)
 
-function guardar() {
-  emit('guardar', {
-    pregunta: pregunta.value,
-    respuestaCorrecta: respuestaCorrecta.value,
-  })
+function guardarPreguntaForm() {
+  if (!pregunta.value.trim()) {
+    toast.error('La afirmación no puede estar vacía')
+    return
+  }
+  guardarPregunta(pregunta.value)
+}
+
+function guardarRespuestaForm() {
+  if (respuestaCorrecta.value === null) return
+  guardarRespuestas([
+    { texto: 'Verdadero', correcta: respuestaCorrecta.value === true },
+    { texto: 'Falso', correcta: respuestaCorrecta.value === false },
+  ])
 }
 </script>
 
@@ -28,6 +41,16 @@ function guardar() {
         placeholderText: 'Escribe la afirmación aquí...',
         heightMin: 120,
       }" />
+      <div class="flex gap-3 pt-4">
+        <button
+          class="btn btn-primary"
+          :disabled="guardandoPregunta"
+          @click="guardarPreguntaForm"
+        >
+          <span v-if="guardandoPregunta" class="loading loading-spinner"></span>
+          {{ guardandoPregunta ? 'Guardando...' : 'Guardar pregunta' }}
+        </button>
+      </div>
     </div>
 
     <div>
@@ -61,7 +84,14 @@ function guardar() {
     </div>
 
     <div class="flex gap-3 pt-4">
-      <button class="btn btn-primary" :disabled="respuestaCorrecta === null" @click="guardar">Guardar</button>
+      <button
+        class="btn btn-primary"
+        :disabled="respuestaCorrecta === null || guardandoRespuestas"
+        @click="guardarRespuestaForm"
+      >
+        <span v-if="guardandoRespuestas" class="loading loading-spinner"></span>
+        {{ guardandoRespuestas ? 'Guardando...' : 'Guardar respuestas' }}
+      </button>
     </div>
   </div>
 </template>

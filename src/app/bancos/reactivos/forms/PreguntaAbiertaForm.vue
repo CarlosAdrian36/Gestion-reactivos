@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
+import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
 
-const emit = defineEmits<{
-  guardar: [data: Record<string, unknown>]
-}>()
+const route = useRoute()
+const bancoId = route.params.id as string
+const { guardarPregunta, guardandoPregunta } = useGuardarReactivo(
+  bancoId,
+  TIPO_REACTIVO.preguntaAbierta,
+)
 
 const pregunta = ref('')
-const respuestaModelo = ref('')
 
-function guardar() {
-  emit('guardar', {
-    pregunta: pregunta.value,
-    respuestaModelo: respuestaModelo.value,
-  })
+function guardarPreguntaForm() {
+  if (!pregunta.value.trim()) {
+    toast.error('La pregunta no puede estar vacía')
+    return
+  }
+  guardarPregunta(pregunta.value)
 }
 </script>
 
@@ -28,22 +34,16 @@ function guardar() {
         placeholderText: 'Escribe la pregunta aquí...',
         heightMin: 120,
       }" />
-    </div>
-
-    <div>
-      <label class="label font-semibold">
-        Respuesta modelo
-        <span class="text-base-content/40 text-xs font-normal">(opcional)</span>
-      </label>
-      <FroalaEditor v-model="respuestaModelo" :config="{
-        toolbarButtons: ['bold', 'italic', 'underline', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'undo', 'redo'],
-        placeholderText: 'Escribe una respuesta de referencia...',
-        heightMin: 120,
-      }" />
-    </div>
-
-    <div class="flex gap-3 pt-4">
-      <button class="btn btn-primary" @click="guardar">Guardar</button>
+      <div class="flex gap-3 pt-4">
+        <button
+          class="btn btn-primary"
+          :disabled="guardandoPregunta"
+          @click="guardarPreguntaForm"
+        >
+          <span v-if="guardandoPregunta" class="loading loading-spinner"></span>
+          {{ guardandoPregunta ? 'Guardando...' : 'Guardar pregunta' }}
+        </button>
+      </div>
     </div>
   </div>
 </template>

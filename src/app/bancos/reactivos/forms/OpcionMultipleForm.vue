@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { z } from 'zod'
 import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
+import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
 
-const props = defineProps<{
-  guardandoPregunta?: boolean
-  guardandoRespuestas?: boolean
-}>()
-
-const emit = defineEmits<{
-  guardar: [data: Record<string, unknown>]
-}>()
+const route = useRoute()
+const bancoId = route.params.id as string
+const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas } =
+  useGuardarReactivo(bancoId, TIPO_REACTIVO.opcionMultiple)
 
 const pregunta = ref('')
 const opciones = ref([
@@ -51,13 +49,15 @@ function seleccionarCorrecta(index: number) {
   opciones.value.forEach((o, i) => (o.correcta = i === index))
 }
 
-function guardarPregunta() {
-  emit('guardar', {
-    pregunta: pregunta.value,
-  })
+function guardarPreguntaForm() {
+  if (!pregunta.value.trim()) {
+    toast.error('La pregunta no puede estar vacía')
+    return
+  }
+  guardarPregunta(pregunta.value)
 }
 
-function guardarRespuesta() {
+function guardarRespuestaForm() {
   const result = opcionesSchema.safeParse(opciones.value)
   if (!result.success) {
     const errores = opciones.value.map(() => '')
@@ -70,9 +70,7 @@ function guardarRespuesta() {
     return
   }
   erroresOpciones.value = []
-  emit('guardar', {
-    opciones: result.data.map((o) => ({ texto: o.texto, correcta: o.correcta })),
-  })
+  guardarRespuestas(result.data.map((o) => ({ texto: o.texto, correcta: o.correcta })))
 }
 
 const preguntaConfig = {
@@ -96,6 +94,12 @@ const preguntaConfig = {
   ],
   placeholderText: 'Escribe la pregunta aquí...',
   heightMin: 120,
+  charCounterCount: true,
+  // pasteDeniedAttrs: ['style', 'class', 'id'], // Elimina atributos en línea como background-color, color, font-family
+  // pasteDeniedTags: ['span', 'font'], // Elimina etiquetas típicas que arrastran fuentes/colores
+
+  wordPasteFormat: 'keep', // Opciones: 'clean' (limpio), 'formatted' (mantiene estilos), 'keep'
+  wordPasteKeepFormatting: true,
 }
 
 const opcionConfig = {
@@ -122,13 +126,9 @@ const opcionConfig = {
       <label class="label font-semibold">Pregunta</label>
       <FroalaEditor v-model="pregunta" :config="preguntaConfig" />
       <div class="flex gap-3 pt-4">
-        <button
-          class="btn btn-primary"
-          :disabled="props.guardandoPregunta"
-          @click="guardarPregunta"
-        >
-          <span v-if="props.guardandoPregunta" class="loading loading-spinner"></span>
-          {{ props.guardandoPregunta ? 'Guardando...' : 'Guardar' }}
+        <button class="btn btn-primary" :disabled="guardandoPregunta" @click="guardarPreguntaForm">
+          <span v-if="guardandoPregunta" class="loading loading-spinner"></span>
+          {{ guardandoPregunta ? 'Guardando...' : 'Guardar pregunta' }}
         </button>
       </div>
     </div>
@@ -178,13 +178,9 @@ const opcionConfig = {
     </div>
 
     <div class="flex gap-3 pt-4">
-      <button
-        class="btn btn-primary"
-        :disabled="props.guardandoRespuestas"
-        @click="guardarRespuesta"
-      >
-        <span v-if="props.guardandoRespuestas" class="loading loading-spinner"></span>
-        {{ props.guardandoRespuestas ? 'Guardando...' : 'Guardar' }}
+      <button class="btn btn-primary" :disabled="guardandoRespuestas" @click="guardarRespuestaForm">
+        <span v-if="guardandoRespuestas" class="loading loading-spinner"></span>
+        {{ guardandoRespuestas ? 'Guardando...' : 'Guardar respuestas' }}
       </button>
     </div>
   </div>

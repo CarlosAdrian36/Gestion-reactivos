@@ -13,7 +13,7 @@ export interface CrearReactivoResponse {
 }
 
 export interface CrearRespuestaRequest {
-  idiomaId: number
+  // idiomaId: number
   posicion: number
   esCorrecta: boolean
   respuesta: string
