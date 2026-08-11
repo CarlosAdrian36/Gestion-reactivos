@@ -1,12 +1,24 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
+import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import { useReactivosStore } from './reactivosStore'
 
 const route = useRoute()
 const bancoId = String(route.params.id)
 const { isLoading } = useReactivos(bancoId)
 const { selectedReactivo } = useReactivosStore()
+
+const { data: respuestas, isLoading: cargandoRespuestas } = useRespuestas(
+  bancoId,
+  () => selectedReactivo.value?.idReactivo,
+)
+
+const tipoReactivoId = computed(() => selectedReactivo.value?.tipoReactivoId)
+const respuestasOrdenadas = computed(() =>
+  [...(respuestas.value ?? [])].sort((a, b) => a.posicion - b.posicion),
+)
 
 const idiomas: Record<number, string> = {
   1: 'Original (EN)',
@@ -159,6 +171,75 @@ function fmtDate(iso: string): string {
                   v-html="selectedReactivo.descripcion"
                 ></div>
               </div>
+            </div>
+
+            <!-- Respuestas: Opción Múltiple / Respuesta Múltiple -->
+            <div v-if="tipoReactivoId === 1 || tipoReactivoId === 2" class="space-y-3">
+              <h3
+                class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
+              >
+                <i class="fa-regular fa-list-check text-[14px]"></i>
+                Respuestas
+              </h3>
+              <div v-if="cargandoRespuestas" class="space-y-2">
+                <div class="skeleton h-12 w-full rounded-xl"></div>
+                <div class="skeleton h-12 w-full rounded-xl"></div>
+              </div>
+              <div v-else-if="respuestasOrdenadas.length" class="space-y-2">
+                <div
+                  v-for="(r, i) in respuestasOrdenadas"
+                  :key="r.idRespuesta"
+                  class="flex items-center gap-3 p-4 rounded-xl border"
+                  :class="
+                    r.esCorrecta
+                      ? 'border-success bg-success/10'
+                      : 'border-base-300 bg-base-200/50'
+                  "
+                >
+                  <span
+                    class="size-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                    :class="
+                      r.esCorrecta
+                        ? 'bg-success text-success-content'
+                        : 'bg-base-300 text-base-content/60'
+                    "
+                  >
+                    {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
+                  </span>
+                  <div
+                    class="min-w-0 flex-1 text-sm text-base-content leading-relaxed [&_p]:m-0"
+                    v-html="r.respuesta"
+                  ></div>
+                </div>
+              </div>
+              <p v-else class="text-sm text-base-content/40">Sin respuestas guardadas</p>
+            </div>
+
+            <!-- Respuestas: Verdadero / Falso -->
+            <div v-else-if="tipoReactivoId === 3" class="space-y-3">
+              <h3
+                class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
+              >
+                <i class="fa-regular fa-toggle-on text-[14px]"></i>
+                Respuestas
+              </h3>
+              <div v-if="cargandoRespuestas" class="skeleton h-14 w-full rounded-xl"></div>
+              <div v-else-if="respuestasOrdenadas.length" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  v-for="r in respuestasOrdenadas"
+                  :key="r.idRespuesta"
+                  class="flex items-center gap-2 px-6 py-4 rounded-xl border"
+                  :class="
+                    r.esCorrecta
+                      ? 'border-success bg-success/10 text-success'
+                      : 'border-base-300 bg-base-200/50 text-base-content/70'
+                  "
+                >
+                  <i :class="r.esCorrecta ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'"></i>
+                  <span class="font-semibold">{{ r.respuesta }}</span>
+                </div>
+              </div>
+              <p v-else class="text-sm text-base-content/40">Sin respuestas guardadas</p>
             </div>
 
             <!-- Details Grid -->
