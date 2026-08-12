@@ -4,11 +4,14 @@ import { useRoute } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import { useReactivosStore } from './reactivosStore'
+import { useModalStore } from '@/common/modals/store/modal.store'
+import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vue'
 
 const route = useRoute()
 const bancoId = String(route.params.id)
 const { isLoading } = useReactivos(bancoId)
 const { selectedReactivo } = useReactivosStore()
+const modal = useModalStore()
 
 const { data: respuestas, isLoading: cargandoRespuestas } = useRespuestas(
   bancoId,
@@ -19,6 +22,18 @@ const tipoReactivoId = computed(() => selectedReactivo.value?.tipoReactivoId)
 const respuestasOrdenadas = computed(() =>
   [...(respuestas.value ?? [])].sort((a, b) => a.posicion - b.posicion),
 )
+
+function abrirEliminar() {
+  if (!selectedReactivo.value) return
+  modal.openModal(
+    eliminarReactivo,
+    { bancoId, reactivo: selectedReactivo.value },
+    [
+      { label: 'Cerrar', variant: 'outline' },
+      { label: 'Eliminar', variant: 'error', type: 'submit' },
+    ],
+  )
+}
 
 const idiomas: Record<number, string> = {
   1: 'Original (EN)',
@@ -107,6 +122,7 @@ function fmtDate(iso: string): string {
                 </button>
                 <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm cursor-pointer"
+                  @click="abrirEliminar"
                 >
                   <i class="fa-regular fa-trash"></i>
                   Eliminar

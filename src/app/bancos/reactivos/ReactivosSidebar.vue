@@ -42,10 +42,10 @@ function fmtDate(iso: string): string {
   const now = new Date()
   const diff = now.getTime() - d.getTime()
   const hours = Math.floor(diff / 3600000)
-  if (hours < 1) return 'Just now'
-  if (hours < 24) return `${hours}h ago`
+  if (hours < 1) return 'Hace un momento'
+  if (hours < 24) return `Hace ${hours}h`
   const days = Math.floor(hours / 24)
-  if (days < 30) return `${days}d ago`
+  if (days < 30) return `Hace ${days}d`
   return d.toLocaleDateString()
 }
 </script>

@@ -11,6 +11,10 @@ export function useReactivosStore() {
     selectedReactivo.value = reactivo
   }
 
+  function clear() {
+    selectedReactivo.value = null
+  }
+
   function setReactivos(list: Reactivo[]) {
     reactivos.value = list
   }
@@ -20,6 +24,7 @@ export function useReactivosStore() {
     reactivos,
     hasSelected,
     select,
+    clear,
     setReactivos,
   }
 }
