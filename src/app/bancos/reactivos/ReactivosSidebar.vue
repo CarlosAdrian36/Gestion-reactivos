@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useReactivosStore } from './reactivosStore'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
+import { stripHtmlToText } from '@/utils/html'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,6 +28,10 @@ function seleccionarReactivo(r: Reactivo) {
 const abierto = ref(true)
 const { data: reactivos, isLoading } = useReactivos(bancoId)
 const { selectedReactivo, select } = useReactivosStore()
+
+function preview(r: Reactivo): string {
+  return stripHtmlToText(r.descripcion)
+}
 
 const nivelColor: Record<string, string> = {
   Remember: 'badge badge-outline text-[10px] font-bold uppercase tracking-wider',
@@ -101,10 +106,9 @@ function fmtDate(iso: string): string {
               {{ r.subTema.descripcion }}
             </span>
           </div>
-          <div
-            class="text-sm text-base-content/80 mb-2 leading-relaxed [&_p]:inline [&_p]:m-0"
-            v-html="r.descripcion"
-          ></div>
+          <p class="text-sm text-base-content/80 mb-2 leading-relaxed line-clamp-2">
+            {{ preview(r) }}
+          </p>
 
           <div class="flex items-center gap-2 mt-auto">
             <div

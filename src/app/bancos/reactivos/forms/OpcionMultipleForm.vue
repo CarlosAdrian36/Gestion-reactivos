@@ -74,20 +74,31 @@ function guardarRespuestaForm() {
 }
 
 const preguntaConfig = {
+  quickInsertEnabled: false,
   toolbarButtons: [
     'bold',
     'italic',
     'underline',
     '|',
+    'fontFamily',
+    'fontSize',
+    '|', // Botones para Tipografía y Tamaño
+    'textColor',
+    'backgroundColor', // Botones para Colores
+    '|',
     'alignLeft',
     'alignCenter',
     'alignRight',
+    '|',
+    'insertTable',
     '|',
     'outdent',
     'indent',
     '|',
     'formatOL',
     'formatUL',
+    '|',
+    'clearFormatting',
     '|',
     'undo',
     'redo',
@@ -113,7 +124,7 @@ const opcionConfig = {
 
   heightMin: 80,
   heightMax: 120,
-
+  quickInsertEnabled: false,
   toolbarSticky: false,
 }
 </script>
