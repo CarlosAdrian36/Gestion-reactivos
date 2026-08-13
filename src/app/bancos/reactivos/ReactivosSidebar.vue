@@ -33,6 +33,14 @@ function preview(r: Reactivo): string {
   return stripHtmlToText(r.descripcion)
 }
 
+const tipoReactivo: Record<number, string> = {
+  1: 'Opción Múltiple',
+  2: 'Respuesta Múltiple',
+  3: 'Verdadero / Falso',
+  4: 'Pregunta Abierta',
+  5: 'Relacional',
+}
+
 const nivelColor: Record<string, string> = {
   Remember: 'badge badge-outline text-[10px] font-bold uppercase tracking-wider',
   Understand: 'badge badge-outline badge-info text-[10px] font-bold uppercase tracking-wider',
@@ -99,11 +107,16 @@ function fmtDate(iso: string): string {
           ></div>
           <div class="flex justify-between items-start mb-1">
             <span class="font-bold text-sm text-base-content">#{{ r.posicion }}</span>
-            <span
-              v-if="r.subTema.descripcion !== 'Sin SubTema'"
-              class="text-xs font-medium text-base-content/60 bg-base-200 px-2 py-0.5 rounded-full"
-            >
-              {{ r.subTema.descripcion }}
+            <span class="flex items-center gap-1 flex-wrap justify-end">
+              <span class="badge badge-outline badge-secondary badge-xs">
+                {{ tipoReactivo[r.tipoReactivoId] || 'Desconocido' }}
+              </span>
+              <span
+                v-if="r.subTema.descripcion !== 'Sin SubTema'"
+                class="text-xs font-medium text-base-content/60 bg-base-200 px-2 py-0.5 rounded-full"
+              >
+                {{ r.subTema.descripcion }}
+              </span>
             </span>
           </div>
           <p class="text-sm text-base-content/80 mb-2 leading-relaxed line-clamp-2">
