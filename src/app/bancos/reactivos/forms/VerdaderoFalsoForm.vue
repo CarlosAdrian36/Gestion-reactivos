@@ -4,14 +4,29 @@ import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
 import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
+import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
+import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
+
+const props = defineProps<{
+  reactivo?: Reactivo
+  respuestas?: Respuesta[]
+}>()
 
 const route = useRoute()
 const bancoId = route.params.id as string
 const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas } =
-  useGuardarReactivo(bancoId, TIPO_REACTIVO.verdaderoFalso)
+  useGuardarReactivo(bancoId, TIPO_REACTIVO.verdaderoFalso, props.reactivo?.idReactivo)
 
-const pregunta = ref('')
-const respuestaCorrecta = ref<boolean | null>(null)
+const pregunta = ref(props.reactivo?.descripcion ?? '')
+
+function calcularCorrecta(respuestas?: Respuesta[]): boolean | null {
+  if (!respuestas?.length) return null
+  const correcta = respuestas.find((r) => r.esCorrecta)
+  if (!correcta) return null
+  return correcta.respuesta.trim().toLowerCase() === 'verdadero'
+}
+
+const respuestaCorrecta = ref<boolean | null>(calcularCorrecta(props.respuestas))
 
 function guardarPreguntaForm() {
   if (!pregunta.value.trim()) {
@@ -23,10 +38,19 @@ function guardarPreguntaForm() {
 
 function guardarRespuestaForm() {
   if (respuestaCorrecta.value === null) return
-  guardarRespuestas([
-    { texto: 'Verdadero', correcta: respuestaCorrecta.value === true },
-    { texto: 'Falso', correcta: respuestaCorrecta.value === false },
-  ])
+  const idVerdadero = props.respuestas?.find(
+    (r) => r.respuesta.trim().toLowerCase() === 'verdadero',
+  )?.idRespuesta
+  const idFalso = props.respuestas?.find(
+    (r) => r.respuesta.trim().toLowerCase() === 'falso',
+  )?.idRespuesta
+  guardarRespuestas(
+    [
+      { idRespuesta: idVerdadero, texto: 'Verdadero', correcta: respuestaCorrecta.value === true },
+      { idRespuesta: idFalso, texto: 'Falso', correcta: respuestaCorrecta.value === false },
+    ],
+    props.respuestas?.map((r) => r.idRespuesta) ?? [],
+  )
 }
 </script>
 

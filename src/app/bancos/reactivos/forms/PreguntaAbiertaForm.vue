@@ -4,15 +4,21 @@ import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
 import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
+import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
+
+const props = defineProps<{
+  reactivo?: Reactivo
+}>()
 
 const route = useRoute()
 const bancoId = route.params.id as string
 const { guardarPregunta, guardandoPregunta } = useGuardarReactivo(
   bancoId,
   TIPO_REACTIVO.preguntaAbierta,
+  props.reactivo?.idReactivo,
 )
 
-const pregunta = ref('')
+const pregunta = ref(props.reactivo?.descripcion ?? '')
 
 function guardarPreguntaForm() {
   if (!pregunta.value.trim()) {

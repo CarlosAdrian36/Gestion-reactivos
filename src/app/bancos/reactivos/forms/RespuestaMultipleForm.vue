@@ -4,15 +4,30 @@ import { useRoute } from 'vue-router'
 import { z } from 'zod'
 import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
-import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
+import { TIPO_REACTIVO, useGuardarReactivo, type OpcionForm } from '@/api/bancos/composable/useGuardarReactivo'
+import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
+import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
+
+const props = defineProps<{
+  reactivo?: Reactivo
+  respuestas?: Respuesta[]
+}>()
 
 const route = useRoute()
 const bancoId = route.params.id as string
 const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas } =
-  useGuardarReactivo(bancoId, TIPO_REACTIVO.respuestaMultiple)
+  useGuardarReactivo(bancoId, TIPO_REACTIVO.respuestaMultiple, props.reactivo?.idReactivo)
 
-const pregunta = ref('')
-const opciones = ref([{ texto: '', correcta: false }, { texto: '', correcta: false }])
+const pregunta = ref(props.reactivo?.descripcion ?? '')
+const opciones = ref<OpcionForm[]>(
+  props.respuestas && props.respuestas.length > 0
+    ? props.respuestas.map((r) => ({
+        idRespuesta: r.idRespuesta,
+        texto: r.respuesta,
+        correcta: r.esCorrecta,
+      }))
+    : [{ texto: '', correcta: false }, { texto: '', correcta: false }],
+)
 
 const opcionesSchema = z.array(
   z.object({
@@ -44,6 +59,21 @@ function guardarPreguntaForm() {
   guardarPregunta(pregunta.value)
 }
 
+const opcionConfig = {
+  toolbarInline: false,
+
+  toolbarButtons: ['bold', 'italic', 'underline', '|', 'undo', 'redo'],
+  toolbarButtonsSM: ['bold', 'italic'],
+  toolbarButtonsXS: ['bold'],
+
+  placeholderText: 'Respuesta',
+
+  heightMin: 80,
+  heightMax: 120,
+  quickInsertEnabled: false,
+  toolbarSticky: false,
+}
+
 function guardarRespuestaForm() {
   const result = opcionesSchema.safeParse(opciones.value)
   if (!result.success) {
@@ -57,7 +87,14 @@ function guardarRespuestaForm() {
     return
   }
   erroresOpciones.value = []
-  guardarRespuestas(result.data.map((o) => ({ texto: o.texto, correcta: o.correcta })))
+  guardarRespuestas(
+    result.data.map((o, i) => ({
+      idRespuesta: opciones.value[i]?.idRespuesta,
+      texto: o.texto,
+      correcta: o.correcta,
+    })),
+    props.respuestas?.map((r) => r.idRespuesta) ?? [],
+  )
 }
 </script>
 
@@ -102,25 +139,32 @@ function guardarRespuestaForm() {
         :key="index"
         class="flex items-center gap-3 mb-2"
       >
-        <input
-          v-model="opcion.correcta"
-          type="checkbox"
-          class="checkbox checkbox-primary checkbox-sm"
-        />
+        <label
+          class="btn btn-xs rounded-lg cursor-pointer select-none transition-colors shrink-0 min-w-20 justify-center"
+          :class="
+            opcion.correcta
+              ? 'btn-success text-success-content border-success'
+              : 'btn-outline border-base-300'
+          "
+        >
+          <input v-model="opcion.correcta" type="checkbox" class="hidden" />
+          Correcta
+        </label>
         <div class="flex-1 min-w-0">
-          <input
+          <FroalaEditor
             v-model="opcion.texto"
-            type="text"
-            class="input input-bordered input-sm w-full"
-            :placeholder="`Opción ${String.fromCharCode(65 + index)}`"
+            :config="{
+              ...opcionConfig,
+              placeholderText: `Opción ${String.fromCharCode(65 + index)}`,
+            }"
           />
           <p v-if="erroresOpciones[index]" class="text-error text-xs mt-1">
             {{ erroresOpciones[index] }}
           </p>
         </div>
         <button
-          v-if="opciones.length > 2"
-          class="btn btn-ghost btn-xs text-error"
+          class="btn btn-ghost btn-xs text-error shrink-0"
+          :class="opciones.length > 2 ? '' : 'invisible'"
           @click="quitarOpcion(index)"
         >
           <i class="fa-regular fa-trash"></i>

@@ -127,7 +127,8 @@ function fmtDate(iso: string): string {
         v-else
         class="flex flex-col items-center justify-center h-full text-center text-base-content/60"
       >
-        <i class="fa-regular fa-file-circle-plus text-4xl mb-2"></i>
+        <i class="fa-regular fa-objects-align-left text-4xl mb-2"></i>
+        <!-- <i class="fa-regular fa-file-circle-plus text-4xl mb-2"></i> -->
         <p class="text-sm font-medium">No hay reactivos</p>
         <p class="text-xs">Agrega el primer reactivo para empezar a trabajar</p>
       </div>
@@ -137,7 +138,7 @@ function fmtDate(iso: string): string {
     <div class="p-3 border-t border-base-300" :class="abierto ? 'block' : 'hidden'">
       <button
         @click="irACrear"
-        class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-content text-sm font-bold hover:bg-primary-dark transition-colors cursor-pointer hover:scale-102 overflow-hidden leading-none"
+        class="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-primary-content text-sm font-bold hover:bg-primary-dark transition-colors cursor-pointer hover:scale-102 overflow-hidden leading-none"
       >
         <i class="fa-regular fa-plus text-[18px]"></i>
         Crear Reactivo

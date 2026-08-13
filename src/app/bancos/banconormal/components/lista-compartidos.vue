@@ -64,13 +64,16 @@
 
     <!-- Botón -->
     <div class="pt-5 mt-auto">
-      <button
+      <!-- <button
         class="btn btn-dash btn-block btn-sm rounded-lg border-dashed hover:border-primary hover:text-primary hover:bg-base-100"
         @click.stop="Compartirbanco(banco)"
       >
         Compartir
-      </button>
+      </button> -->
     </div>
+    <button class="btn btn-dash btn-primary btn-sm" @click.stop="Compartirbanco(banco)">
+      Compartir
+    </button>
   </div>
 </template>
 <script lang="ts" setup>

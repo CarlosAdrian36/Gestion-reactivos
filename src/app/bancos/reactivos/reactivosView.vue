@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import { useReactivosStore } from './reactivosStore'
@@ -8,6 +8,7 @@ import { useModalStore } from '@/common/modals/store/modal.store'
 import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vue'
 
 const route = useRoute()
+const router = useRouter()
 const bancoId = String(route.params.id)
 const { isLoading } = useReactivos(bancoId)
 const { selectedReactivo } = useReactivosStore()
@@ -25,14 +26,14 @@ const respuestasOrdenadas = computed(() =>
 
 function abrirEliminar() {
   if (!selectedReactivo.value) return
-  modal.openModal(
-    eliminarReactivo,
-    { bancoId, reactivo: selectedReactivo.value },
-    [
-      { label: 'Cerrar', variant: 'outline' },
-      { label: 'Eliminar', variant: 'error', type: 'submit' },
-    ],
-  )
+  modal.openModal(eliminarReactivo, { bancoId, reactivo: selectedReactivo.value }, [
+    { label: 'Cerrar', variant: 'outline' },
+    { label: 'Eliminar', variant: 'error', type: 'submit' },
+  ])
+}
+
+function irAEditar() {
+  router.push({ name: 'editarReactivo', params: { id: bancoId } })
 }
 
 const idiomas: Record<number, string> = {
@@ -95,8 +96,8 @@ function fmtDate(iso: string): string {
                 <div
                   class="text-2xl font-bold text-base-content tracking-tight mb-1 [&_p]:inline [&_p]:m-0"
                 >
-                  #{{ selectedReactivo.posicion }}:
-                  <span v-html="selectedReactivo.descripcion.slice(0, 50) + '...'"></span>
+                  #{{ selectedReactivo.posicion }}
+                  <!-- <span v-html="selectedReactivo.descripcion.slice(0, 50) + '...'"></span> -->
                 </div>
                 <div class="flex items-center gap-3 text-xs text-base-content/60">
                   <span class="flex items-center gap-1">
@@ -116,6 +117,7 @@ function fmtDate(iso: string): string {
                 </button> -->
                 <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content hover:bg-base-200 transition-colors cursor-pointer"
+                  @click="irAEditar"
                 >
                   <i class="fa-regular fa-pen-to-square text-[14px]"></i>
                   Editar
@@ -183,7 +185,7 @@ function fmtDate(iso: string): string {
               </h3>
               <div class="bg-base-200 rounded-xl p-6">
                 <div
-                  class="text-lg text-base-content leading-relaxed [&_p]:m-0"
+                  class="fr-view text-lg text-base-content leading-relaxed [&_p]:m-0"
                   v-html="selectedReactivo.descripcion"
                 ></div>
               </div>
@@ -207,9 +209,7 @@ function fmtDate(iso: string): string {
                   :key="r.idRespuesta"
                   class="flex items-center gap-3 p-4 rounded-xl border"
                   :class="
-                    r.esCorrecta
-                      ? 'border-success bg-success/10'
-                      : 'border-base-300 bg-base-200/50'
+                    r.esCorrecta ? 'border-success bg-success/10' : 'border-base-300 bg-base-200/50'
                   "
                 >
                   <span
@@ -223,7 +223,7 @@ function fmtDate(iso: string): string {
                     {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
                   </span>
                   <div
-                    class="min-w-0 flex-1 text-sm text-base-content leading-relaxed [&_p]:m-0"
+                    class="fr-view min-w-0 flex-1 text-sm text-base-content leading-relaxed [&_p]:m-0"
                     v-html="r.respuesta"
                   ></div>
                 </div>
@@ -240,7 +240,10 @@ function fmtDate(iso: string): string {
                 Respuestas
               </h3>
               <div v-if="cargandoRespuestas" class="skeleton h-14 w-full rounded-xl"></div>
-              <div v-else-if="respuestasOrdenadas.length" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div
+                v-else-if="respuestasOrdenadas.length"
+                class="grid grid-cols-1 sm:grid-cols-2 gap-3"
+              >
                 <div
                   v-for="r in respuestasOrdenadas"
                   :key="r.idRespuesta"
@@ -251,7 +254,9 @@ function fmtDate(iso: string): string {
                       : 'border-base-300 bg-base-200/50 text-base-content/70'
                   "
                 >
-                  <i :class="r.esCorrecta ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'"></i>
+                  <i
+                    :class="r.esCorrecta ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'"
+                  ></i>
                   <span class="font-semibold">{{ r.respuesta }}</span>
                 </div>
               </div>
@@ -325,13 +330,15 @@ function fmtDate(iso: string): string {
               </div> -->
               <div class="flex items-center gap-4">
                 <div class="text-right">
-                  <p class="text-[10px] uppercase tracking-wider text-base-content/40">Created</p>
+                  <p class="text-[10px] uppercase tracking-wider text-base-content/40">Creado</p>
                   <p class="text-base-content font-medium">
                     {{ fmtDate(selectedReactivo.fechaCreacion) }}
                   </p>
                 </div>
                 <div class="text-right">
-                  <p class="text-[10px] uppercase tracking-wider text-base-content/40">Modified</p>
+                  <p class="text-[10px] uppercase tracking-wider text-base-content/40">
+                    Modificado
+                  </p>
                   <p class="text-base-content font-medium">
                     {{ fmtDate(selectedReactivo.fechaModificacion) }}
                   </p>

@@ -4,18 +4,37 @@ import { useRoute } from 'vue-router'
 import { z } from 'zod'
 import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
-import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
+import {
+  TIPO_REACTIVO,
+  useGuardarReactivo,
+  type OpcionForm,
+} from '@/api/bancos/composable/useGuardarReactivo'
+import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
+import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
+
+const props = defineProps<{
+  reactivo?: Reactivo
+  respuestas?: Respuesta[]
+}>()
 
 const route = useRoute()
 const bancoId = route.params.id as string
 const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas } =
-  useGuardarReactivo(bancoId, TIPO_REACTIVO.opcionMultiple)
+  useGuardarReactivo(bancoId, TIPO_REACTIVO.opcionMultiple, props.reactivo?.idReactivo)
 
-const pregunta = ref('')
-const opciones = ref([
-  { texto: '', correcta: false },
-  { texto: '', correcta: false },
-])
+const pregunta = ref(props.reactivo?.descripcion ?? '')
+const opciones = ref<OpcionForm[]>(
+  props.respuestas && props.respuestas.length > 0
+    ? props.respuestas.map((r) => ({
+        idRespuesta: r.idRespuesta,
+        texto: r.respuesta,
+        correcta: r.esCorrecta,
+      }))
+    : [
+        { texto: '', correcta: false },
+        { texto: '', correcta: false },
+      ],
+)
 
 const opcionesSchema = z.array(
   z.object({
@@ -70,7 +89,14 @@ function guardarRespuestaForm() {
     return
   }
   erroresOpciones.value = []
-  guardarRespuestas(result.data.map((o) => ({ texto: o.texto, correcta: o.correcta })))
+  guardarRespuestas(
+    result.data.map((o, i) => ({
+      idRespuesta: opciones.value[i]?.idRespuesta,
+      texto: o.texto,
+      correcta: o.correcta,
+    })),
+    props.respuestas?.map((r) => r.idRespuesta) ?? [],
+  )
 }
 
 const preguntaConfig = {
@@ -106,10 +132,8 @@ const preguntaConfig = {
   placeholderText: 'Escribe la pregunta aquí...',
   heightMin: 120,
   charCounterCount: true,
-  // pasteDeniedAttrs: ['style', 'class', 'id'], // Elimina atributos en línea como background-color, color, font-family
-  // pasteDeniedTags: ['span', 'font'], // Elimina etiquetas típicas que arrastran fuentes/colores
 
-  wordPasteFormat: 'keep', // Opciones: 'clean' (limpio), 'formatted' (mantiene estilos), 'keep'
+  wordPasteFormat: 'keep',
   wordPasteKeepFormatting: true,
 }
 
@@ -158,13 +182,22 @@ const opcionConfig = {
       </div>
 
       <div v-for="(opcion, index) in opciones" :key="index" class="flex items-center gap-3 mb-2">
-        <!-- <input type="radio" aria-label="Correcta" class="btn btn-dash btn-success" /> -->
-        <input
-          type="checkbox"
-          :checked="opcion.correcta"
-          class="btn btn-ghost btn-xs checkbox checkbox-primary"
-          @change="seleccionarCorrecta(index)"
-        />
+        <label
+          class="btn btn-xs cursor-pointer select-none transition-colors shrink-0 min-w-20 justify-center"
+          :class="
+            opcion.correcta
+              ? 'btn-success text-success-content border-success'
+              : 'btn-outline border-base-300'
+          "
+        >
+          <input
+            type="checkbox"
+            class="hidden"
+            :checked="opcion.correcta"
+            @change="seleccionarCorrecta(index)"
+          />
+          Correcta
+        </label>
 
         <div class="flex-1 min-w-0">
           <FroalaEditor
@@ -179,8 +212,8 @@ const opcionConfig = {
           </p>
         </div>
         <button
-          v-if="opciones.length > 2"
-          class="btn btn-ghost btn-xs text-error"
+          class="btn btn-ghost btn-xs text-error shrink-0"
+          :class="opciones.length > 2 ? '' : 'invisible'"
           @click="quitarOpcion(index)"
         >
           <i class="fa-regular fa-trash"></i>

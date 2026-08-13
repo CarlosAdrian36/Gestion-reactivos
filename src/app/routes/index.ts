@@ -20,6 +20,12 @@ export const bancoRoutes: RouteRecordRaw[] = [
     meta: { sidebar: 'reactivos' },
   },
   {
+    path: 'banco/:id/reactivos/editar',
+    name: 'editarReactivo',
+    component: () => import('@/app/bancos/reactivos/editarReactivo.vue'),
+    meta: { sidebar: 'reactivos' },
+  },
+  {
     path: 'banco/:id/reactivos/crear',
     name: 'crearReactivo',
     component: () => import('@/app/bancos/reactivos/crearReactivo.vue'),
