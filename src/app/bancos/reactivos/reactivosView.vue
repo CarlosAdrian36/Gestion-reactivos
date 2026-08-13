@@ -83,7 +83,7 @@ function fmtDate(iso: string): string {
                 >Banco Detalle</RouterLink
               >
             </li>
-            <li class="text-base-content/60">#{{ selectedReactivo.idReactivo }}</li>
+            <li class="text-base-content/60">#{{ selectedReactivo.posicion }}</li>
           </ul>
         </div>
 
@@ -341,6 +341,14 @@ function fmtDate(iso: string): string {
                   </p>
                   <p class="text-base-content font-medium">
                     {{ fmtDate(selectedReactivo.fechaModificacion) }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="text-right">
+                  <p class="text-[10px] uppercase tracking-wider text-base-content/40">ID</p>
+                  <p class="text-base-content font-medium font-mono text-xs">
+                    {{ selectedReactivo.idReactivo }}
                   </p>
                 </div>
               </div>

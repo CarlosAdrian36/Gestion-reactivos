@@ -1,14 +1,14 @@
 <template>
   <div class="flex flex-col h-full">
     <!-- Encabezado -->
-    <div class="flex flex-row items-center mb-4">
-      <i class="fa-regular fa-user-gear text-primary pe-2"></i>
+    <div class="flex items-center gap-2 mb-6">
+      <i class="fa-regular fa-user-gear text-primary"></i>
 
       <h2 class="text-xs font-bold uppercase tracking-widest">Compartido con</h2>
     </div>
 
     <!-- Lista -->
-    <div class="flex-1 overflow-y-auto max-h-96 pr-2 space-y-4">
+    <div class="flex-1 overflow-y-auto max-h-80 pr-2 space-y-4">
       <div v-if="data?.compartidos.length === 0">
         <div class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-5">
           <i class="fa-regular fa-user-group text-4xl text-base-content/40"></i>
@@ -64,16 +64,13 @@
 
     <!-- Botón -->
     <div class="pt-5 mt-auto">
-      <!-- <button
-        class="btn btn-dash btn-block btn-sm rounded-lg border-dashed hover:border-primary hover:text-primary hover:bg-base-100"
+      <button
+        class="btn btn-dash btn-block btn-primary btn-sm rounded-lg"
         @click.stop="Compartirbanco(banco)"
       >
         Compartir
-      </button> -->
+      </button>
     </div>
-    <button class="btn btn-dash btn-primary btn-sm" @click.stop="Compartirbanco(banco)">
-      Compartir
-    </button>
   </div>
 </template>
 <script lang="ts" setup>

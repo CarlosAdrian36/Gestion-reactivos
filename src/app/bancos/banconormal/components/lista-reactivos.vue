@@ -1,14 +1,12 @@
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex flex-row items-center mb-4">
-      <button
-        class="btn btn-ghost btn-sm gap-2 px-3 py-2 rounded-lg hover:bg-base-200"
-        @click="irAListado"
-      >
-        <i class="fa-regular fa-ballot-check text-primary pe-2"></i>
-        <h2 class="text-xs font-bold uppercase tracking-widest">Listado de Reactivos</h2>
-      </button>
-    </div>
+    <button
+      class="flex items-center gap-2 mb-6 px-0 text-left hover:opacity-70 transition-opacity cursor-pointer"
+      @click="irAListado"
+    >
+      <i class="fa-regular fa-ballot-check text-primary"></i>
+      <h2 class="text-xs font-bold uppercase tracking-widest">Listado de Reactivos</h2>
+    </button>
 
     <!-- Contenido -->
     <div class="grow overflow-y-auto max-h-80 pr-2 space-y-2">
@@ -50,13 +48,11 @@
     </div>
 
     <!-- Botón -->
-    <!-- <button
-      class="btn btn-dash btn-block hover:border-primary hover:text-primary hover:bg-base-100 btn-sm rounded-lg border-dashed border-slate-300 mt-auto"
-      @click="irACrear"
-    >
-      Crear Reactivo
-    </button> -->
-    <button class="btn btn-dash btn-primary btn-sm" @click="irACrear">Crear Reactivo</button>
+    <div class="mt-auto pt-5">
+      <button class="btn btn-dash btn-block btn-primary btn-sm rounded-lg" @click="irACrear">
+        Crear Reactivo
+      </button>
+    </div>
   </div>
 </template>
 
