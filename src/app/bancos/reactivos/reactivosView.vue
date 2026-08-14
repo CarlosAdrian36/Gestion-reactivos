@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import { useReactivosStore } from './reactivosStore'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vue'
+import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 
 const route = useRoute()
 const router = useRouter()
 const bancoId = String(route.params.id)
-const { isLoading } = useReactivos(bancoId)
-const { selectedReactivo } = useReactivosStore()
+const { data: reactivos, isLoading } = useReactivos(bancoId)
+const { selectedReactivo, clear } = useReactivosStore()
 const modal = useModalStore()
+
+watch(reactivos, (lista) => {
+  const sel = selectedReactivo.value
+  if (lista && sel && !lista.some((r) => r.idReactivo === sel.idReactivo)) clear()
+})
 
 const { data: respuestas, isLoading: cargandoRespuestas } = useRespuestas(
   bancoId,
@@ -20,6 +26,7 @@ const { data: respuestas, isLoading: cargandoRespuestas } = useRespuestas(
 )
 
 const tipoReactivoId = computed(() => selectedReactivo.value?.tipoReactivoId)
+const { tipoPorId } = useTiposReactivo()
 const respuestasOrdenadas = computed(() =>
   [...(respuestas.value ?? [])].sort((a, b) => a.posicion - b.posicion),
 )
@@ -40,14 +47,6 @@ const idiomas: Record<number, string> = {
   1: 'Original (EN)',
   2: 'v1: Es-MX',
   3: 'v2: Fr-CA',
-}
-
-const tipoReactivo: Record<number, string> = {
-  1: 'Opción Múltiple',
-  2: 'Respuesta Múltiple',
-  3: 'Verdadero / Falso',
-  4: 'Pregunta Abierta',
-  5: 'Relacional',
 }
 
 function fmtDate(iso: string): string {
@@ -83,7 +82,7 @@ function fmtDate(iso: string): string {
                 >Banco Detalle</RouterLink
               >
             </li>
-            <li class="text-base-content/60">#{{ selectedReactivo.posicion }}</li>
+            <li class="text-base-content/60">Reactivo {{ selectedReactivo.posicion }}</li>
           </ul>
         </div>
 
@@ -96,7 +95,7 @@ function fmtDate(iso: string): string {
                 <div
                   class="text-2xl font-bold text-base-content tracking-tight mb-1 [&_p]:inline [&_p]:m-0"
                 >
-                  #{{ selectedReactivo.posicion }}
+                  Reactivo {{ selectedReactivo.posicion }}
                   <!-- <span v-html="selectedReactivo.descripcion.slice(0, 50) + '...'"></span> -->
                 </div>
                 <div class="flex items-center gap-3 text-xs text-base-content/60">
@@ -105,7 +104,21 @@ function fmtDate(iso: string): string {
                     v{{ selectedReactivo.version }}
                   </span>
                   <span class="w-1 h-1 rounded-full bg-base-300"></span>
-                  <span>{{ tipoReactivo[selectedReactivo.tipoReactivoId] || 'Unknown' }}</span>
+                  <span>{{ tipoPorId(selectedReactivo.tipoReactivoId)?.nombre ?? 'Unknown' }}</span>
+                  <span class="w-1 h-1 rounded-full bg-base-300"></span>
+                  <span
+                    class="flex items-center gap-1"
+                    :class="selectedReactivo.esCompleto ? 'text-success' : 'text-error'"
+                  >
+                    <i
+                      :class="
+                        selectedReactivo.esCompleto
+                          ? 'fa-light fa-circle-check'
+                          : 'fa-light fa-circle-x'
+                      "
+                    ></i>
+                    {{ selectedReactivo.esCompleto ? 'Completo' : 'Incompleto' }}
+                  </span>
                 </div>
               </div>
               <div class="flex gap-2">
@@ -318,7 +331,7 @@ function fmtDate(iso: string): string {
                 <div class="flex flex-col gap-1">
                   <span class="uppercase tracking-wider font-semibold">Type</span>
                   <span class="px-2 py-0.5 bg-base-300 rounded text-base-content font-medium">
-                    {{ tipoReactivo[selectedReactivo.tipoReactivoId] || 'Unknown' }}
+                    {{ tipoPorId(selectedReactivo.tipoReactivoId)?.nombre ?? 'Unknown' }}
                   </span>
                 </div>
                 <div class="flex flex-col gap-1">

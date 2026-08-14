@@ -5,6 +5,7 @@ import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useReactivosStore } from './reactivosStore'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import { stripHtmlToText } from '@/utils/html'
+import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 
 const route = useRoute()
 const router = useRouter()
@@ -33,13 +34,7 @@ function preview(r: Reactivo): string {
   return stripHtmlToText(r.descripcion)
 }
 
-const tipoReactivo: Record<number, string> = {
-  1: 'Opción Múltiple',
-  2: 'Respuesta Múltiple',
-  3: 'Verdadero / Falso',
-  4: 'Pregunta Abierta',
-  5: 'Relacional',
-}
+const { tipoPorId } = useTiposReactivo()
 
 const nivelColor: Record<string, string> = {
   Remember: 'badge badge-outline text-[10px] font-bold uppercase tracking-wider',
@@ -108,9 +103,15 @@ function fmtDate(iso: string): string {
           <div class="flex justify-between items-start mb-1">
             <span class="font-bold text-sm text-base-content">#{{ r.posicion }}</span>
             <span class="flex items-center gap-1 flex-wrap justify-end">
-              <span class="badge badge-outline badge-secondary badge-xs">
-                {{ tipoReactivo[r.tipoReactivoId] || 'Desconocido' }}
-              </span>
+              <i
+                :class="
+                  r.esCompleto
+                    ? 'fa-solid fa-circle-check text-success'
+                    : 'fa-solid fa-circle-x text-error'
+                "
+                :title="r.esCompleto ? 'Completo' : 'Incompleto'"
+                class="text-[12px] shrink-0"
+              ></i>
               <span
                 v-if="r.subTema.descripcion !== 'Sin SubTema'"
                 class="text-xs font-medium text-base-content/60 bg-base-200 px-2 py-0.5 rounded-full"
@@ -123,16 +124,29 @@ function fmtDate(iso: string): string {
             {{ preview(r) }}
           </p>
 
-          <div class="flex items-center gap-2 mt-auto">
-            <div
-              v-if="r.nivelCognitivo.descripcion !== 'Sin Nivel'"
-              class="flex items-center gap-2"
-            >
-              <span :class="nivelColor[r.nivelCognitivo.descripcion] || 'badge badge-outline'">
-                {{ r.nivelCognitivo.descripcion.slice(0, 1) }}
-              </span>
+          <div class="flex items-center justify-between mt-auto">
+            <div class="flex items-center gap-2">
+              <div
+                v-if="r.nivelCognitivo.descripcion !== 'Sin Nivel'"
+                class="flex items-center gap-2"
+              >
+                <span :class="nivelColor[r.nivelCognitivo.descripcion] || 'badge badge-outline'">
+                  {{ r.nivelCognitivo.descripcion.slice(0, 1) }}
+                </span>
+              </div>
+              <span class="text-[10px] text-base-content/40">{{
+                fmtDate(r.fechaModificacion)
+              }}</span>
             </div>
-            <span class="text-[10px] text-base-content/40">{{ fmtDate(r.fechaModificacion) }}</span>
+            <span
+              class="badge badge-outline badge-info badge-xs"
+              :title="tipoPorId(r.tipoReactivoId)?.nombre"
+            >
+              <i
+                :class="tipoPorId(r.tipoReactivoId)?.icono ?? 'fa-regular fa-circle-question'"
+                class="text-[10px]"
+              ></i>
+            </span>
           </div>
         </div>
       </template>

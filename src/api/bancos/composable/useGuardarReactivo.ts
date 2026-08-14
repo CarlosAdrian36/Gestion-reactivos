@@ -9,14 +9,10 @@ import { actualizarReactivoAction } from '@/api/bancos/actions/actualizar-reacti
 import { actualizarRespuestaAction } from '@/api/bancos/actions/actualizar-respuesta.action'
 import { eliminarRespuestaAction } from '@/api/bancos/actions/eliminar-respuesta.action'
 import { useReactivosStore } from '@/app/bancos/reactivos/reactivosStore'
+import { TIPO_REACTIVO } from './useTiposReactivo'
+import type { Reactivo } from '../interfaces/reactivo.interface'
 
-export const TIPO_REACTIVO = {
-  opcionMultiple: 1,
-  respuestaMultiple: 2,
-  verdaderoFalso: 3,
-  preguntaAbierta: 4,
-  relacional: 5,
-} as const
+export { TIPO_REACTIVO }
 
 export interface OpcionForm {
   idRespuesta?: string
@@ -44,6 +40,19 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
     router.push({ name: 'reactivosList', params: { id: bancoId } })
   }
 
+  const sincronizarReactivo = async (descripcion?: string) => {
+    queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
+    await queryClient.refetchQueries({ queryKey: ['reactivos', bancoId] })
+    const lista = queryClient.getQueryData<Reactivo[]>(['reactivos', bancoId])
+    const { selectedReactivo, select } = useReactivosStore()
+    const fresco = lista?.find((r) => r.idReactivo === idReactivo)
+    if (fresco) {
+      select(fresco)
+    } else if (descripcion && selectedReactivo.value) {
+      select({ ...selectedReactivo.value, descripcion })
+    }
+  }
+
   const crearReactivoMutation = useMutation({
     mutationFn: (descripcion: string) =>
       crearReactivoAction(bancoId, {
@@ -66,13 +75,9 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
   const actualizarReactivoMutation = useMutation({
     mutationFn: (descripcion: string) =>
       actualizarReactivoAction(bancoId, idReactivo!, { tipoReactivoId, descripcion }),
-    onSuccess: (_data, descripcion) => {
-      const { selectedReactivo, select } = useReactivosStore()
-      if (selectedReactivo.value) {
-        select({ ...selectedReactivo.value, descripcion })
-      }
+    onSuccess: async (_data, descripcion) => {
+      await sincronizarReactivo(descripcion)
       toast.success('Reactivo actualizado correctamente')
-      queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
       volverALista()
     },
     onError: (error) => {
@@ -135,10 +140,10 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
         }
       }
     },
-    onSuccess: () => {
-      toast.success('Respuestas actualizadas correctamente')
-      queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
+    onSuccess: async () => {
+      await sincronizarReactivo()
       queryClient.invalidateQueries({ queryKey: ['respuestas', bancoId, idReactivo] })
+      toast.success('Respuestas actualizadas correctamente')
       volverALista()
     },
     onError: (error) => {

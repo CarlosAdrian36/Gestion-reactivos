@@ -33,12 +33,36 @@ onMounted(() => {
 
 <template>
   <div class="max-w-4xl mx-auto px-4 py-8">
-    <button class="btn btn-ghost btn-sm mb-6 gap-2" @click="volver">
+    <!-- <button class="btn btn-ghost btn-sm mb-6 gap-2" @click="volver">
       <i class="fa-regular fa-arrow-left"></i>
       Volver
-    </button>
+    </button> -->
 
     <template v-if="selectedReactivo">
+      <div class="breadcrumbs text-sm mb-6">
+        <ul>
+          <li>
+            <RouterLink class="link link-hover" :to="{ name: 'misBancos' }">Inicio</RouterLink>
+          </li>
+          <li>
+            <RouterLink
+              class="link link-hover"
+              :to="{ name: 'bancoDetalle', params: { id: bancoId } }"
+              >Banco Detalle</RouterLink
+            >
+          </li>
+          <li>
+            <RouterLink
+              class="link link-hover"
+              :to="{ name: 'reactivosList', params: { id: bancoId } }"
+            >
+              Reactivo {{ selectedReactivo.posicion }}
+            </RouterLink>
+          </li>
+          <li class="text-base-content/60">edición</li>
+        </ul>
+      </div>
+
       <div class="mb-6">
         <h1 class="text-3xl font-bold">Editar Reactivo #{{ selectedReactivo.posicion }}</h1>
         <p class="text-base-content/70 mt-1">Modifica el enunciado y las respuestas</p>

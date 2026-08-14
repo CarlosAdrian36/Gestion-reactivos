@@ -5,51 +5,15 @@ import RespuestaMultipleForm from './forms/RespuestaMultipleForm.vue'
 import VerdaderoFalsoForm from './forms/VerdaderoFalsoForm.vue'
 import PreguntaAbiertaForm from './forms/PreguntaAbiertaForm.vue'
 import RelacionalForm from './forms/RelacionalForm.vue'
+import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
+import type { TipoReactivoSlug } from '@/api/bancos/interfaces/tipo-reactivo.interface'
 
-type TipoReactivo =
-  | 'opcion-multiple'
-  | 'respuesta-multiple'
-  | 'verdadero-falso'
-  | 'pregunta-abierta'
-  | 'relacional'
+const { tipos, isLoading } = useTiposReactivo()
 
 const paso = ref<'grid' | 'formulario'>('grid')
-const tipoSeleccionado = ref<TipoReactivo | null>(null)
+const tipoSeleccionado = ref<TipoReactivoSlug | null>(null)
 
-const tipos = [
-  {
-    id: 'opcion-multiple' as TipoReactivo,
-    nombre: 'Opción Múltiple',
-    descripcion: 'Seleccionar una opción correcta entre varias',
-    icono: 'fa-regular fa-list-check',
-  },
-  {
-    id: 'respuesta-multiple' as TipoReactivo,
-    nombre: 'Respuesta Múltiple',
-    descripcion: 'Seleccionar varias opciones correctas',
-    icono: 'fa-regular fa-rectangle-list',
-  },
-  {
-    id: 'verdadero-falso' as TipoReactivo,
-    nombre: 'Verdadero/Falso',
-    descripcion: 'Determinar si una afirmación es verdadera o falsa',
-    icono: 'fa-regular fa-toggle-on',
-  },
-  {
-    id: 'pregunta-abierta' as TipoReactivo,
-    nombre: 'Pregunta Abierta',
-    descripcion: 'Respuesta libre y abierta',
-    icono: 'fa-regular fa-file-lines',
-  },
-  {
-    id: 'relacional' as TipoReactivo,
-    nombre: 'Relacional',
-    descripcion: 'Relacionar elementos de dos columnas',
-    icono: 'fa-regular fa-arrow-right-arrow-left',
-  },
-]
-
-function seleccionarTipo(tipo: TipoReactivo) {
+function seleccionarTipo(tipo: TipoReactivoSlug) {
   tipoSeleccionado.value = tipo
   paso.value = 'formulario'
 }
@@ -68,7 +32,15 @@ function volverAGrid() {
         <p class="text-base-content/70 mt-1">Selecciona el tipo de reactivo que deseas crear</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div v-for="i in 4" :key="i" class="card bg-base-100 border border-base-300 p-6 space-y-3">
+          <div class="skeleton size-12 rounded-xl"></div>
+          <div class="skeleton h-4 w-2/3"></div>
+          <div class="skeleton h-3 w-full"></div>
+        </div>
+      </div>
+
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div
           v-for="tipo in tipos"
           :key="tipo.id"
