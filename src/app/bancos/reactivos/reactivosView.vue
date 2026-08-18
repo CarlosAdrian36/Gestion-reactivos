@@ -113,8 +113,8 @@ function fmtDate(iso: string): string {
                     <i
                       :class="
                         selectedReactivo.esCompleto
-                          ? 'fa-light fa-circle-check'
-                          : 'fa-light fa-circle-x'
+                          ? 'fa-solid fa-circle-check'
+                          : 'fa-solid fa-circle-x'
                       "
                     ></i>
                     {{ selectedReactivo.esCompleto ? 'Completo' : 'Incompleto' }}

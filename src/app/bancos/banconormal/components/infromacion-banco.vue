@@ -76,6 +76,20 @@ function fmtDate(iso: string): string {
           </p>
         </div>
       </div>
+
+      <div class="flex items-center gap-3 rounded-xl bg-base-200/70 p-3">
+        <div
+          class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0"
+        >
+          <i class="fa-solid fa-fingerprint"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] uppercase tracking-wider text-base-content/50">ID</p>
+          <p class="text-sm font-semibold text-base-content break-words font-mono">
+            {{ banco.idBanco }}
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>

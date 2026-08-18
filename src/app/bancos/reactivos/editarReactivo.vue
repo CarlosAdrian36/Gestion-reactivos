@@ -59,7 +59,7 @@ onMounted(() => {
               Reactivo {{ selectedReactivo.posicion }}
             </RouterLink>
           </li>
-          <li class="text-base-content/60">edición</li>
+          <li class="text-base-content/60">Edición</li>
         </ul>
       </div>
 
