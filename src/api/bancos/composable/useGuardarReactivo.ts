@@ -8,7 +8,8 @@ import { crearRespuestaAction } from '@/api/bancos/actions/crear-respuesta.actio
 import { actualizarReactivoAction } from '@/api/bancos/actions/actualizar-reactivo.action'
 import { actualizarRespuestaAction } from '@/api/bancos/actions/actualizar-respuesta.action'
 import { eliminarRespuestaAction } from '@/api/bancos/actions/eliminar-respuesta.action'
-import { useReactivosStore } from '@/app/bancos/reactivos/reactivosStore'
+import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
+import { storeToRefs } from 'pinia'
 import { TIPO_REACTIVO } from './useTiposReactivo'
 import type { Reactivo } from '../interfaces/reactivo.interface'
 
@@ -44,12 +45,13 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
     queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
     await queryClient.refetchQueries({ queryKey: ['reactivos', bancoId] })
     const lista = queryClient.getQueryData<Reactivo[]>(['reactivos', bancoId])
-    const { selectedReactivo, select } = useReactivosStore()
+    const reactivosStore = useReactivoSeleccionadoStore()
+    const { selectedReactivo } = storeToRefs(reactivosStore)
     const fresco = lista?.find((r) => r.idReactivo === idReactivo)
     if (fresco) {
-      select(fresco)
+      reactivosStore.select(fresco)
     } else if (descripcion && selectedReactivo.value) {
-      select({ ...selectedReactivo.value, descripcion })
+      reactivosStore.select({ ...selectedReactivo.value, descripcion })
     }
   }
 

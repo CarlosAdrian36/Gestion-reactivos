@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useReactivosStore } from './reactivosStore'
+import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
+import { storeToRefs } from 'pinia'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import OpcionMultipleForm from './forms/OpcionMultipleForm.vue'
 import RespuestaMultipleForm from './forms/RespuestaMultipleForm.vue'
@@ -11,7 +12,8 @@ import PreguntaAbiertaForm from './forms/PreguntaAbiertaForm.vue'
 const route = useRoute()
 const router = useRouter()
 const bancoId = String(route.params.id)
-const { selectedReactivo } = useReactivosStore()
+const store = useReactivoSeleccionadoStore()
+const { selectedReactivo } = storeToRefs(store)
 
 const { data: respuestas, isLoading: cargandoRespuestas } = useRespuestas(
   bancoId,

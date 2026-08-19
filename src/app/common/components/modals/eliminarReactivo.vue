@@ -34,14 +34,14 @@
 import { deleteReactivoAction } from '@/api/bancos/actions/delete-reactivo.action'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import { useModalStore } from '@/common/modals/store/modal.store'
-import { useReactivosStore } from '@/app/bancos/reactivos/reactivosStore'
+import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
 import { useQueryClient } from '@tanstack/vue-query'
 import { onMounted, onUnmounted } from 'vue'
 import { toast } from 'vue-sonner'
 
 const modal = useModalStore()
 const queryClient = useQueryClient()
-const { clear } = useReactivosStore()
+const { clear } = useReactivoSeleccionadoStore()
 
 const props = defineProps<{
   bancoId: string

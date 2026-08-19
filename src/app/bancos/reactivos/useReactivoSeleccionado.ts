@@ -1,10 +1,10 @@
+import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 
-const selectedReactivo = ref<Reactivo | null>(null)
-const reactivos = ref<Reactivo[]>([])
+export const useReactivoSeleccionadoStore = defineStore('reactivoSeleccionado', () => {
+  const selectedReactivo = ref<Reactivo | null>(null)
 
-export function useReactivosStore() {
   const hasSelected = computed(() => selectedReactivo.value !== null)
 
   function select(reactivo: Reactivo) {
@@ -15,16 +15,5 @@ export function useReactivosStore() {
     selectedReactivo.value = null
   }
 
-  function setReactivos(list: Reactivo[]) {
-    reactivos.value = list
-  }
-
-  return {
-    selectedReactivo,
-    reactivos,
-    hasSelected,
-    select,
-    clear,
-    setReactivos,
-  }
-}
+  return { selectedReactivo, hasSelected, select, clear }
+})

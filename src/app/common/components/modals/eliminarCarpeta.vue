@@ -50,7 +50,7 @@ const props = defineProps<{
 const onSubmit = async () => {
   try {
     if (!props.carpeta) return
-    await deleteCarpeta(props.carpeta.carpetaId)
+    await deleteCarpeta(props.carpeta.idCarpeta)
     toast.success('Se elimino exitosamente la carpeta')
 
     await queryClient.invalidateQueries({

@@ -3,7 +3,8 @@ import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
-import { useReactivosStore } from './reactivosStore'
+import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
+import { storeToRefs } from 'pinia'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vue'
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
@@ -12,7 +13,9 @@ const route = useRoute()
 const router = useRouter()
 const bancoId = String(route.params.id)
 const { data: reactivos, isLoading } = useReactivos(bancoId)
-const { selectedReactivo, clear } = useReactivosStore()
+const store = useReactivoSeleccionadoStore()
+const { selectedReactivo } = storeToRefs(store)
+const { clear } = store
 const modal = useModalStore()
 
 watch(reactivos, (lista) => {

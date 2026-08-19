@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
-import { useReactivosStore } from './reactivosStore'
+import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import { stripHtmlToText } from '@/utils/html'
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
@@ -28,7 +28,7 @@ function seleccionarReactivo(r: Reactivo) {
 
 const abierto = ref(true)
 const { data: reactivos, isLoading } = useReactivos(bancoId)
-const { selectedReactivo, select } = useReactivosStore()
+const { selectedReactivo, select } = useReactivoSeleccionadoStore()
 
 function preview(r: Reactivo): string {
   return stripHtmlToText(r.descripcion)

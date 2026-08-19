@@ -1,24 +1,26 @@
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue'
-import { useBancoStore } from '../store/bancos.store'
-import { storeToRefs } from 'pinia'
+import { computed, onMounted, ref } from 'vue'
+import { getBancosAction } from '@/api/bancos/actions/get-bancos.actions'
 import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import router from '@/router'
 
-const bancoStore = useBancoStore()
-const { bancos, loading: bancosLoading } = storeToRefs(bancoStore)
+const bancos = ref<Banco[]>([])
+const loading = ref(true)
 
-const loading = computed(() => bancosLoading.value)
+const proyectos = computed(() => bancos.value.filter((b) => b.esProyecto))
 
 onMounted(async () => {
-  await bancoStore.fetchBancos()
+  try {
+    bancos.value = await getBancosAction()
+  } finally {
+    loading.value = false
+  }
 })
+
 const goToItem = (item: Banco) => {
   if (item.esProyecto === true) {
-    router.push({ name: 'bancoDetalle', params: { id: item.bancoId } })
+    router.push({ name: 'bancoDetalle', params: { id: item.idBanco } })
   } else {
-    // Si es carpeta, podrías navegar a una vista de carpeta o expandirla
-    // router.push({ name: 'detalleCarpeta', params: { id: item.id } })
     console.log('Carpeta seleccionada:', item.nombre)
   }
 }
@@ -77,8 +79,8 @@ const goToItem = (item: Banco) => {
           <!-- BODY -->
           <tbody v-if="bancos.length">
             <tr
-              v-for="value in bancoStore.proyectos"
-              :key="value.bancoId"
+              v-for="value in proyectos"
+              :key="value.idBanco"
               class="hover transition-colors cursor-pointer"
               @click="goToItem(value)"
             >
