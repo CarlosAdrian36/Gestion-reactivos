@@ -5,7 +5,7 @@ import { isAxiosError } from 'axios'
 
 export const saveCarpetaAction = async (
   carpeta: CreateUpdateCarpetaRequest,
-  carpetaId?: number,
+  carpetaId?: string,
 ): Promise<Carpeta> => {
   try {
     if (carpetaId) {

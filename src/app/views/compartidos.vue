@@ -36,9 +36,9 @@
         <tbody v-if="data && data?.length > 0">
           <tr
             v-for="value in data"
-            :key="value.bancoId"
+            :key="value.idBanco"
             class="hover transition-colors cursor-pointer"
-            @click="irABanco(value.bancoId)"
+            @click="irABanco(value.idBanco)"
           >
             <!-- ICON -->
             <td class="text-center align-middle">
@@ -144,7 +144,7 @@ const { data, isLoading } = useQuery({
   queryFn: () => getBancosCompartidosAction(),
 })
 
-function irABanco(bancoId: number) {
+function irABanco(bancoId: string) {
   router.push({
     name: 'bancoDetalle',
     params: { id: bancoId },

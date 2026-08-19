@@ -43,7 +43,7 @@
           <tbody v-if="data && data?.length > 0">
             <tr
               v-for="value in data"
-              :key="value.guid"
+              :key="value.idCuenta"
               class="hover transition-colors cursor-pointers"
             >
               <!-- Id -->

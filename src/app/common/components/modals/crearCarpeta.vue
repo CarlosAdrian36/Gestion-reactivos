@@ -73,7 +73,7 @@ const [nombre, nombreAttrs] = defineField('nombre')
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    await saveCarpetaAction(values, props.carpeta?.carpetaId)
+    await saveCarpetaAction(values, props.carpeta?.idCarpeta)
 
     toast.success(
       props.carpeta ? 'Carpeta actualizada correctamente' : 'Carpeta creada correctamente',

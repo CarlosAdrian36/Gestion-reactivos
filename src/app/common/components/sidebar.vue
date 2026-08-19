@@ -1,21 +1,37 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useSidebarStore } from '../store/ui/sidebarStore'
 import { useAuthStore } from '@/auth/store/auth.store'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import CerrarSesion from './modals/cerrarSesion.vue'
 
 const router = useRouter()
+const route = useRoute()
 const sidebar = useSidebarStore()
 const authStore = useAuthStore()
 const modal = useModalStore()
 
+const isBancosActive = computed(() => {
+  const path = route.path
+  return path.startsWith('/mis-bancos') || path.startsWith('/banco')
+})
+
+const isCompartidosActive = computed(() => {
+  const path = route.path
+  return path.startsWith('/compartidos') || path.startsWith('/Compartidos')
+})
+
+const isUsuariosActive = computed(() => {
+  const path = route.path
+  return path.startsWith('/usuarios') || path.startsWith('/Usuarios')
+})
+
 function cerrarSesion() {
   modal.openModal(CerrarSesion, {}, [
-    { label: 'Cerrar', variant: 'outline' },
+    { label: 'Cancelar', variant: 'outline' },
     {
-      label: 'Salir',
+      label: 'Cerrar sesión',
       variant: 'error',
       action: () => {
         modal.closeModal()
@@ -60,10 +76,10 @@ watch(temaOscuro, (val) => {
       <!-- Nav items -->
       <ul class="flex flex-col gap-1 w-full">
         <li>
-          <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'misBancos' }">
+          <RouterLink v-slot="{ navigate }" :to="{ name: 'misBancos' }">
             <div class="relative">
               <div
-                v-if="isActive"
+                v-if="isBancosActive"
                 class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-full"
               ></div>
               <a
@@ -73,7 +89,7 @@ watch(temaOscuro, (val) => {
                   sidebar.isOpen
                     ? 'gap-3 px-3 py-2.5 text-sm'
                     : 'gap-0 p-2.5 justify-center text-xl',
-                  isActive
+                  isBancosActive
                     ? 'bg-primary/5 border-primary/20 text-primary'
                     : 'border-transparent text-(--color-texto) hover:bg-base-200',
                 ]"
@@ -86,10 +102,10 @@ watch(temaOscuro, (val) => {
           </RouterLink>
         </li>
         <li>
-          <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'compartidos' }">
+          <RouterLink v-slot="{ navigate }" :to="{ name: 'compartidos' }">
             <div class="relative">
               <div
-                v-if="isActive"
+                v-if="isCompartidosActive"
                 class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-full"
               ></div>
               <a
@@ -99,7 +115,7 @@ watch(temaOscuro, (val) => {
                   sidebar.isOpen
                     ? 'gap-3 px-3 py-2.5 text-sm'
                     : 'gap-0 p-2.5 justify-center text-xl',
-                  isActive
+                  isCompartidosActive
                     ? 'bg-primary/5 border-primary/20 text-primary'
                     : 'border-transparent text-(--color-texto) hover:bg-base-200',
                 ]"
@@ -112,10 +128,10 @@ watch(temaOscuro, (val) => {
           </RouterLink>
         </li>
         <li v-if="authStore.user?.roles?.some((r) => r.nombre === 'Administrador')">
-          <RouterLink v-slot="{ isActive, navigate }" :to="{ name: 'usuarios' }">
+          <RouterLink v-slot="{ navigate }" :to="{ name: 'usuarios' }">
             <div class="relative">
               <div
-                v-if="isActive"
+                v-if="isUsuariosActive"
                 class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-full"
               ></div>
               <a
@@ -125,7 +141,7 @@ watch(temaOscuro, (val) => {
                   sidebar.isOpen
                     ? 'gap-3 px-3 py-2.5 text-sm'
                     : 'gap-0 p-2.5 justify-center text-xl',
-                  isActive
+                  isUsuariosActive
                     ? 'bg-primary/5 border-primary/20 text-primary'
                     : 'border-transparent text-(--color-texto) hover:bg-base-200',
                 ]"
@@ -182,7 +198,7 @@ watch(temaOscuro, (val) => {
         <template v-else>
           <div class="flex flex-col items-center gap-3">
             <button
-              class="flex size-9 items-center justify-center rounded-lg text-base-content/60 hover:text-base-content hover:bg-base-200 transition-colors"
+              class="flex size-9 items-center justify-center rounded-lg text-base-content/60 hover:text-base-content hover:bg-base-200 transition-colors hover:cursor-pointer"
               :title="temaOscuro ? 'Modo claro' : 'Modo oscuro'"
               @click="temaOscuro = !temaOscuro"
             >
@@ -190,7 +206,7 @@ watch(temaOscuro, (val) => {
               <i class="fa-solid fa-circle-half-stroke text-lg"></i>
             </button>
             <button
-              class="flex size-9 items-center justify-center rounded-lg text-error/60 hover:text-error hover:bg-error/10 transition-colors"
+              class="flex size-9 items-center justify-center rounded-lg text-error/60 hover:text-error hover:bg-error/10 transition-colors hover:cursor-pointer"
               title="Cerrar sesión"
               @click="cerrarSesion()"
             >

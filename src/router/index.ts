@@ -4,6 +4,7 @@ import { loginRoute } from '@/auth/routes'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/auth/store/auth.store'
 import { AuthStatus } from '@/auth/interface/auth-status.enum'
+import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -54,6 +55,10 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+
+  if (from.meta?.sidebar === 'reactivos' && to.meta?.sidebar !== 'reactivos') {
+    useReactivoSeleccionadoStore().clear()
+  }
 
   if (to.meta?.requiresAuth) {
     const localToken = localStorage.getItem('token')

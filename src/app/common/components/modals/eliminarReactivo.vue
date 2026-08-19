@@ -5,7 +5,7 @@
       <div class="text-rose-500">
         <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
       </div>
-      <h2 class="text-xl font-bold text-slate-800">Eliminar Carpeta</h2>
+      <h2 class="text-xl font-bold text-slate-800">Eliminar Reactivo</h2>
     </div>
   </header>
   <main class="p-4 flex flex-col items-center text-center">
@@ -13,8 +13,8 @@
       <i class="fa-regular fa-trash text-5xl text-error"></i>
     </div>
     <h3 class="text-xl font-bold text-slate-900 mb-6 leading-snug max-w-sm">
-      ¿Estás seguro que deseas eliminar La carpeta
-      <span class="text-rose-600"> {{ props.carpeta?.nombre }} </span> junto con su contenido?
+      ¿Estás seguro que deseas eliminar el reactivo
+      <span class="text-rose-600"> #{{ props.reactivo.posicion }} </span>?
     </h3>
     <div
       class="warning-box rounded-lg p-4 flex items-start gap-4 text-left w-full mb-8 bg-rose-100/50"
@@ -23,47 +23,44 @@
         <i class="fa-regular fa-circle-info"></i>
       </div>
       <p class="text-slate-700 text-sm leading-relaxed">
-        Esta acción eliminará la carpeta y todos los bancos contenidos en él. Esta acción no se
-        puede deshacer.
+        Esta acción eliminará el reactivo junto con sus respuestas. Esta acción no se puede
+        deshacer.
       </p>
     </div>
   </main>
 </template>
 
-<script setup lang="ts">
-import { toast } from 'vue-sonner'
-import { onMounted, onUnmounted } from 'vue'
-import { isAxiosError } from 'axios'
-import { useQueryClient } from '@tanstack/vue-query'
-
-import { deleteCarpeta } from '@/api/carpetas/actions/delete-carpeta.action'
-import type { Carpeta } from '@/api/carpetas/interfaces'
+<script lang="ts" setup>
+import { deleteReactivoAction } from '@/api/bancos/actions/delete-reactivo.action'
+import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import { useModalStore } from '@/common/modals/store/modal.store'
+import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
+import { useQueryClient } from '@tanstack/vue-query'
+import { onMounted, onUnmounted } from 'vue'
+import { toast } from 'vue-sonner'
 
 const modal = useModalStore()
 const queryClient = useQueryClient()
+const { clear } = useReactivoSeleccionadoStore()
 
 const props = defineProps<{
-  carpeta?: Carpeta
+  bancoId: string
+  reactivo: Reactivo
 }>()
 
 const onSubmit = async () => {
   try {
-    if (!props.carpeta) return
-    await deleteCarpeta(props.carpeta.idCarpeta)
-    toast.success('Se elimino exitosamente la carpeta')
-
+    await deleteReactivoAction(props.bancoId, props.reactivo.idReactivo)
+    toast.success('Se eliminó el reactivo correctamente')
+    clear()
     await queryClient.invalidateQueries({
-      queryKey: ['items-unificados'],
+      queryKey: ['reactivos', props.bancoId],
     })
     modal.closeModal()
   } catch (error) {
-    if (isAxiosError(error)) {
-      toast.error(error.response?.data.detail ?? 'Error al eliminar la carpeta')
-    }
+    toast.error(error instanceof Error ? error.message : 'Error al eliminar el reactivo')
   }
 }
-
 onMounted(() => {
   modal.setSubmitFN(onSubmit)
 })
