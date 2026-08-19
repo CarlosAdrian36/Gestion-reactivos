@@ -9,7 +9,7 @@ export const useBancoStore = defineStore('bancos', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  const proyectos = computed(() => bancos.value.filter(b => b.esProyecto))
+  const proyectos = computed(() => bancos.value.filter((b) => b.esProyecto))
 
   async function fetchBancos() {
     if (loading.value) return
@@ -24,15 +24,15 @@ export const useBancoStore = defineStore('bancos', () => {
     }
   }
 
-  async function selectBancoById(id: number) {
-    const found = bancos.value.find(b => b.bancoId === Number(id))
+  async function selectBancoById(id: string) {
+    const found = bancos.value.find((b) => b.idBanco === id)
     if (found) {
       selectedBanco.value = found
       return
     }
     if (!loading.value) {
       await fetchBancos()
-      selectedBanco.value = bancos.value.find(b => b.bancoId === Number(id)) ?? null
+      selectedBanco.value = bancos.value.find((b) => b.idBanco === id) ?? null
     }
   }
 

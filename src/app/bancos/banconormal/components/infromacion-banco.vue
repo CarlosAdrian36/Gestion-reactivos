@@ -43,7 +43,7 @@ function fmtDate(iso: string): string {
         </div>
         <div class="min-w-0">
           <p class="text-[10px] uppercase tracking-wider text-base-content/50">Propietario</p>
-          <p class="text-sm font-semibold text-base-content break-words">
+          <p class="text-sm font-semibold text-base-content wrap-break-word">
             {{ banco.propietario.nombre }}
             {{ banco.propietario.apellidoPaterno }}
             {{ banco.propietario.apellidoMaterno }}
@@ -85,7 +85,7 @@ function fmtDate(iso: string): string {
         </div>
         <div class="min-w-0">
           <p class="text-[10px] uppercase tracking-wider text-base-content/50">ID</p>
-          <p class="text-sm font-semibold text-base-content break-words font-mono">
+          <p class="text-sm font-semibold text-base-content wrap-break-word font-mono">
             {{ banco.idBanco }}
           </p>
         </div>
