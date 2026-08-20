@@ -21,5 +21,10 @@ export const loginRoute: RouteRecordRaw = {
       name: 'establecer',
       component: () => import('@/auth/views/establecerContrasena.vue'),
     },
+    {
+      path: 'Error',
+      name: 'Error',
+      component: () => import('@/auth/views/expiracionToken.vue'),
+    },
   ],
 }
