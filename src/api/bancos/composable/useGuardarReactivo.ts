@@ -163,6 +163,58 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
     else crearRespuestasMutation.mutate(opciones)
   }
 
+  const isGuardando = ref(false)
+
+  const guardarTodo = async (
+    descripcion: string,
+    opciones?: OpcionForm[],
+    idsActuales?: string[],
+  ): Promise<boolean> => {
+    if (!esEdicion.value) return false
+    isGuardando.value = true
+    try {
+      await actualizarReactivoAction(bancoId, idReactivo!, { tipoReactivoId, descripcion })
+
+      if (opciones && idsActuales) {
+        const idsConservados = opciones
+          .filter((o) => o.idRespuesta)
+          .map((o) => o.idRespuesta as string)
+        const idsEliminar = idsActuales.filter((id) => !idsConservados.includes(id))
+
+        for (const id of idsEliminar) {
+          await eliminarRespuestaAction(bancoId, idReactivo!, id)
+        }
+
+        let posicion = idsActuales.length + 1
+        for (const opcion of opciones) {
+          if (opcion.texto.trim().length === 0) continue
+          if (opcion.idRespuesta) {
+            await actualizarRespuestaAction(bancoId, idReactivo!, opcion.idRespuesta, {
+              esCorrecta: opcion.correcta,
+              respuesta: opcion.texto,
+            })
+          } else {
+            await crearRespuestaAction(bancoId, idReactivo!, {
+              posicion: posicion++,
+              esCorrecta: opcion.correcta,
+              respuesta: opcion.texto,
+            })
+          }
+        }
+      }
+
+      await sincronizarReactivo(descripcion)
+      toast.success('Reactivo actualizado correctamente')
+      volverALista()
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al guardar el reactivo')
+      return false
+    } finally {
+      isGuardando.value = false
+    }
+  }
+
   return {
     reactivoCreado,
     guardandoPregunta: computed(() =>
@@ -175,7 +227,9 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
         ? sincronizarRespuestasMutation.isPending.value
         : crearRespuestasMutation.isPending.value,
     ),
+    isGuardando,
     guardarPregunta,
     guardarRespuestas,
+    guardarTodo,
   }
 }

@@ -47,7 +47,7 @@ function guardarPreguntaForm() {
           @click="guardarPreguntaForm"
         >
           <span v-if="guardandoPregunta" class="loading loading-spinner"></span>
-          {{ guardandoPregunta ? 'Guardando...' : 'Guardar pregunta' }}
+          {{ guardandoPregunta ? 'Guardando...' : 'Guardar' }}
         </button>
       </div>
     </div>

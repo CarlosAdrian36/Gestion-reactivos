@@ -92,13 +92,13 @@ function fmtDate(iso: string): string {
           class="group relative flex flex-col p-4 rounded-lg cursor-pointer border transition-all"
           :class="
             selectedReactivo?.idReactivo === r.idReactivo
-              ? 'bg-primary/5 border-primary/20'
+              ? 'bg-primary/8 border-primary/30 shadow-sm shadow-primary/10'
               : 'border-transparent hover:bg-white hover:border-base-300 hover:shadow-sm'
           "
         >
           <div
             v-if="selectedReactivo?.idReactivo === r.idReactivo"
-            class="absolute left-0 top-3 bottom-3 w-1 bg-primary rounded-r-full"
+            class="absolute left-0 top-3 bottom-3 w-1.5 bg-primary rounded-r-full"
           ></div>
           <div class="flex justify-between items-start mb-1">
             <span class="font-bold text-sm text-base-content">#{{ r.posicion }}</span>

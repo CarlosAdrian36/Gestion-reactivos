@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const bancoId = route.params.id as string
-const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas } =
+const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas, isGuardando, guardarTodo } =
   useGuardarReactivo(bancoId, TIPO_REACTIVO.verdaderoFalso, props.reactivo?.idReactivo)
 
 const pregunta = ref(props.reactivo?.descripcion ?? '')
@@ -52,6 +52,31 @@ function guardarRespuestaForm() {
     props.respuestas?.map((r) => r.idRespuesta) ?? [],
   )
 }
+
+function guardarTodoForm() {
+  if (!pregunta.value.trim()) {
+    toast.error('La afirmación no puede estar vacía')
+    return
+  }
+  if (respuestaCorrecta.value === null) {
+    toast.error('Selecciona la respuesta correcta')
+    return
+  }
+  const idVerdadero = props.respuestas?.find(
+    (r) => r.respuesta.trim().toLowerCase() === 'verdadero',
+  )?.idRespuesta
+  const idFalso = props.respuestas?.find(
+    (r) => r.respuesta.trim().toLowerCase() === 'falso',
+  )?.idRespuesta
+  guardarTodo(
+    pregunta.value,
+    [
+      { idRespuesta: idVerdadero, texto: 'Verdadero', correcta: respuestaCorrecta.value === true },
+      { idRespuesta: idFalso, texto: 'Falso', correcta: respuestaCorrecta.value === false },
+    ],
+    props.respuestas?.map((r) => r.idRespuesta) ?? [],
+  )
+}
 </script>
 
 <template>
@@ -65,16 +90,6 @@ function guardarRespuestaForm() {
         placeholderText: 'Escribe la afirmación aquí...',
         heightMin: 120,
       }" />
-      <div class="flex gap-3 pt-4">
-        <button
-          class="btn btn-primary"
-          :disabled="guardandoPregunta"
-          @click="guardarPreguntaForm"
-        >
-          <span v-if="guardandoPregunta" class="loading loading-spinner"></span>
-          {{ guardandoPregunta ? 'Guardando...' : 'Guardar pregunta' }}
-        </button>
-      </div>
     </div>
 
     <div>
@@ -109,13 +124,28 @@ function guardarRespuestaForm() {
 
     <div class="flex gap-3 pt-4">
       <button
+        v-if="props.reactivo?.idReactivo"
         class="btn btn-primary"
-        :disabled="respuestaCorrecta === null || guardandoRespuestas"
-        @click="guardarRespuestaForm"
+        :disabled="isGuardando"
+        @click="guardarTodoForm"
       >
-        <span v-if="guardandoRespuestas" class="loading loading-spinner"></span>
-        {{ guardandoRespuestas ? 'Guardando...' : 'Guardar respuestas' }}
+        <span v-if="isGuardando" class="loading loading-spinner"></span>
+        {{ isGuardando ? 'Guardando...' : 'Guardar' }}
       </button>
+      <template v-else>
+        <button class="btn btn-primary" :disabled="guardandoPregunta" @click="guardarPreguntaForm">
+          <span v-if="guardandoPregunta" class="loading loading-spinner"></span>
+          {{ guardandoPregunta ? 'Guardando...' : 'Guardar pregunta' }}
+        </button>
+        <button
+          class="btn btn-primary"
+          :disabled="respuestaCorrecta === null || guardandoRespuestas"
+          @click="guardarRespuestaForm"
+        >
+          <span v-if="guardandoRespuestas" class="loading loading-spinner"></span>
+          {{ guardandoRespuestas ? 'Guardando...' : 'Guardar respuestas' }}
+        </button>
+      </template>
     </div>
   </div>
 </template>
