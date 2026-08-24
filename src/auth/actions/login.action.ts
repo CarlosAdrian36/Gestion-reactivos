@@ -16,10 +16,11 @@ export const loginAction = async (data: LoginCredentials): Promise<LoginSuccess 
     }
   } catch (error) {
     if (isAxiosError(error)) {
-      const detail = error.response?.data?.detail ?? 'Error al iniciar sesión'
-
-      return { ok: false, message: detail }
+      if (!error.response || error.response.status >= 500) {
+        return { ok: false, message: '' }
+      }
+      return { ok: false, message: error.response?.data?.detail ?? '' }
     }
-    throw new Error('No se pudo hacer la petición de inicio de sesión')
+    return { ok: false, message: '' }
   }
 }

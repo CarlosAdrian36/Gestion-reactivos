@@ -38,7 +38,18 @@ const onSubmit = handleSubmit(async () => {
   })
   if (result.ok) return
 
-  toast.error(result.message ?? 'Credenciales incorrectas')
+  const esErrorServidor =
+    !result.message ||
+    result.message.includes('servidor') ||
+    result.message.includes('conectar') ||
+    result.message.includes('500') ||
+    result.message.includes('Internal')
+
+  toast.error(
+    esErrorServidor
+      ? 'El servicio no está disponible. Intente más tarde.'
+      : 'Ususario o contraseña incorrectos. Verifique sus credenciales e intente nuevamente.',
+  )
 })
 </script>
 
