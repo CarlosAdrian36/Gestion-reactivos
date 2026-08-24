@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { validarSolicitudCambioContrasena } from '../actions/validarSolicitud.action'
 
 export const loginRoute: RouteRecordRaw = {
   path: '/auth',
@@ -20,6 +21,20 @@ export const loginRoute: RouteRecordRaw = {
       path: 'establecerContrasena',
       name: 'establecer',
       component: () => import('@/auth/views/establecerContrasena.vue'),
+      beforeEnter: async (to, _from, next) => {
+        const solicitudId = to.query.SolicitudId as string
+        if (!solicitudId) {
+          next({ name: 'Error' })
+          return
+        }
+        try {
+          const valido = await validarSolicitudCambioContrasena(solicitudId)
+          if (valido) next()
+          else next({ name: 'Error' })
+        } catch {
+          next({ name: 'Error' })
+        }
+      },
     },
     {
       path: 'Error',
