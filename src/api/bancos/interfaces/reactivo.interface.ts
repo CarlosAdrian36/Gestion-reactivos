@@ -19,6 +19,8 @@ export interface Reactivo {
   version: number
   descripcion: string
   posicion: number
+  posicionGrupo: number
+  grupo: number
   esCompleto: boolean
   fechaCreacion: string
   fechaModificacion: string

@@ -4,6 +4,7 @@ export interface CrearReactivoRequest {
   subTemaId: number
   tipoReactivoId: number
   descripcion: string
+  idGrupo?: number | null
 }
 
 export interface CrearReactivoResponse {

@@ -8,6 +8,9 @@ import { storeToRefs } from 'pinia'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vue'
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
+import { useInstruccionesGrupos } from '@/api/bancos/composable/useInstruccionesGrupos'
+import { useRespuestasGrupo } from '@/api/bancos/composable/useRespuestasGrupo'
+import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
 
 const route = useRoute()
 const router = useRouter()
@@ -33,6 +36,31 @@ const { tipoPorId } = useTiposReactivo()
 const respuestasOrdenadas = computed(() =>
   [...(respuestas.value ?? [])].sort((a, b) => a.posicion - b.posicion),
 )
+
+// Relacional: datos del grupo
+const { data: instrucciones } = useInstruccionesGrupos(bancoId)
+
+const instruccionGrupo = computed(() => {
+  if (!selectedReactivo.value?.grupo) return ''
+  return (
+    instrucciones.value?.find((i) => i.grupo === selectedReactivo.value?.grupo)?.descripcion ?? ''
+  )
+})
+
+const reactivosGrupo = computed(() => {
+  if (!selectedReactivo.value?.grupo) return []
+  return (reactivos.value ?? [])
+    .filter((r) => r.grupo === selectedReactivo.value?.grupo)
+    .sort((a, b) => a.posicionGrupo - b.posicionGrupo)
+})
+
+const grupoReactivoIds = computed(() => reactivosGrupo.value.map((r) => r.idReactivo))
+const { respuestasMap: respuestasGrupoMap, isLoading: cargandoRespuestasGrupo } =
+  useRespuestasGrupo(bancoId, grupoReactivoIds)
+
+function getRespuestasReactivo(idReactivo: string): Respuesta[] {
+  return (respuestasGrupoMap.value.get(idReactivo) ?? []).sort((a, b) => a.posicion - b.posicion)
+}
 
 function abrirEliminar() {
   if (!selectedReactivo.value) return
@@ -277,6 +305,108 @@ function fmtDate(iso: string): string {
                 </div>
               </div>
               <p v-else class="text-sm text-base-content/40">Sin respuestas guardadas</p>
+            </div>
+
+            <!-- Relacional: Instrucción + tabla de reactivos -->
+            <div v-else-if="tipoReactivoId === 5" class="space-y-6">
+              <!-- Instrucción del grupo -->
+              <div class="space-y-3">
+                <h3
+                  class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
+                >
+                  <i class="fa-regular fa-arrow-right-arrow-left text-[14px]"></i>
+                  Instrucción del grupo
+                </h3>
+                <div class="bg-base-200 rounded-xl p-6">
+                  <div
+                    class="fr-view text-lg text-base-content leading-relaxed [&_p]:m-0"
+                    v-html="instruccionGrupo || '<em>Sin instrucción</em>'"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Tabla de reactivos del grupo -->
+              <div class="space-y-3">
+                <h3
+                  class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
+                >
+                  <i class="fa-regular fa-list text-[14px]"></i>
+                  Reactivos del grupo
+                </h3>
+
+                <div v-if="cargandoRespuestasGrupo" class="space-y-2">
+                  <div class="skeleton h-12 w-full rounded-xl"></div>
+                  <div class="skeleton h-12 w-full rounded-xl"></div>
+                </div>
+
+                <div v-else-if="reactivosGrupo.length" class="overflow-x-auto">
+                  <table class="table table-bordered w-full">
+                    <thead>
+                      <tr>
+                        <th class="bg-base-200 text-xs font-semibold uppercase tracking-wider w-[40%]">
+                          <span class="flex items-center gap-2">
+                            <i class="fa-regular fa-pen-to-square text-[14px]"></i>
+                            Reactivo
+                          </span>
+                        </th>
+                        <th class="bg-base-200 text-xs font-semibold uppercase tracking-wider w-[60%]">
+                          <span class="flex items-center gap-2">
+                            <i class="fa-regular fa-circle-check text-[14px]"></i>
+                            Respuestas
+                          </span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="reactivo in reactivosGrupo" :key="reactivo.idReactivo">
+                        <td>
+                          <div
+                            class="fr-view text-sm text-base-content leading-relaxed [&_p]:m-0"
+                            v-html="reactivo.descripcion"
+                          ></div>
+                        </td>
+                        <td>
+                          <div class="space-y-1.5">
+                            <div
+                              v-for="(r, i) in getRespuestasReactivo(reactivo.idReactivo)"
+                              :key="r.idRespuesta"
+                              class="flex items-center gap-2 text-sm"
+                            >
+                              <span
+                                class="size-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+                                :class="
+                                  r.esCorrecta
+                                    ? 'bg-success text-success-content'
+                                    : 'bg-base-300 text-base-content/60'
+                                "
+                              >
+                                {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
+                              </span>
+                              <span
+                                class="fr-view [&_p]:m-0"
+                                :class="
+                                  r.esCorrecta
+                                    ? 'text-success font-medium'
+                                    : 'text-base-content'
+                                "
+                                v-html="r.respuesta"
+                              ></span>
+                            </div>
+                            <p
+                              v-if="!getRespuestasReactivo(reactivo.idReactivo).length"
+                              class="text-xs text-base-content/40 italic"
+                            >
+                              Sin respuestas
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <p v-else class="text-sm text-base-content/40">Sin reactivos en el grupo</p>
+              </div>
             </div>
 
             <!-- Details Grid -->

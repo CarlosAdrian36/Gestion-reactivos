@@ -8,6 +8,7 @@ import OpcionMultipleForm from './forms/OpcionMultipleForm.vue'
 import RespuestaMultipleForm from './forms/RespuestaMultipleForm.vue'
 import VerdaderoFalsoForm from './forms/VerdaderoFalsoForm.vue'
 import PreguntaAbiertaForm from './forms/PreguntaAbiertaForm.vue'
+import RelacionalForm from './forms/RelacionalForm.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -92,15 +93,10 @@ onMounted(() => {
           :respuestas="respuestas"
         />
         <PreguntaAbiertaForm v-else-if="tipoReactivoId === 4" :reactivo="selectedReactivo" />
-        <div
+        <RelacionalForm
           v-else-if="tipoReactivoId === 5"
-          class="card bg-base-100 border border-base-300 p-10 text-center"
-        >
-          <i class="fa-regular fa-arrow-right-arrow-left text-4xl text-base-content/40 mb-4"></i>
-          <p class="font-semibold text-base-content">
-            La edición de reactivos relacionales estará disponible próximamente.
-          </p>
-        </div>
+          :grupo-id="selectedReactivo.grupo"
+        />
       </template>
     </template>
   </div>
