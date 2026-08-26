@@ -220,7 +220,7 @@ function fmtDate(iso: string): string {
           <!-- Content Area -->
           <div class="p-8 space-y-8">
             <!-- Description / Question Stem -->
-            <div class="space-y-3">
+            <div v-if="tipoReactivoId !== 5" class="space-y-3">
               <h3
                 class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
               >
