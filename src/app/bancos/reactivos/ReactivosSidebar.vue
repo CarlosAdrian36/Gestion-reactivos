@@ -22,7 +22,7 @@ interface DisplayGrupo {
   instruccion: string
   cantidadReactivos: number
   esCompleto: boolean
-  reactivos: Reactivo[]
+  primerReactivo: Reactivo
 }
 
 type DisplayItem = DisplayIndividual | DisplayGrupo
@@ -47,14 +47,11 @@ function seleccionarReactivo(r: Reactivo) {
 }
 
 function seleccionarGrupo(item: DisplayGrupo) {
-  const primerReactivo = item.reactivos[0]
-  if (primerReactivo) {
-    select(primerReactivo)
-    router.push({
-      name: 'reactivosList',
-      params: { id: bancoId },
-    })
-  }
+  select(item.primerReactivo)
+  router.push({
+    name: 'reactivosList',
+    params: { id: bancoId },
+  })
 }
 
 const abierto = ref(true)
@@ -91,7 +88,7 @@ const itemsParaMostrar = computed<DisplayItem[]>(() => {
       instruccion: stripHtmlToText(instruccion?.descripcion ?? 'Sin instrucción'),
       cantidadReactivos: miembros.length,
       esCompleto: miembros.every((r) => r.esCompleto),
-      reactivos: miembros,
+      primerReactivo: miembros[0]!,
     })
   }
 
@@ -108,8 +105,7 @@ function isActive(item: DisplayItem): boolean {
     return selectedReactivo.value.idReactivo === item.reactivo.idReactivo
   }
   return (
-    selectedReactivo.value.grupo === item.grupoId &&
-    selectedReactivo.value.tipoReactivoId === 5
+    selectedReactivo.value.grupo === item.grupoId && selectedReactivo.value.tipoReactivoId === 5
   )
 }
 
@@ -164,7 +160,10 @@ function fmtDate(iso: string): string {
         </div>
       </template>
       <template v-else-if="itemsParaMostrar.length > 0">
-        <template v-for="item in itemsParaMostrar" :key="item.tipo === 'individual' ? item.reactivo.idReactivo : `grupo-${item.grupoId}`">
+        <template
+          v-for="item in itemsParaMostrar"
+          :key="item.tipo === 'individual' ? item.reactivo.idReactivo : `grupo-${item.grupoId}`"
+        >
           <!-- Individual reactivo -->
           <div
             v-if="item.tipo === 'individual'"
@@ -210,7 +209,11 @@ function fmtDate(iso: string): string {
                   v-if="item.reactivo.nivelCognitivo.descripcion !== 'Sin Nivel'"
                   class="flex items-center gap-2"
                 >
-                  <span :class="nivelColor[item.reactivo.nivelCognitivo.descripcion] || 'badge badge-outline'">
+                  <span
+                    :class="
+                      nivelColor[item.reactivo.nivelCognitivo.descripcion] || 'badge badge-outline'
+                    "
+                  >
                     {{ item.reactivo.nivelCognitivo.descripcion.slice(0, 1) }}
                   </span>
                 </div>
@@ -223,7 +226,10 @@ function fmtDate(iso: string): string {
                 :title="tipoPorId(item.reactivo.tipoReactivoId)?.nombre"
               >
                 <i
-                  :class="tipoPorId(item.reactivo.tipoReactivoId)?.icono ?? 'fa-regular fa-circle-question'"
+                  :class="
+                    tipoPorId(item.reactivo.tipoReactivoId)?.icono ??
+                    'fa-regular fa-circle-question'
+                  "
                   class="text-[10px]"
                 ></i>
               </span>
@@ -247,10 +253,20 @@ function fmtDate(iso: string): string {
             ></div>
             <div class="flex justify-between items-start mb-1">
               <span class="font-bold text-sm text-base-content">#{{ item.posicion }}</span>
-              <i
-                class="fa-regular fa-arrow-right-arrow-left text-primary text-[12px] shrink-0"
-                title="Relacional"
-              ></i>
+              <span class="flex items-center gap-1 flex-wrap justify-end">
+                <i
+                  :class="
+                    item.esCompleto
+                      ? 'fa-solid fa-circle-check text-success'
+                      : 'fa-solid fa-circle-x text-error'
+                  "
+                  :title="item.esCompleto ? 'Completo' : 'Incompleto'"
+                  class="text-[12px] shrink-0"
+                ></i>
+                <!-- <span class="text-xs font-medium text-base-content/60 bg-base-200 px-2 py-0.5 rounded-full">
+                  {{ item.cantidadReactivos }} reactivos
+                </span> -->
+              </span>
             </div>
             <p class="text-sm text-base-content/80 mb-2 leading-relaxed line-clamp-2">
               {{ item.instruccion }}
@@ -258,18 +274,22 @@ function fmtDate(iso: string): string {
 
             <div class="flex items-center justify-between mt-auto">
               <div class="flex items-center gap-2">
-                <span class="text-xs text-base-content/50 font-medium">
-                  {{ item.cantidadReactivos }} reactivos
-                </span>
+                <span class="text-[10px] text-base-content/40">{{
+                  fmtDate(item.primerReactivo.fechaModificacion)
+                }}</span>
               </div>
-              <i
-                :class="
-                  item.esCompleto
-                    ? 'fa-solid fa-circle-check text-success'
-                    : 'fa-solid fa-circle-x text-error'
-                "
-                class="text-[12px]"
-              ></i>
+              <span
+                class="badge badge-ghost badge-info badge-xs"
+                :title="tipoPorId(item.primerReactivo.tipoReactivoId)?.nombre"
+              >
+                <i
+                  :class="
+                    tipoPorId(item.primerReactivo.tipoReactivoId)?.icono ??
+                    'fa-regular fa-circle-question'
+                  "
+                  class="text-[10px]"
+                ></i>
+              </span>
             </div>
           </div>
         </template>
