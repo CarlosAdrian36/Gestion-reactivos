@@ -19,7 +19,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const bancoId = route.params.id as string
-const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas, isGuardando, guardarTodo } =
+const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas, isGuardando, guardarCreacion, guardarTodo } =
   useGuardarReactivo(bancoId, TIPO_REACTIVO.opcionMultiple, props.reactivo?.idReactivo)
 
 const pregunta = ref(props.reactivo?.descripcion ?? '')
@@ -31,7 +31,6 @@ const opciones = ref<OpcionForm[]>(
         correcta: r.esCorrecta,
       }))
     : [
-        { texto: '', correcta: false },
         { texto: '', correcta: false },
       ],
 )
@@ -52,7 +51,7 @@ function agregarOpcion() {
 }
 
 function quitarOpcion(index: number) {
-  if (opciones.value.length > 2) {
+  if (opciones.value.length > 1) {
     opciones.value.splice(index, 1)
     erroresOpciones.value.splice(index, 1)
   }
@@ -74,6 +73,14 @@ function guardarPreguntaForm() {
     return
   }
   guardarPregunta(pregunta.value)
+}
+
+async function guardar() {
+  if (props.reactivo?.idReactivo) {
+    guardarTodoForm()
+  } else {
+    await guardarCreacion(pregunta.value, opciones.value)
+  }
 }
 
 function guardarRespuestaForm() {
@@ -235,7 +242,7 @@ const opcionConfig = {
         </div>
         <button
           class="btn btn-ghost btn-xs text-error shrink-0"
-          :class="opciones.length > 2 ? '' : 'invisible'"
+          :class="opciones.length > 1 ? '' : 'invisible'"
           @click="quitarOpcion(index)"
         >
           <i class="fa-regular fa-trash"></i>
@@ -245,24 +252,13 @@ const opcionConfig = {
 
     <div class="flex gap-3 pt-4">
       <button
-        v-if="props.reactivo?.idReactivo"
         class="btn btn-primary"
-        :disabled="isGuardando"
-        @click="guardarTodoForm"
+        :disabled="isGuardando || !pregunta.trim()"
+        @click="guardar"
       >
         <span v-if="isGuardando" class="loading loading-spinner"></span>
         {{ isGuardando ? 'Guardando...' : 'Guardar' }}
       </button>
-      <template v-else>
-        <button class="btn btn-primary" :disabled="guardandoPregunta" @click="guardarPreguntaForm">
-          <span v-if="guardandoPregunta" class="loading loading-spinner"></span>
-          {{ guardandoPregunta ? 'Guardando...' : 'Guardar pregunta' }}
-        </button>
-        <button class="btn btn-primary" :disabled="guardandoRespuestas" @click="guardarRespuestaForm">
-          <span v-if="guardandoRespuestas" class="loading loading-spinner"></span>
-          {{ guardandoRespuestas ? 'Guardando...' : 'Guardar respuestas' }}
-        </button>
-      </template>
     </div>
   </div>
 </template>

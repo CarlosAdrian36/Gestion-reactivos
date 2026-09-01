@@ -84,10 +84,7 @@ const displayedToken = computed(() => {
       </button>
 
       <!-- BRAND (click to toggle nav sidebar) -->
-      <div
-        class="flex items-center gap-3 cursor-pointer"
-        @click="sidebar.toggleSidebar()"
-      >
+      <div class="flex items-center gap-3 cursor-pointer" @click="sidebar.toggleSidebar()">
         <div
           class="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center"
         >
@@ -100,7 +97,7 @@ const displayedToken = computed(() => {
           <p class="text-xs text-base-content/60">Sistema de gestión</p>
         </div>
       </div>
-      <span class="countdown font-mono text-4xl">
+      <!-- <span class="countdown font-mono text-4xl">
         <span
           :style="{ '--value': authStore.minutes, '--digits': 2 }"
           aria-live="polite"
@@ -116,30 +113,10 @@ const displayedToken = computed(() => {
           aria-label="segundos"
           >{{ authStore.seconds }}</span
         >
-      </span>
+      </span> -->
     </div>
 
-    <div class="ml-6 flex flex-col">
-      <span class="mb-1 text-xs font-semibold uppercase tracking-wide text-base-content/60">
-        Token
-      </span>
-
-      <button
-        @click="copyToken"
-        :title="authStore.token"
-        class="btn btn-sm h-10 w-82 justify-between border border-base-300 bg-base-100"
-      >
-        <SlotText :text="copied ? '¡Copiado!' : displayedToken" class="font-mono text-xs" />
-        <label class="swap swap-rotate" :class="{ 'swap-active': copied }">
-          <i class="swap-off fa-regular fa-copy text-sm"></i>
-
-          <i class="swap-on fa-regular fa-circle-check text-success text-sm"></i>
-        </label>
-      </button>
-    </div>
-    <!-- RIGHT -->
-    <div class="navbar-end gap-2">
-      <!-- AVATAR -->
+    <!-- <div class="navbar-end gap-2">
       <div class="dropdown dropdown-end">
         <button class="btn btn-ghost btn-circle avatar">
           <div class="w-9 rounded-full ring ring-primary/20 ring-offset-2 ring-offset-base-100">
@@ -170,20 +147,6 @@ const displayedToken = computed(() => {
             </RouterLink>
           </li>
 
-          <!-- <li>
-            <a class="text-sm">
-              <i class="fa-regular fa-gear"></i>
-              Configuración
-            </a>
-          </li>
-
-          <li>
-            <a class="text-sm">
-              <i class="fa-solid fa-key"></i>
-              Actualizar contraseña
-            </a>
-          </li> -->
-
           <div class="divider my-1"></div>
 
           <li>
@@ -194,7 +157,7 @@ const displayedToken = computed(() => {
           </li>
         </ul>
       </div>
-    </div>
+    </div> -->
   </header>
 </template>
 <style scoped>

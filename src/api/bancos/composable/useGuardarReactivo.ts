@@ -165,6 +165,51 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
 
   const isGuardando = ref(false)
 
+  const guardarCreacion = async (descripcion: string, opciones: OpcionForm[]): Promise<boolean> => {
+    if (!descripcion.trim()) {
+      toast.error('La pregunta no puede estar vacía')
+      return false
+    }
+    isGuardando.value = true
+    try {
+      await new Promise<void>((resolve, reject) => {
+        crearReactivoMutation.mutate(descripcion, {
+          onSuccess: () => resolve(),
+          onError: (error) => reject(error),
+        })
+      })
+
+      const enviadas: boolean[] = []
+      for (let i = 0; i < opciones.length; i++) {
+        const opcion = opciones[i]!
+        if (opcion.texto.trim().length === 0) continue
+        const res = await crearRespuestaAction(bancoId, reactivoCreado.value!.idReactivo, {
+          posicion: i + 1,
+          esCorrecta: opcion.correcta,
+          respuesta: opcion.texto,
+        })
+        enviadas.push(res.respuestaCreada)
+      }
+
+      toast.success(`${enviadas.length} respuesta(s) guardada(s) correctamente`)
+      queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
+      await queryClient.refetchQueries({ queryKey: ['reactivos', bancoId] })
+
+      const lista = queryClient.getQueryData<Reactivo[]>(['reactivos', bancoId])
+      const reactivosStore = useReactivoSeleccionadoStore()
+      const fresco = lista?.find((r) => r.idReactivo === reactivoCreado.value!.idReactivo)
+      if (fresco) reactivosStore.select(fresco)
+
+      volverALista()
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al guardar el reactivo')
+      return false
+    } finally {
+      isGuardando.value = false
+    }
+  }
+
   const guardarTodo = async (
     descripcion: string,
     opciones?: OpcionForm[],
@@ -230,6 +275,7 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
     isGuardando,
     guardarPregunta,
     guardarRespuestas,
+    guardarCreacion,
     guardarTodo,
   }
 }
