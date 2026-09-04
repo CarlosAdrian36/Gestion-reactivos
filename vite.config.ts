@@ -29,7 +29,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://148.234.2.207:30704', // URL base de tu backend (con HTTPS y puerto correcto)
+        target: 'https://148.234.2.210:30704', // URL base de tu backend (con HTTPS y puerto correcto)
         changeOrigin: true, // Cambia el origen para que el servidor no lo rechace
         secure: false, // Permite certificados autofirmados (solo desarrollo)
         // Si el backend espera la ruta exacta '/api/v1/sesiones', no necesitas rewrite
