@@ -153,6 +153,32 @@ watch(temaOscuro, (val) => {
             </div>
           </RouterLink>
         </li>
+        <li v-if="authStore.user?.roles?.some((r) => r.nombre === 'Administrador')">
+          <RouterLink v-slot="{ navigate }" :to="{ name: 'proyectos' }">
+            <div class="relative">
+              <div
+                v-if="isProyectosActive"
+                class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-full"
+              ></div>
+              <a
+                @click="navigate"
+                :class="[
+                  'flex items-center transition-colors rounded-lg font-medium border',
+                  sidebar.isOpen
+                    ? 'gap-3 px-3 py-2.5 text-sm'
+                    : 'gap-0 p-2.5 justify-center text-xl',
+                  isUsuariosActive
+                    ? 'bg-primary/5 border-primary/20 text-primary'
+                    : 'border-transparent text-(--color-texto) hover:bg-base-200',
+                ]"
+                :title="!sidebar.isOpen ? 'Proyectos' : undefined"
+              >
+                <i class="fa-regular fa-chart-network text-xl"></i>
+                <span v-show="sidebar.isOpen">Proyectos</span>
+              </a>
+            </div>
+          </RouterLink>
+        </li>
       </ul>
 
       <div v-show="sidebar.isOpen" class="border-t border-primary/10 my-4 w-full"></div>

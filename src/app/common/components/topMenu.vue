@@ -97,7 +97,7 @@ const displayedToken = computed(() => {
           <p class="text-xs text-base-content/60">Sistema de gestión</p>
         </div>
       </div>
-      <!-- <span class="countdown font-mono text-4xl">
+      <span class="countdown font-mono text-4xl">
         <span
           :style="{ '--value': authStore.minutes, '--digits': 2 }"
           aria-live="polite"
@@ -113,7 +113,7 @@ const displayedToken = computed(() => {
           aria-label="segundos"
           >{{ authStore.seconds }}</span
         >
-      </span> -->
+      </span>
     </div>
 
     <!-- <div class="navbar-end gap-2">
