@@ -30,263 +30,213 @@
         </div>
       </div>
 
-      <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-visible">
-        <div class="overflow-visible">
-          <div v-if="isLoading" class="p-6 space-y-3">
-            <div class="skeleton h-14 w-full"></div>
-            <div class="skeleton h-16 w-full"></div>
-            <div class="skeleton h-16 w-full"></div>
-            <div class="skeleton h-16 w-full"></div>
+      <DataTable :data="BancosCarpeta" :columns="columnas" @row-click="irADetalle">
+        <template #cell-tipo>
+          <div
+            class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-primary/10"
+          >
+            <i class="fa-regular fa-file-lines text-primary text-lg"></i>
           </div>
+        </template>
 
-          <table v-else class="table table-fixed w-full block overflow-x-auto whitespace-nowrap">
-            <!-- HEAD -->
-            <thead class="bg-base-200">
-              <tr>
-                <th class="w-16 text-center">Tipo</th>
+        <template #cell-nombre="{ row }">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <p class="font-semibold truncate" :title="row.nombre">
+                {{ row.nombre }}
+              </p>
+            </div>
 
-                <th class="min-w-62.5">Nombre</th>
+            <p
+              v-if="row.descripcion"
+              class="text-sm text-base-content/60 truncate mt-1"
+              :title="row.descripcion"
+            >
+              {{ row.descripcion }}
+            </p>
+          </div>
+        </template>
 
-                <th class="w-40 text-center">Contenido</th>
+        <template #cell-contenido="{ row }">
+          <div class="flex justify-center text-base-content/60">
+            <div class="inline-flex items-center min-w-30">
+              <span class="w-12 text-right font-mono">
+                {{ row.cantidadReactivos || 0 }}
+              </span>
 
-                <th class="w-52 text-center">Última modificación</th>
+              <span class="ml-2 text-left"> reactivos </span>
+            </div>
+          </div>
+        </template>
 
-                <th class="w-40 text-center">Compartido</th>
+        <template #cell-fechaModificacion="{ row }">
+          <div class="flex flex-col">
+            <span class="font-medium text-sm">
+              {{
+                new Date(row.fechaModificacion).toLocaleDateString('es-ES', {
+                  dateStyle: 'medium',
+                })
+              }}
+            </span>
+          </div>
+          <span class="text-sm text-base-content/60">
+            {{
+              new Date(row.fechaModificacion).toLocaleTimeString('es-ES', {
+                timeStyle: 'short',
+              })
+            }}
+          </span>
+        </template>
 
-                <th class="w-32 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody v-if="BancosCarpeta?.length">
-              <!-- <pre>{{ data }}</pre> -->
-              <tr
-                v-for="value in BancosCarpeta"
-                :key="value.idBanco"
-                class="hover transition-colors cursor-pointer hover:bg-base-300"
-                @click="irADetalle(value)"
-              >
-                <!-- ICON -->
-                <td class="text-center align-middle">
-                  <div
-                    class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-primary/10"
+        <template #cell-compartido="{ row }">
+          <div class="flex justify-center">
+            <div class="inline-flex items-center text-success min-w-30">
+              <span class="w-5 text-center">
+                <i class="fa-light fa-user-group"></i>
+              </span>
+
+              <span class="ml-2">
+                {{ row.cantidadCompartidos }}
+                {{ row.cantidadCompartidos === 1 ? 'usuario' : 'usuarios' }}
+              </span>
+            </div>
+          </div>
+        </template>
+
+        <template #cell-acciones="{ row }">
+          <div class="dropdown dropdown-left" @click.stop>
+            <div
+              tabindex="0"
+              role="button"
+              class="btn btn-ghost btn-sm btn-circle"
+              @click.stop
+            >
+              <i class="fa-regular fa-ellipsis-vertical"></i>
+            </div>
+
+            <ul
+              tabindex="0"
+              class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
+            >
+              <li>
+                <a @click.stop="abrirModalBanco(row, carpetaIdNumber)">
+                  <i class="fa-regular fa-pen-to-square"></i>
+                  Editar
+                </a>
+              </li>
+              <li>
+                <a>
+                  <i class="fa-regular fa-share"></i>
+                  Compartir
+                </a>
+              </li>
+
+              <li>
+                <div class="dropdown">
+                  <div tabindex="0" role="button" class="m-1">
+                    <i class="fa-regular fa-folder"></i>
+                    Mover a
+                  </div>
+                  <ul
+                    tabindex="-1"
+                    class="menu dropdown-content bg-base-100 rounded-box z-1 w-72 p-2 shadow-xl border border-base-300"
                   >
-                    <i class="fa-regular fa-file-lines text-primary text-lg"></i>
-                  </div>
-                </td>
-                <!-- Nombre y descripcion -->
-                <td class="align-middle">
-                  <div class="min-w-0">
-                    <div class="flex items-center gap-2">
-                      <p class="font-semibold truncate" :title="value.nombre">
-                        {{ value.nombre }}
-                      </p>
-                    </div>
-
-                    <p
-                      v-if="value.descripcion"
-                      class="text-sm text-base-content/60 truncate mt-1"
-                      :title="value.descripcion"
+                    <li class="sticky top-0 bg-base-100 z-10 p-2">
+                      <input
+                        v-model="busquedaCarpeta"
+                        type="text"
+                        placeholder="Buscar carpeta..."
+                        class="input input-sm input-bordered w-full"
+                      />
+                    </li>
+                    <li v-if="isLoadingCarpeta">
+                      <div>Cargando carpetas...</div>
+                    </li>
+                    <li
+                      v-else-if="carpetasFiltradas.length === 0"
+                      class="text-center text-base-content/60 py-2"
                     >
-                      {{ value.descripcion }}
-                    </p>
-                  </div>
-                </td>
-                <!-- Contenido -->
-
-                <td class="text-center align-middle">
-                  <div class="flex justify-center text-base-content/60">
-                    <div class="inline-flex items-center min-w-30">
-                      <span class="w-12 text-right font-mono">
-                        {{ value.cantidadReactivos || 0 }}
-                      </span>
-
-                      <span class="ml-2 text-left"> reactivos </span>
-                    </div>
-                  </div>
-                </td>
-                <!-- Ultima Modificacion -->
-                <td class="text-center align-middle">
-                  <div class="flex flex-col">
-                    <span class="font-medium text-sm">
-                      {{
-                        new Date(value.fechaModificacion).toLocaleDateString('es-ES', {
-                          dateStyle: 'medium',
-                        })
-                      }}
-                    </span>
-                  </div>
-                  <span class="text-sm text-base-content/60">
-                    {{
-                      new Date(value.fechaModificacion).toLocaleTimeString('es-ES', {
-                        timeStyle: 'short',
-                      })
-                    }}
-                  </span>
-                </td>
-                <!-- Compartido -->
-
-                <td class="text-center align-middle">
-                  <div class="flex justify-center">
-                    <div class="inline-flex items-center text-success min-w-30">
-                      <span class="w-5 text-center">
-                        <i class="fa-light fa-user-group"></i>
-                      </span>
-
-                      <span class="ml-2">
-                        {{ value.cantidadCompartidos }}
-                        {{ value.cantidadCompartidos === 1 ? 'usuario' : 'usuarios' }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                <!-- Acciones -->
-                <td class="text-center align-middle overflow-visible">
-                  <div class="dropdown dropdown-left" @click.stop>
-                    <div
-                      tabindex="0"
-                      role="button"
-                      class="btn btn-ghost btn-sm btn-circle"
-                      @click.stop
-                    >
-                      <i class="fa-regular fa-ellipsis-vertical"></i>
-                    </div>
-
-                    <ul
-                      tabindex="0"
-                      class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
-                    >
-                      <li>
-                        <a @click.stop="abrirModalBanco(value, carpetaIdNumber)">
-                          <i class="fa-regular fa-pen-to-square"></i>
-                          Editar
-                        </a>
-                      </li>
-                      <li>
-                        <a>
-                          <i class="fa-regular fa-share"></i>
-                          Compartir
-                        </a>
-                      </li>
-
-                      <li>
-                        <div class="dropdown">
-                          <div tabindex="0" role="button" class="m-1">
-                            <i class="fa-regular fa-folder"></i>
-                            Mover a
-                          </div>
-                          <ul
-                            tabindex="-1"
-                            class="menu dropdown-content bg-base-100 rounded-box z-1 w-72 p-2 shadow-xl border border-base-300"
-                          >
-                            <!-- BUSCADOR -->
-                            <li class="sticky top-0 bg-base-100 z-10 p-2">
-                              <input
-                                v-model="busquedaCarpeta"
-                                type="text"
-                                placeholder="Buscar carpeta..."
-                                class="input input-sm input-bordered w-full"
-                              />
-                            </li>
-                            <!-- LOADING -->
-                            <li v-if="isLoadingCarpeta">
-                              <div>Cargando carpetas...</div>
-                            </li>
-                            <!-- SIN RESULTADOS -->
-                            <li
-                              v-else-if="carpetasFiltradas.length === 0"
-                              class="text-center text-base-content/60 py-2"
-                            >
-                              No se encontraron carpetas
-                            </li>
-                            <!-- RESULTADOS -->
-                            <li v-for="carpeta in carpetasFiltradas" :key="carpeta.idCarpeta">
-                              <a
-                                :class="{
-                                  'pointer-events-none opacity-50 ':
-                                    carpetax?.idCarpeta === carpeta.idCarpeta,
-                                }"
-                                @click="
-                                  moverCarpetaACarpeta(
-                                    carpetax?.idCarpeta!,
-                                    value.idBanco,
-                                    carpeta.idCarpeta,
-                                  )
-                                "
-                                class="flex items-center justify-between"
-                              >
-                                <span class="truncate max-w-45" :title="carpeta.nombre">
-                                  {{
-                                    carpeta.nombre.length > 30
-                                      ? carpeta.nombre.slice(0, 30) + '...'
-                                      : carpeta.nombre
-                                  }}
-                                </span>
-                                <i
-                                  v-if="carpetax?.idCarpeta === carpeta.idCarpeta"
-                                  class="fa-solid fa-check text-success"
-                                ></i>
-                                <i v-else class="fa-regular fa-folder text-warning"></i>
-                              </a>
-                            </li>
-                            <div class="divider"></div>
-                            <li>
-                              <a
-                                @click="moveRaiz(carpetax?.idCarpeta!, value.idBanco)"
-                                class="flex items-center justify-between"
-                              >
-                                Sin carpeta
-
-                                <i class="fa-regular fa-folder-minus"></i>
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </li>
-
-                      <div class="divider"></div>
-
-                      <li>
-                        <a @click="Eliminar(value, carpetaIdNumber)" class="text-error">
-                          <i class="fa-regular fa-trash"></i>
-                          Eliminar banco
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-            <tbody v-else>
-              <tr>
-                <td colspan="5">
-                  <div class="flex flex-col items-center py-16">
-                    <div
-                      class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-4"
-                    >
-                      <i class="fa-regular fa-file-lines text-4xl text-base-content/40"></i>
-                    </div>
-
-                    <h2 class="text-lg font-bold">No hay elementos</h2>
-
-                    <p class="text-sm text-base-content/60 mt-1">
-                      Puedes crear un banco para comenzar
-                    </p>
-
-                    <div class="flex items-center gap-2 mt-5">
-                      <button
-                        class="btn btn-primary"
-                        @click="abrirModalBanco(undefined, carpetaIdNumber)"
+                      No se encontraron carpetas
+                    </li>
+                    <li v-for="carpeta in carpetasFiltradas" :key="carpeta.idCarpeta">
+                      <a
+                        :class="{
+                          'pointer-events-none opacity-50 ':
+                            carpetax?.idCarpeta === carpeta.idCarpeta,
+                        }"
+                        @click="
+                          moverCarpetaACarpeta(
+                            carpetax?.idCarpeta!,
+                            row.idBanco,
+                            carpeta.idCarpeta,
+                          )
+                        "
+                        class="flex items-center justify-between"
                       >
-                        <i class="fa-regular fa-file-lines"></i>
-                        Nuevo Banco
-                      </button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+                        <span class="truncate max-w-45" :title="carpeta.nombre">
+                          {{
+                            carpeta.nombre.length > 30
+                              ? carpeta.nombre.slice(0, 30) + '...'
+                              : carpeta.nombre
+                          }}
+                        </span>
+                        <i
+                          v-if="carpetax?.idCarpeta === carpeta.idCarpeta"
+                          class="fa-solid fa-check text-success"
+                        ></i>
+                        <i v-else class="fa-regular fa-folder text-warning"></i>
+                      </a>
+                    </li>
+                    <div class="divider"></div>
+                    <li>
+                      <a
+                        @click="moveRaiz(carpetax?.idCarpeta!, row.idBanco)"
+                        class="flex items-center justify-between"
+                      >
+                        Sin carpeta
+
+                        <i class="fa-regular fa-folder-minus"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+
+              <div class="divider"></div>
+
+              <li>
+                <a @click.stop="Eliminar(row, carpetaIdNumber)" class="text-error">
+                  <i class="fa-regular fa-trash"></i>
+                  Eliminar banco
+                </a>
+              </li>
+            </ul>
+          </div>
+        </template>
+
+        <template #empty>
+          <div class="flex flex-col items-center py-16">
+            <div
+              class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-4"
+            >
+              <i class="fa-regular fa-file-lines text-4xl text-base-content/40"></i>
+            </div>
+
+            <h2 class="text-lg font-bold">No hay elementos</h2>
+
+            <p class="text-sm text-base-content/60 mt-1">
+              Puedes crear un banco para comenzar
+            </p>
+
+            <div class="flex items-center gap-2 mt-5">
+              <button class="btn btn-primary" @click="abrirModalBanco(undefined, carpetaIdNumber)">
+                <i class="fa-regular fa-file-lines"></i>
+                Nuevo Banco
+              </button>
+            </div>
+          </div>
+        </template>
+      </DataTable>
     </div>
   </div>
 </template>
@@ -305,6 +255,8 @@ import { useCarpetas } from '@/api/carpetas/composable/useCarpetas'
 import { moveCarpetaCarpeta } from '@/api/carpetas/actions/move-carpeta-carpeta.action'
 import { toast } from 'vue-sonner'
 import { moveCarpetaRaiz } from '@/api/carpetas/actions/move-carpeta-raiz.action'
+import DataTable from '@/app/common/components/table/DataTable.vue'
+import type { DataTableColumns } from '@/app/common/components/table/features'
 
 const modal = useModalStore()
 const route = useRoute()
@@ -332,10 +284,49 @@ const { data: carpetax, isLoading: isLoadingInformacionCarpeta } = useQuery({
 const isLoading = computed(() => {
   return isLoadingBancosCarpetas.value || isLoadingInformacionCarpeta.value
 })
+
+const columnas: DataTableColumns<Banco> = [
+  {
+    id: 'tipo',
+    header: 'Tipo',
+    meta: { thClass: 'w-16 text-center', tdClass: 'text-center align-middle' },
+  },
+  {
+    accessorKey: 'nombre',
+    header: 'Nombre',
+    meta: { thClass: 'min-w-62.5', tdClass: 'align-middle' },
+  },
+  {
+    id: 'contenido',
+    accessorFn: (banco) => banco.cantidadReactivos,
+    header: 'Contenido',
+    meta: { thClass: 'w-40 text-center', tdClass: 'text-center align-middle' },
+  },
+  {
+    accessorKey: 'fechaModificacion',
+    header: 'Última modificación',
+    sortFn: 'datetime',
+    sortDescFirst: true,
+    meta: { thClass: 'w-52 text-center', tdClass: 'text-center align-middle' },
+  },
+  {
+    id: 'compartido',
+    accessorFn: (banco) => banco.cantidadCompartidos,
+    header: 'Compartido',
+    meta: { thClass: 'w-40 text-center', tdClass: 'text-center align-middle' },
+  },
+  {
+    id: 'acciones',
+    header: 'Acciones',
+    meta: { thClass: 'w-32 text-center', tdClass: 'text-center align-middle overflow-visible' },
+  },
+]
+
 function irADetalle(banco: Banco) {
   router.push({ name: 'bancoDetalle', params: { id: banco.idBanco } })
 }
 function abrirModalBanco(banco?: Banco, carpetaId?: string) {
+  closeDropdown()
   console.warn('este es el id', banco?.idBanco)
   modal.openModal(NuevoBanco, { carpetaId, banco }, [
     { label: 'Cerrar', variant: 'outline' },
@@ -377,13 +368,10 @@ const moveRaiz = async (C: string, B: string) => {
 }
 
 const moverCarpetaACarpeta = async (carpetaId: string, bancoId: string, destino: string) => {
-  // const carpetaOrigen = carpetaId.toString()
   const banco = bancoId.toString()
   const DestinoC = destino.toString()
 
   const origen = carpetaId.toString()
-  // console.warn(carpetaOrigen, banco)
-  // console.warn(typeof carpetaOrigen, typeof banco)
   try {
     const rep = await moveCarpetaCarpeta(origen, banco, DestinoC)
     if (rep.bancoMovido === true) {
@@ -404,7 +392,6 @@ const moverCarpetaACarpeta = async (carpetaId: string, bancoId: string, destino:
 const busquedaCarpeta = ref('')
 
 const carpetasFiltradas = computed(() => {
-  console.warn(carpetax.value?.idCarpeta)
   if (!carpetas.value) return []
 
   return carpetas.value.filter((carpeta) =>

@@ -3,6 +3,8 @@ import { computed, onMounted, ref } from 'vue'
 import { getBancosAction } from '@/api/bancos/actions/get-bancos.actions'
 import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import router from '@/router'
+import DataTable from '@/app/common/components/table/DataTable.vue'
+import type { DataTableColumns } from '@/app/common/components/table/features'
 
 const bancos = ref<Banco[]>([])
 const loading = ref(true)
@@ -17,6 +19,37 @@ onMounted(async () => {
   }
 })
 
+const columnas: DataTableColumns<Banco> = [
+  {
+    id: 'tipo',
+    header: 'Tipo',
+    meta: { thClass: 'w-16 text-center', tdClass: 'text-center align-middle' },
+  },
+  {
+    accessorKey: 'nombre',
+    header: 'Nombre',
+    meta: { thClass: 'min-w-62.5', tdClass: 'align-middle' },
+  },
+  {
+    id: 'contenido',
+    accessorFn: (banco) => banco.cantidadReactivos,
+    header: 'Contenidos',
+    meta: { thClass: 'w-40 text-center', tdClass: 'text-center align-middle' },
+  },
+  {
+    accessorKey: 'fechaModificacion',
+    header: 'Última modificación',
+    sortFn: 'datetime',
+    sortDescFirst: true,
+    meta: { thClass: 'w-52 text-center', tdClass: 'text-center align-middle' },
+  },
+  {
+    id: 'acciones',
+    header: 'Acciones',
+    meta: { thClass: 'w-32 text-center', tdClass: 'text-center align-middle overflow-visible' },
+  },
+]
+
 const goToItem = (item: Banco) => {
   if (item.esProyecto === true) {
     router.push({ name: 'bancoDetalle', params: { id: item.idBanco } })
@@ -27,7 +60,6 @@ const goToItem = (item: Banco) => {
 </script>
 
 <template>
-  <!-- metodo /getProyectos -->
   <div class="max-w-7xl mx-auto px-4">
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
@@ -40,7 +72,6 @@ const goToItem = (item: Banco) => {
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- BOTON -->
         <button class="btn btn-primary">
           <i class="fa-regular fa-plus"></i>
           Crear
@@ -48,165 +79,116 @@ const goToItem = (item: Banco) => {
       </div>
     </div>
 
-    <!-- TABLA -->
-    <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-visible">
-      <!-- LOADING -->
-      <div class="overflow-x-auto">
-        <div v-if="loading" class="p-6 space-y-3">
-          <div class="skeleton h-14 w-full"></div>
-          <div class="skeleton h-16 w-full"></div>
-          <div class="skeleton h-16 w-full"></div>
-          <div class="skeleton h-16 w-full"></div>
+    <DataTable :data="proyectos" :columns="columnas" :is-loading="loading" @row-click="goToItem">
+      <template #cell-tipo>
+        <div
+          class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-primary/10"
+        >
+          <i class="fa-regular fa-file-lines text-primary text-lg"></i>
         </div>
+      </template>
 
-        <!-- TABLE -->
-        <table v-else class="table table-fixed w-full">
-          <!-- HEAD -->
-          <thead class="bg-base-200">
-            <tr>
-              <th class="w-16 text-center">Tipo</th>
+      <template #cell-nombre="{ row }">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <p class="font-semibold truncate" :title="row.nombre">
+              {{ row.nombre }}
+            </p>
+          </div>
 
-              <th class="min-w-62.5">Nombre</th>
+          <p class="text-sm text-base-content/60 truncate mt-1" :title="row.descripcion">
+            {{ row.descripcion }}
+          </p>
+        </div>
+      </template>
 
-              <th class="w-40 text-center">Contenidos</th>
+      <template #cell-contenido="{ row }">
+        <div class="flex justify-center">
+          <div class="badge badge-ghost">{{ row.cantidadReactivos }} reactivos</div>
+        </div>
+      </template>
 
-              <th class="w-52 text-center">Última modificación</th>
+      <template #cell-fechaModificacion="{ row }">
+        <div class="flex flex-col">
+          <span class="font-medium text-sm">
+            {{
+              new Date(row.fechaModificacion).toLocaleDateString('es-ES', {
+                dateStyle: 'medium',
+              })
+            }}
+          </span>
+        </div>
+      </template>
 
-              <th class="w-32 text-center">Acciones</th>
-            </tr>
-          </thead>
+      <template #cell-acciones>
+        <div class="dropdown dropdown-end dropdown-left">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
+            <i class="fa-regular fa-ellipsis-vertical"></i>
+          </div>
 
-          <!-- BODY -->
-          <tbody v-if="bancos.length">
-            <tr
-              v-for="value in proyectos"
-              :key="value.idBanco"
-              class="hover transition-colors cursor-pointer"
-              @click="goToItem(value)"
-            >
-              <!-- ICON -->
-              <td class="text-center align-middle">
-                <div
-                  class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-primary/10"
-                >
-                  <i class="fa-regular fa-file-lines text-primary text-lg"></i>
-                </div>
-              </td>
+          <ul
+            tabindex="0"
+            class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
+          >
+            <li>
+              <a>
+                <i class="fa-regular fa-eye"></i>
+                Ver
+              </a>
+            </li>
 
-              <!-- NAME -->
-              <td class="align-middle">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2">
-                    <p class="font-semibold truncate" :title="value.nombre">
-                      {{ value.nombre }}
-                    </p>
-                  </div>
+            <li>
+              <a>
+                <i class="fa-regular fa-pen"></i>
+                Editar
+              </a>
+            </li>
+            <li>
+              <a>
+                <i class="fa-regular fa-pen"></i>
+                Compartir
+              </a>
+            </li>
 
-                  <p class="text-sm text-base-content/60 truncate mt-1" :title="value.descripcion">
-                    {{ value.descripcion }}
-                  </p>
-                </div>
-              </td>
+            <li>
+              <a>
+                <i class="fa-regular fa-copy"></i>
+                Copiar
+              </a>
+            </li>
 
-              <!-- CONTENT -->
-              <td class="text-center align-middle">
-                <div class="flex justify-center">
-                  <div class="badge badge-ghost">{{ value.cantidadReactivos }} reactivos</div>
-                </div>
-              </td>
+            <div class="divider my-1"></div>
 
-              <!-- DATE -->
-              <td class="text-center align-middle">
-                <div class="flex flex-col">
-                  <span class="font-medium text-sm">
-                    {{
-                      new Date(value.fechaModificacion).toLocaleDateString('es-ES', {
-                        dateStyle: 'medium',
-                      })
-                    }}
-                  </span>
-                </div>
-              </td>
+            <li>
+              <a class="text-error">
+                <i class="fa-regular fa-trash"></i>
+                Eliminar
+              </a>
+            </li>
+          </ul>
+        </div>
+      </template>
 
-              <!-- ACTIONS -->
-              <td class="text-center align-middle overflow-visible">
-                <div class="dropdown dropdown-end dropdown-left">
-                  <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
-                    <i class="fa-regular fa-ellipsis-vertical"></i>
-                  </div>
+      <template #empty>
+        <div class="flex flex-col items-center py-16">
+          <div
+            class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-4"
+          >
+            <i class="fa-regular fa-folder-open text-4xl text-base-content/40"></i>
+          </div>
 
-                  <ul
-                    tabindex="0"
-                    class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
-                  >
-                    <li>
-                      <a>
-                        <i class="fa-regular fa-eye"></i>
-                        Ver
-                      </a>
-                    </li>
+          <h2 class="text-lg font-bold">No hay elementos</h2>
 
-                    <li>
-                      <a>
-                        <i class="fa-regular fa-pen"></i>
-                        Editar
-                      </a>
-                    </li>
-                    <li>
-                      <a>
-                        <i class="fa-regular fa-pen"></i>
-                        Compartir
-                      </a>
-                    </li>
+          <p class="text-sm text-base-content/60 mt-1">
+            Puedes crear una carpeta o banco para comenzar
+          </p>
 
-                    <li>
-                      <a>
-                        <i class="fa-regular fa-copy"></i>
-                        Copiar
-                      </a>
-                    </li>
-
-                    <div class="divider my-1"></div>
-
-                    <li>
-                      <a class="text-error">
-                        <i class="fa-regular fa-trash"></i>
-                        Eliminar
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-
-          <!-- EMPTY -->
-          <tbody v-else>
-            <tr>
-              <td colspan="5">
-                <div class="flex flex-col items-center py-16">
-                  <div
-                    class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-4"
-                  >
-                    <i class="fa-regular fa-folder-open text-4xl text-base-content/40"></i>
-                  </div>
-
-                  <h2 class="text-lg font-bold">No hay elementos</h2>
-
-                  <p class="text-sm text-base-content/60 mt-1">
-                    Puedes crear una carpeta o banco para comenzar
-                  </p>
-
-                  <button class="btn btn-primary mt-5">
-                    <i class="fa-regular fa-plus"></i>
-                    Crear elemento
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+          <button class="btn btn-primary mt-5">
+            <i class="fa-regular fa-plus"></i>
+            Crear elemento
+          </button>
+        </div>
+      </template>
+    </DataTable>
   </div>
 </template>
