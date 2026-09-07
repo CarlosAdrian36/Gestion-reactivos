@@ -21,7 +21,7 @@ import CompartirBanco from '../common/components/modals/CompartirBanco.vue'
 
 const modal = useModalStore()
 
-const { data, isLoading, error, isError } = useQuery({
+const { data, isLoading } = useQuery({
   queryKey: ['items-unificados'],
   queryFn: () => getItemsUnificadosAction(),
   staleTime: 1000 * 60, // 1 minutes
@@ -115,7 +115,7 @@ const moverBanco = async (carpetaId: string, bancoId: string) => {
         queryKey: ['items-unificados'],
       })
     }
-  } catch (error) {
+  } catch {
     toast.error('Ocurrio algo inesperado')
   }
 }

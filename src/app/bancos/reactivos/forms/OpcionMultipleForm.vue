@@ -19,7 +19,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const bancoId = route.params.id as string
-const { guardarPregunta, guardarRespuestas, guardandoPregunta, guardandoRespuestas, isGuardando, guardarCreacion, guardarTodo } =
+const { isGuardando, guardarCreacion, guardarTodo } =
   useGuardarReactivo(bancoId, TIPO_REACTIVO.opcionMultiple, props.reactivo?.idReactivo)
 
 const pregunta = ref(props.reactivo?.descripcion ?? '')
@@ -67,43 +67,12 @@ function seleccionarCorrecta(index: number) {
   opciones.value.forEach((o, i) => (o.correcta = i === index))
 }
 
-function guardarPreguntaForm() {
-  if (!pregunta.value.trim()) {
-    toast.error('La pregunta no puede estar vacía')
-    return
-  }
-  guardarPregunta(pregunta.value)
-}
-
 async function guardar() {
   if (props.reactivo?.idReactivo) {
     guardarTodoForm()
   } else {
     await guardarCreacion(pregunta.value, opciones.value)
   }
-}
-
-function guardarRespuestaForm() {
-  const result = opcionesSchema.safeParse(opciones.value)
-  if (!result.success) {
-    const errores = opciones.value.map(() => '')
-    for (const issue of result.error.issues) {
-      const idx = issue.path[0] as number
-      errores[idx] = issue.message
-    }
-    erroresOpciones.value = errores
-    toast.error('Cada respuesta debe tener al menos 1 carácter')
-    return
-  }
-  erroresOpciones.value = []
-  guardarRespuestas(
-    result.data.map((o, i) => ({
-      idRespuesta: opciones.value[i]?.idRespuesta,
-      texto: o.texto,
-      correcta: o.correcta,
-    })),
-    props.respuestas?.map((r) => r.idRespuesta) ?? [],
-  )
 }
 
 function guardarTodoForm() {

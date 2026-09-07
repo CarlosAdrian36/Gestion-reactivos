@@ -1,6 +1,6 @@
 import { globalIgnores } from 'eslint/config'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import pluginVue, { rules } from 'eslint-plugin-vue'
+import pluginVue from 'eslint-plugin-vue'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import skipFormatting from 'eslint-config-prettier/flat'
 
@@ -14,11 +14,6 @@ export default defineConfigWithVueTs(
     name: 'app/files-to-lint',
     files: ['**/*.{vue,ts,mts,tsx}'],
   },
-  {
-    rules: {
-      'vue/multi-word-component-names': 'off',
-    },
-  },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
@@ -28,4 +23,11 @@ export default defineConfigWithVueTs(
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,
+
+  {
+    name: 'app/rules',
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
 )

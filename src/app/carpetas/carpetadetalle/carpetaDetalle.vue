@@ -371,7 +371,7 @@ const moveRaiz = async (C: string, B: string) => {
         queryKey: ['items-unificados'],
       })
     }
-  } catch (error) {
+  } catch {
     toast.error('Algo salio mal')
   }
 }
@@ -396,7 +396,7 @@ const moverCarpetaACarpeta = async (carpetaId: string, bancoId: string, destino:
         queryKey: ['items-unificados'],
       })
     }
-  } catch (error) {
+  } catch {
     toast.error('Algo salio mal')
   }
 }

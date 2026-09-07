@@ -6,7 +6,7 @@ export const getRolesAction = async (): Promise<Rol[]> => {
     const { data } = await apiClient.get<RolesResponse>('/roles')
     console.log(data)
     return data.roles
-  } catch (error) {
+  } catch {
     throw new Error('Error')
   }
 }

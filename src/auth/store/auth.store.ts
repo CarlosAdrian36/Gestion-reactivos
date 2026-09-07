@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', () => {
       await loadUserProfile()
 
       return { ok: true }
-    } catch (error) {
+    } catch {
       clearSession()
       return { ok: false, message: 'Error al conectar con el servidor' }
     }
@@ -68,7 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
       await loadUserProfile()
 
       return true
-    } catch (error) {
+    } catch {
       clearSession()
       return false
     }

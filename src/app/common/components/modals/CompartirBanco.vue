@@ -295,7 +295,7 @@ async function compartir() {
   }
 
   try {
-    const { compartido } = await crearCompartidoAction(
+    await crearCompartidoAction(
       props.banco.idBanco,
       usuarioSeleccionado.value.idCuenta,
       {

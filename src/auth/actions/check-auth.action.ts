@@ -1,14 +1,5 @@
 import { apiClient } from '@/api/http'
-import type { validate } from '../interface'
 import { isAxiosError } from 'axios'
-
-interface checkError {
-  ok: false
-}
-
-interface checkSuccess {
-  ok: true
-}
 
 export const checkAuthAction = async (): Promise<boolean> => {
   try {

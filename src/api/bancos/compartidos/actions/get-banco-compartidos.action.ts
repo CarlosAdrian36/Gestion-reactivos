@@ -4,11 +4,7 @@ import type { ListaPersonasCompartidas } from '../interface/listaPersonasCompart
 export const getListaPersonasCompartidas = async (
   bancoId: string,
 ): Promise<ListaPersonasCompartidas> => {
-  try {
-    const { data } = await apiClient.get<ListaPersonasCompartidas>(`/bancos/${bancoId}/compartidos`)
-    console.log(data)
-    return data
-  } catch (error) {
-    throw error
-  }
+  const { data } = await apiClient.get<ListaPersonasCompartidas>(`/bancos/${bancoId}/compartidos`)
+  console.log(data)
+  return data
 }

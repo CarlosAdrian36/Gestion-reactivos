@@ -1,62 +1,11 @@
 <script lang="ts" setup>
-import { useModalStore } from '@/common/modals/store/modal.store.ts'
 import { useSidebarStore } from '../store/ui/sidebarStore'
-import CerrarSesion from './modals/cerrarSesion.vue'
 import { useAuthStore } from '@/auth/store/auth.store.ts'
 
 import 'slot-text/style.css'
-import { SlotText } from 'slot-text/vue'
-
-import { computed, ref } from 'vue'
 
 const sidebar = useSidebarStore()
-const modal = useModalStore()
 const authStore = useAuthStore()
-function cerrarSesion() {
-  modal.openModal(CerrarSesion, {}, [
-    { label: 'Cerrar', variant: 'outline' },
-    {
-      label: 'Salir',
-      variant: 'error',
-      action: () => {
-        modal.closeModal()
-        authStore.logout()
-      },
-    },
-  ])
-}
-
-import { toast } from 'vue-sonner'
-
-const copied = ref(false)
-
-const copyToken = async () => {
-  if (!authStore.token) return
-
-  try {
-    await navigator.clipboard.writeText(authStore.token)
-
-    copied.value = true
-
-    setTimeout(() => {
-      copied.value = false
-    }, 3000)
-  } catch {
-    toast.error('No se pudo copiar el token')
-  }
-}
-
-const displayedToken = computed(() => {
-  if (!authStore.token) return ''
-
-  const maxLength = 35
-
-  if (authStore.token.length <= maxLength) {
-    return authStore.token
-  }
-
-  return authStore.token.slice(0, maxLength) + '...'
-})
 </script>
 
 <template>

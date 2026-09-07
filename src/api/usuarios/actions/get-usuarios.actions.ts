@@ -6,7 +6,7 @@ export const getUsuariosAction = async (): Promise<Cuenta[]> => {
     const { data } = await apiClient.get<Usuario>('/cuentas')
     console.log(data)
     return data.cuentas
-  } catch (error) {
+  } catch {
     throw new Error('Error')
   }
 }

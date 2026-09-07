@@ -74,12 +74,6 @@ function irAEditar() {
   router.push({ name: 'editarReactivo', params: { id: bancoId } })
 }
 
-const idiomas: Record<number, string> = {
-  1: 'Original (EN)',
-  2: 'v1: Es-MX',
-  3: 'v2: Fr-CA',
-}
-
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('es-MX', {
     year: 'numeric',

@@ -101,7 +101,7 @@
                   </p>
 
                   <div class="flex items-center gap-2 mt-5">
-                    <button class="btn bg-white" @click="">
+                    <button class="btn bg-white" @click="NuevoUsuario()">
                       <i class="fa-regular fa-user"></i>
                       Nuevo Usuario
                     </button>

@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { establecerContrasena } from '../actions/establecercontrasena.action'
 import { toast } from 'vue-sonner'
+import { isAxiosError } from 'axios'
 
 const isSubmitting = ref(false)
 const showPassword = ref(false)
@@ -54,8 +55,9 @@ const onSubmit = handleSubmit(async (values) => {
     setTimeout(() => {
       router.replace('/auth/login')
     }, 1500)
-  } catch (error: any) {
-    toast.error(error.response?.data?.detail ?? 'Ocurrió un error al establecer la contraseña')
+  } catch (error) {
+    const detail = isAxiosError(error) ? error.response?.data?.detail : undefined
+    toast.error(detail ?? 'Ocurrió un error al establecer la contraseña')
   } finally {
     isSubmitting.value = false
   }

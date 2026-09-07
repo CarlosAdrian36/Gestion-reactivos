@@ -61,7 +61,7 @@ const carpetaSchema = z.object({
 })
 
 // Formulario
-const { handleSubmit, errors, defineField, setFieldError, isSubmitting } = useForm({
+const { handleSubmit, errors, defineField, setFieldError } = useForm({
   validationSchema: toTypedSchema(carpetaSchema),
   initialValues: {
     nombre: props.carpeta?.nombre ?? '',

@@ -8,9 +8,7 @@ export const crearReactivoAction = async (
 ): Promise<CrearReactivoResponse> => {
   try {
     const payload = { ...body }
-    if (payload.idGrupo != null && payload.idGrupo > 0) {
-      payload.idGrupo = payload.idGrupo
-    } else {
+    if (payload.idGrupo == null || payload.idGrupo <= 0) {
       delete payload.idGrupo
     }
     const { data } = await apiClient.post<CrearReactivoResponse>(

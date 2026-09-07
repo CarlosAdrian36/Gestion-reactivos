@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSidebarStore } from '../store/ui/sidebarStore'
@@ -25,6 +25,11 @@ const isCompartidosActive = computed(() => {
 const isUsuariosActive = computed(() => {
   const path = route.path
   return path.startsWith('/usuarios') || path.startsWith('/Usuarios')
+})
+
+const isProyectosActive = computed(() => {
+  const path = route.path
+  return path.startsWith('/Proyectos')
 })
 
 function cerrarSesion() {
@@ -167,7 +172,7 @@ watch(temaOscuro, (val) => {
                   sidebar.isOpen
                     ? 'gap-3 px-3 py-2.5 text-sm'
                     : 'gap-0 p-2.5 justify-center text-xl',
-                  isUsuariosActive
+                  isProyectosActive
                     ? 'bg-primary/5 border-primary/20 text-primary'
                     : 'border-transparent text-(--color-texto) hover:bg-base-200',
                 ]"

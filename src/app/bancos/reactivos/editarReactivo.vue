@@ -23,10 +23,6 @@ const { data: respuestas, isLoading: cargandoRespuestas } = useRespuestas(
 
 const tipoReactivoId = computed(() => selectedReactivo.value?.tipoReactivoId)
 
-function volver() {
-  router.push({ name: 'reactivosList', params: { id: bancoId } })
-}
-
 onMounted(() => {
   if (!selectedReactivo.value) {
     router.replace({ name: 'reactivosList', params: { id: bancoId } })

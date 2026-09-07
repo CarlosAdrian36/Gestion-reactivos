@@ -237,7 +237,7 @@ const usuarioSchema = z
     },
   )
 
-const { handleSubmit, errors, defineField, isSubmitting } = useForm({
+const { handleSubmit, errors, defineField } = useForm({
   validationSchema: toTypedSchema(usuarioSchema),
 
   initialValues: {
@@ -260,16 +260,10 @@ const [nombre, nombreAttrs] = defineField('nombre')
 const [apellidoPaterno, apellidoPaternoAttrs] = defineField('apellidoPaterno')
 const [apellidoMaterno, apellidoMaternoAttrs] = defineField('apellidoMaterno')
 // const [tieneCaducidadAttrs] = defineField('tieneCaducidad')
-const [curp, curpAttrs] = defineField('curp')
 const [fechaExpiracion, fechaExpiracionAttrs] = defineField('fechaExpiracion')
-const [vigencia, vigenciaAttrs] = defineField('vigencia')
+const [vigencia] = defineField('vigencia')
 
-const {
-  data: roles,
-  isLoading,
-  error,
-  isError,
-} = useQuery({
+const { data: roles } = useQuery({
   queryKey: ['roles'],
   queryFn: () => getRolesAction(),
   staleTime: 1000 * 60, // 1 minutes

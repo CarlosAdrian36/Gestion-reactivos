@@ -18,6 +18,8 @@ apiClient.interceptors.request.use((config) => {
       console.log('[Interceptor Token]', token ? token.substring(0, 20) + '...' : 'VACÍO')
     }
   }
+  config.headers['Cache-Control'] = 'no-store'
+  config.headers['Pragma'] = 'no-cache'
   return config
 })
 

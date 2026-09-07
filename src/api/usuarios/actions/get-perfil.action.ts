@@ -7,7 +7,7 @@ export const getPerfilAction = async (): Promise<Cuenta> => {
     const { data } = await apiClient.get<PerfilResponse>('/perfil')
     console.log('Perfil data:', data) // Log the response data for debugging
     return data.cuenta
-  } catch (error) {
+  } catch {
     throw new Error('Error al obtener el perfil')
   }
 }
