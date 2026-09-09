@@ -98,6 +98,8 @@ const router = useRouter()
 const { data, isLoading } = useQuery({
   queryKey: ['Compartidos'],
   queryFn: () => getBancosCompartidosAction(),
+  staleTime: 1000 * 60,
+  refetchOnWindowFocus: true,
 })
 
 const columnas: DataTableColumns<Banco> = [

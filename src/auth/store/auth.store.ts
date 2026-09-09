@@ -33,7 +33,8 @@ export const useAuthStore = defineStore('auth', () => {
     return remainingSeconds.value % 60
   })
 
-  console.log('1', authStatus.value)
+  let authCheckPromise: Promise<boolean> | null = null
+  let isLoggingOut = false
 
   const login = async (data: LoginCredentials): Promise<{ ok: boolean; message?: string }> => {
     authStatus.value = AuthStatus.Checking
@@ -56,22 +57,30 @@ export const useAuthStore = defineStore('auth', () => {
       return { ok: false, message: 'Error al conectar con el servidor' }
     }
   }
-  const checkAuthStatus = async (): Promise<boolean> => {
+  const checkAuthStatus = (): Promise<boolean> => {
+    if (authCheckPromise) return authCheckPromise
+
     authStatus.value = AuthStatus.Checking
-    try {
-      const statusResp = await checkAuthAction()
-      if (!statusResp) {
+    authCheckPromise = (async () => {
+      try {
+        const esValida = await checkAuthAction()
+        if (!esValida) {
+          clearSession()
+          return false
+        }
+        authStatus.value = AuthStatus.Authenticated
+        loadUserProfile()
+
+        return true
+      } catch {
         clearSession()
         return false
+      } finally {
+        authCheckPromise = null
       }
-      authStatus.value = AuthStatus.Authenticated
-      await loadUserProfile()
+    })()
 
-      return true
-    } catch {
-      clearSession()
-      return false
-    }
+    return authCheckPromise
   }
 
   const loadUserProfile = async () => {
@@ -84,12 +93,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    console.error('logout Ejecutado')
-
     try {
       if (token.value) {
         const logoutResp = await logoutApi()
-        console.warn('logoutResp', logoutResp)
         if (logoutResp === false) {
           return false
         }
@@ -114,10 +120,15 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
   }
   watch(remainingSeconds, async (value) => {
-    if (value <= 0 && token.value) {
-      const result = await logout()
-      if (!result) {
-        clearSession()
+    if (value <= 0 && token.value && !isLoggingOut) {
+      isLoggingOut = true
+      try {
+        const result = await logout()
+        if (!result) {
+          clearSession()
+        }
+      } finally {
+        isLoggingOut = false
       }
     }
   })

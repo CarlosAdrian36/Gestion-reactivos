@@ -11,5 +11,7 @@ export function useRespuestas(
     queryKey: ['respuestas', bancoId, reactivoId],
     queryFn: () => getRespuestasAction(bancoId, reactivoId.value!),
     enabled: computed(() => !!reactivoId.value),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: true,
   })
 }

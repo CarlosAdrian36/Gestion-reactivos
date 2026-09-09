@@ -14,7 +14,6 @@ export const checkAuthAction = async (): Promise<boolean> => {
     }
     return true
   } catch (error) {
-    console.log('en el checkauterror', error)
     if (isAxiosError(error) && error.response?.status === 401) {
       return false
     }

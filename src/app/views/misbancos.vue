@@ -8,8 +8,6 @@ import { toast } from 'vue-sonner'
 import { getItemsUnificadosAction } from '@/app/unifiacados/actions/get-items-unificados.actions'
 import { moveBancoCarpeta } from '@/api/carpetas/actions/move-riaz-carpeta.action.ts'
 
-import { useCarpetas } from '@/api/carpetas/composable/useCarpetas.ts'
-
 import CrearCarpeta from '../common/components/modals/crearCarpeta.vue'
 import eliminarCarpeta from '../common/components/modals/eliminarCarpeta.vue'
 import NuevoBanco from '../common/components/modals/nuevoBanco.vue'
@@ -31,8 +29,6 @@ const { data, isLoading } = useQuery({
   refetchOnWindowFocus: true, // refetch al volver a la pestaña
   refetchOnReconnect: true, // refetch al recuperar red
 })
-
-const { data: carpetas, isLoading: isLoadingCarpeta } = useCarpetas()
 
 const itemClass = (item: ItemUnificado) => {
   return item.tipo === 'banco' ? ' bg-primary/10' : 'bg-warning/10'
@@ -139,11 +135,16 @@ const irADetalle = (item: ItemUnificado) => {
 
 const busquedaCarpeta = ref('')
 
-const carpetasFiltradas = computed(() => {
-  if (!carpetas.value) return []
+const carpetasDisponibles = computed(() =>
+  (data.value ?? []).filter((item) => item.tipo === 'carpeta'),
+)
 
-  return carpetas.value.filter((carpeta) =>
-    carpeta.nombre.toLowerCase().includes(busquedaCarpeta.value.toLowerCase()),
+const carpetasFiltradas = computed(() => {
+  const busqueda = busquedaCarpeta.value.toLowerCase().trim()
+  if (!busqueda) return carpetasDisponibles.value
+
+  return carpetasDisponibles.value.filter((carpeta) =>
+    carpeta.nombre.toLowerCase().includes(busqueda),
   )
 })
 const queryClient = useQueryClient()
@@ -335,18 +336,15 @@ const moverBanco = async (carpetaId: string, bancoId: string) => {
                       class="input input-sm input-bordered w-full"
                     />
                   </li>
-                  <li v-if="isLoadingCarpeta">
-                    <div>Cargando carpetas...</div>
-                  </li>
                   <li
-                    v-else-if="carpetasFiltradas.length === 0"
+                    v-if="carpetasFiltradas.length === 0"
                     class="text-center text-base-content/60 py-2"
                   >
                     No se encontraron carpetas
                   </li>
-                  <li v-for="carpeta in carpetasFiltradas" :key="carpeta.idCarpeta">
+                  <li v-for="carpeta in carpetasFiltradas" :key="carpeta.id">
                     <a
-                      @click="moverBanco(carpeta.idCarpeta, row.id)"
+                      @click="moverBanco(carpeta.id, row.id)"
                       class="flex items-center justify-between"
                     >
                       <span class="truncate max-w-45" :title="carpeta.nombre">

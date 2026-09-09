@@ -15,6 +15,8 @@ export function useRespuestasGrupo(
         queryKey: ['respuestas', bancoId, id],
         queryFn: () => getRespuestasAction(bancoId, id),
         enabled: !!id,
+        staleTime: 1000 * 60,
+        refetchOnWindowFocus: true,
       })),
     ),
   })

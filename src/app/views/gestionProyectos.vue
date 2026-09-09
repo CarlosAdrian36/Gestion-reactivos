@@ -1,23 +1,22 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import { getBancosAction } from '@/api/bancos/actions/get-bancos.actions'
 import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import router from '@/router'
 import DataTable from '@/app/common/components/table/DataTable.vue'
 import type { DataTableColumns } from '@/app/common/components/table/features'
 
-const bancos = ref<Banco[]>([])
-const loading = ref(true)
-
-const proyectos = computed(() => bancos.value.filter((b) => b.esProyecto))
-
-onMounted(async () => {
-  try {
-    bancos.value = await getBancosAction()
-  } finally {
-    loading.value = false
-  }
+const { data: bancos, isLoading } = useQuery({
+  queryKey: ['bancos'],
+  queryFn: getBancosAction,
+  staleTime: 1000 * 60,
+  refetchOnMount: true,
+  refetchOnWindowFocus: true,
+  refetchOnReconnect: true,
 })
+
+const proyectos = computed(() => (bancos.value ?? []).filter((b) => b.esProyecto))
 
 const columnas: DataTableColumns<Banco> = [
   {
@@ -79,7 +78,7 @@ const goToItem = (item: Banco) => {
       </div>
     </div>
 
-    <DataTable :data="proyectos" :columns="columnas" :is-loading="loading" @row-click="goToItem">
+    <DataTable :data="proyectos" :columns="columnas" :is-loading="isLoading" @row-click="goToItem">
       <template #cell-tipo>
         <div
           class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-primary/10"

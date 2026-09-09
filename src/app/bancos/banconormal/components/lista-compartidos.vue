@@ -84,6 +84,8 @@ const props = defineProps<{
 const { data } = useQuery({
   queryKey: ['ListaPersonasCompartidas', props.banco.idBanco],
   queryFn: () => getListaPersonasCompartidas(props.banco.idBanco),
+  staleTime: 1000 * 60,
+  refetchOnWindowFocus: true,
 })
 
 import { useMutation, useQueryClient } from '@tanstack/vue-query'

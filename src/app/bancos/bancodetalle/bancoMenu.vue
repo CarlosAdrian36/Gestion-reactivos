@@ -105,6 +105,8 @@ const esOrigenCompartidos = computed(() => route.query.origen === 'compartidos')
 const { data, isLoading } = useQuery({
   queryKey: ['BancoById', bancoId],
   queryFn: () => getBancoById(bancoId),
+  staleTime: 1000 * 60,
+  refetchOnWindowFocus: true,
 })
 </script>
 

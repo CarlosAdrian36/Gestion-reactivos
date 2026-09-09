@@ -5,5 +5,7 @@ export function useInstruccionesGrupos(bancoId: string) {
   return useQuery({
     queryKey: ['instruccionesGrupos', bancoId],
     queryFn: () => getInstruccionesGruposAction(bancoId),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: true,
   })
 }

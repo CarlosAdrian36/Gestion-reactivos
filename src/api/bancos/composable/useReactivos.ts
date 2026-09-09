@@ -9,5 +9,7 @@ export function useReactivos(bancoId: string) {
       const { data } = await apiClient.get<{ reactivos: Reactivo[] }>(`/bancos/${bancoId}/reactivos`)
       return data.reactivos
     },
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: true,
   })
 }

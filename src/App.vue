@@ -6,7 +6,7 @@ import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 import BaseModal from './common/modals/BaseModal.vue'
 import { useAuthStore } from './auth/store/auth.store'
 import { AuthStatus } from './auth/interface/auth-status.enum'
-import { onMounted, watch } from 'vue'
+import { watch } from 'vue'
 import Fullscreenloaded from './app/common/components/fullscreenloaded.vue'
 
 const authStore = useAuthStore()
@@ -26,10 +26,6 @@ watch(
     }
   },
 )
-
-onMounted(() => {
-  authStore.checkAuthStatus()
-})
 </script>
 
 <template>

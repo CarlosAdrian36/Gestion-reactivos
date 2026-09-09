@@ -5,7 +5,5 @@ import type { ItemUnificado } from '../interface/item-unificado.interface'
 
 export const getItemsUnificadosAction = async (): Promise<ItemUnificado[]> => {
   const [bancos, carpetas] = await Promise.all([getBancosAction(), getCarpetasAction()])
-  console.log('bancos', bancos)
-  console.log('carpetas', carpetas)
   return [...bancos.map(mapBanco), ...carpetas.map(mapCarpeta)]
 }

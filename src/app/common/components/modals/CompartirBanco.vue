@@ -220,7 +220,7 @@ import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
 import { crearCompartidoAction } from '@/api/bancos/actions/crear-compartido.action'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { toast } from 'vue-sonner'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 const props = defineProps<{
   banco: Banco
@@ -230,15 +230,17 @@ const modal = useModalStore()
 
 const busqueda = ref('')
 const permiso = ref('lectura')
-const usuarios = ref<Cuenta[]>([])
+const { data: usuarios } = useQuery({
+  queryKey: ['usuarios'],
+  queryFn: getUsuariosAction,
+  staleTime: 1000 * 60,
+  refetchOnMount: true,
+  refetchOnWindowFocus: true,
+  refetchOnReconnect: true,
+})
 const usuarioSeleccionado = ref<Cuenta | null>(null)
 
-onMounted(async () => {
-  try {
-    usuarios.value = await getUsuariosAction()
-  } catch (error) {
-    console.error('Error al cargar usuarios:', error)
-  }
+onMounted(() => {
   modal.setSubmitFN(compartir)
 })
 
@@ -250,7 +252,7 @@ const resultados = computed(() => {
   const q = busqueda.value.toLowerCase().trim()
   if (!q) return []
 
-  const filtrados = usuarios.value.filter(
+  const filtrados = (usuarios.value ?? []).filter(
     (u) =>
       u.nombreUsuario.toLowerCase().includes(q) ||
       u.identidad.nombre.toLowerCase().includes(q) ||
