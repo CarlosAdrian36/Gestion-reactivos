@@ -66,7 +66,7 @@ const goToItem = (item: Banco) => {
         <h1 class="text-2xl font-bold">Gestión de Proyectos</h1>
 
         <p class="text-sm text-base-content/70">
-          Administra carpetas y bancos de reactivos con flujos de trabajo
+          Administra bancos de reactivos con flujos de trabajo
         </p>
       </div>
 
@@ -80,9 +80,7 @@ const goToItem = (item: Banco) => {
 
     <DataTable :data="proyectos" :columns="columnas" :is-loading="isLoading" @row-click="goToItem">
       <template #cell-tipo>
-        <div
-          class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-primary/10"
-        >
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-primary/10">
           <i class="fa-regular fa-file-lines text-primary text-lg"></i>
         </div>
       </template>
@@ -170,16 +168,14 @@ const goToItem = (item: Banco) => {
 
       <template #empty>
         <div class="flex flex-col items-center py-16">
-          <div
-            class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-4"
-          >
-            <i class="fa-regular fa-folder-open text-4xl text-base-content/40"></i>
+          <div class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-4">
+            <i class="fa-regular fa-file-lines text-4xl text-base-content/40"></i>
           </div>
 
           <h2 class="text-lg font-bold">No hay elementos</h2>
 
           <p class="text-sm text-base-content/60 mt-1">
-            Puedes crear una carpeta o banco para comenzar
+            Puedes crear un banco de reactivos con flujo de trabajo para comenzar
           </p>
 
           <button class="btn btn-primary mt-5">
