@@ -107,6 +107,21 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
   }
+  const hasActiveSession = (): boolean => {
+    return !!token.value && expiracion.value > Date.now()
+  }
+
+  const getRemainingTime = (): string => {
+    const diff = Math.floor((expiracion.value - Date.now()) / 1000)
+    if (diff <= 0) return '0 segundos'
+    const mins = Math.floor(diff / 60)
+    const secs = diff % 60
+    if (mins > 0) {
+      return `${mins} minuto${mins !== 1 ? 's' : ''} y ${secs} segundo${secs !== 1 ? 's' : ''}`
+    }
+    return `${secs} segundo${secs !== 1 ? 's' : ''}`
+  }
+
   const clearSession = () => {
     modal.isOpen = false
     modal.closeModal()
@@ -157,5 +172,7 @@ export const useAuthStore = defineStore('auth', () => {
     checkAuthStatus,
     loadUserProfile,
     clearSession,
+    hasActiveSession,
+    getRemainingTime,
   }
 })

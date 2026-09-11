@@ -32,6 +32,12 @@ const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
 
 const onSubmit = handleSubmit(async () => {
+  if (authStore.hasActiveSession()) {
+    const tiempo = authStore.getRemainingTime()
+    toast.warning(`Ya tienes una sesión activa. Espera ${tiempo} para que expire.`)
+    return
+  }
+
   const result = await authStore.login({
     nombreUsuario: usuario.value,
     password: contrasena.value,
