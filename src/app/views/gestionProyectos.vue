@@ -6,6 +6,8 @@ import router from '@/router'
 import DataTable from '@/app/common/components/table/DataTable.vue'
 import type { DataTableColumns } from '@/app/common/components/table/features'
 import WorkflowStepper from '@/app/common/components/WorkflowStepper.vue'
+import banderaUs from '@/assets/banderas/us.png'
+import banderaFr from '@/assets/banderas/fr.png'
 
 const { data: proyectos, isLoading } = useQuery({
   queryKey: ['proyectos'],
@@ -28,8 +30,17 @@ const columnas: DataTableColumns<BancoProyecto> = [
     meta: { thClass: 'min-w-62.5', tdClass: 'align-middle' },
   },
   {
+    id: 'idiomas',
+    accessorFn: (p) => p.idiomas.filter((i) => i.idiomaId !== 1).length,
+    header: 'Idiomas',
+    meta: { thClass: 'w-32 text-center', tdClass: 'text-center align-middle' },
+  },
+  {
     id: 'flujo',
-    accessorFn: (p) => `${p.fase.nombre}-${p.estado.nombre}`,
+    accessorFn: (p) => {
+      const faseActual = p.fases.find((f) => f.estado === 'En proceso')
+      return faseActual ? `${faseActual.nombre}-${p.estado.nombre}` : p.estado.nombre
+    },
     header: 'Flujo de trabajo',
     meta: { thClass: 'w-80 text-center', tdClass: 'text-center align-middle' },
   },
@@ -51,20 +62,14 @@ const goToItem = (item: BancoProyecto) => {
   router.push({ name: 'bancoDetalle', params: { id: item.idBanco } })
 }
 
-function getStepIndex(fase: string): number {
-  switch (fase) {
-    case 'Construccion':
-      return 0
-    case 'Revision':
-      return 1
-    case 'Traduccion':
-      return 2
-    case 'Revision traduccion':
-      return 3
-    case 'Finalizado':
-      return 4
+function getBandera(idiomaId: number): string {
+  switch (idiomaId) {
+    case 2:
+      return banderaUs
+    case 3:
+      return banderaFr
     default:
-      return 0
+      return ''
   }
 }
 </script>
@@ -102,13 +107,22 @@ function getStepIndex(fase: string): number {
         </div>
       </template>
 
+      <template #cell-idiomas="{ row }">
+        <div class="flex justify-center gap-1">
+          <img
+            v-for="idioma in row.idiomas.filter((i) => i.idiomaId !== 1)"
+            :key="idioma.idiomaId"
+            :src="getBandera(idioma.idiomaId)"
+            :alt="idioma.descripcion"
+            class="w-6 h-4 object-contain"
+            :title="idioma.descripcion"
+          />
+          <span v-if="row.idiomas.filter((i) => i.idiomaId !== 1).length === 0" class="text-base-content/40 text-sm">-</span>
+        </div>
+      </template>
+
       <template #cell-flujo="{ row }">
-        <WorkflowStepper
-          :current-step-index="getStepIndex(row.fase.nombre)"
-          :current-label="row.fase.nombre"
-          :current-status="row.estado.nombre"
-          :completed="row.fase.nombre === 'Finalizado' && row.estado.nombre === 'Completada'"
-        />
+        <WorkflowStepper :fases="row.fases" :estado="row.estado" />
       </template>
 
       <template #cell-fechaModificacion="{ row }">

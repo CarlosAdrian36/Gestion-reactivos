@@ -1,35 +1,46 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
+import type { Fase, Estado } from '@/api/proyectos/interfaces/proyecto.interface'
 
 interface Props {
-  currentStepIndex: number
-  currentLabel: string
-  currentStatus: string
-  completed?: boolean
+  fases: Fase[]
+  estado: Estado
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  completed: false,
-})
+const props = defineProps<Props>()
 
-const STEPS = [
-  { id: 'construccion', label: 'Construccion', icon: 'fa-regular fa-helmet-safety' },
-  { id: 'revision', label: 'Revision', icon: ' fa-regular fa-magnifying-glass' },
-  { id: 'traduccion', label: 'Traduccion', icon: 'fa-regular fa-messages' },
-  { id: 'rev_traduccion', label: 'Revision traduccion', icon: 'fa-regular fa-message-slash' },
-  { id: 'finalizado', label: 'Finalizado', icon: ' fa-regular fa-flag' },
+const STEPS_CONFIG = [
+  { nombre: 'Construccion', icon: 'fa-solid fa-helmet-safety' },
+  { nombre: 'Revision', icon: 'fa-solid fa-magnifying-glass' },
+  { nombre: 'Traduccion', icon: 'fa-solid fa-language' },
+  { nombre: 'Revision traduccion', icon: 'fa-solid fa-comments' },
+  { nombre: 'Finalizado', icon: 'fa-solid fa-flag' },
 ]
 
+const isFinalizado = computed(() => props.estado.nombre === 'Completada')
+
 const progressWidth = computed(() => {
-  if (props.completed) return '85%'
-  return `${(props.currentStepIndex / 4) * 85}%`
+  if (isFinalizado.value) return '85%'
+  const lastIndex = props.fases.length - 1
+  const currentIdx = props.fases.findIndex((f) => f.estado === 'En proceso')
+  if (currentIdx === -1) return '0%'
+  return `${(currentIdx / lastIndex) * 85}%`
 })
 
-function getStepState(idx: number): 'completed' | 'in_progress' | 'pending' {
-  if (props.completed) return 'completed'
-  if (idx < props.currentStepIndex) return 'completed'
-  if (idx === props.currentStepIndex) return 'in_progress'
+function getStepState(fase: Fase): 'completed' | 'in_progress' | 'pending' {
+  if (isFinalizado.value) return 'completed'
+  if (fase.estado === 'Completada') return 'completed'
+  if (fase.estado === 'En proceso') return 'in_progress'
   return 'pending'
+}
+
+function getStepIcon(stepNombre: string): string {
+  const config = STEPS_CONFIG.find((s) => s.nombre === stepNombre)
+  return config?.icon || ''
+}
+
+function getStepLabel(fase: Fase): string {
+  return `${fase.nombre} (${fase.estado})`
 }
 </script>
 
@@ -43,39 +54,40 @@ function getStepState(idx: number): 'completed' | 'in_progress' | 'pending' {
       />
 
       <div
-        v-for="(step, idx) in STEPS"
-        :key="step.id"
+        v-for="(fase, idx) in fases"
+        :key="idx"
         class="relative z-10 flex items-center justify-center"
-        :title="step.label"
+        :title="getStepLabel(fase)"
       >
         <div
-          v-if="getStepState(idx) === 'completed'"
+          v-if="getStepState(fase) === 'completed'"
           class="flex items-center justify-center text-white rounded-full w-7 h-7 bg-emerald-500 border-2 border-emerald-500 shadow-sm"
         >
-          <i :class="step.icon" class="text-xs"></i>
+          <i :class="getStepIcon(fase.nombre)" class="text-xs"></i>
         </div>
 
         <div
-          v-else-if="getStepState(idx) === 'in_progress'"
+          v-else-if="getStepState(fase) === 'in_progress'"
           class="flex items-center justify-center bg-white border-2 rounded-full w-7 h-7 border-blue-600 shadow-sm"
         >
-          <i :class="step.icon" class="text-xs text-blue-600"></i>
+          <i :class="getStepIcon(fase.nombre)" class="text-xs text-blue-600"></i>
         </div>
 
         <div
           v-else
           class="flex items-center justify-center bg-white border-2 rounded-full w-7 h-7 border-slate-300 shadow-sm"
         >
-          <i :class="step.icon" class="text-xs text-slate-400"></i>
+          <i :class="getStepIcon(fase.nombre)" class="text-xs text-slate-400"></i>
         </div>
       </div>
     </div>
 
     <span
       class="mt-1 text-xs font-semibold"
-      :class="completed ? 'text-emerald-600' : 'text-blue-600'"
+      :class="isFinalizado ? 'text-emerald-600' : 'text-blue-600'"
     >
-      {{ currentLabel }} ({{ currentStatus }})
+      {{ fases.find((f) => f.estado === 'En proceso')?.nombre || fases[fases.length - 1]?.nombre }}
+      ({{ estado.nombre }})
     </span>
   </div>
 </template>

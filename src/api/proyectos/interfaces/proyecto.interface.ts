@@ -6,8 +6,9 @@ export interface Estado {
 }
 
 export interface Fase {
-  idFase: number
   nombre: 'Construccion' | 'Revision' | 'Traduccion' | 'Revision traduccion' | 'Finalizado'
+  estado: 'Pendiente' | 'En proceso' | 'Completada'
+  funcion: 'Elaborador' | 'Revisor' | 'Traductor' | 'Revisor de traduccion' | null
 }
 
 export interface BancoProyecto {
@@ -21,10 +22,11 @@ export interface BancoProyecto {
   idiomas: Idioma[]
   esProyecto: boolean
   fechaEntrega: string
-  tipoElementoId: number
+  tipoElementoId: 2
   estado: Estado
-  fase: Fase
-  notificaciones: number
+  funciones: string[]
+  fases: Fase[]
+  notificaciones: boolean
 }
 
 export interface ProyectosResponse {
