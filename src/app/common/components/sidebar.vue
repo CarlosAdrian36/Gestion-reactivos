@@ -192,7 +192,7 @@ watch(temaOscuro, (val) => {
       <div v-if="authStore.user" class="mt-auto px-3 pb-3 w-full space-y-0.5">
         <template v-if="sidebar.isOpen">
           <button
-            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-(--color-texto) hover:bg-base-200"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-(--color-texto) hover:bg-base-200 hover:cursor-pointer"
             @click="temaOscuro = !temaOscuro"
           >
             <i class="fa-solid fa-circle-half-stroke text-xl"></i>
@@ -200,7 +200,7 @@ watch(temaOscuro, (val) => {
           </button>
           <button
             @click="cerrarSesion()"
-            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-error hover:bg-error/10"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-error hover:bg-error/10 hover:cursor-pointer"
           >
             <i class="fa-regular fa-right-from-bracket text-xl"></i>
             <span>Cerrar sesión</span>
