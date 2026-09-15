@@ -6,8 +6,19 @@ import router from '@/router'
 import DataTable from '@/app/common/components/table/DataTable.vue'
 import type { DataTableColumns } from '@/app/common/components/table/features'
 import WorkflowStepper from '@/app/common/components/WorkflowStepper.vue'
+import NuevoProyecto from '@/app/common/components/modals/nuevoProyecto.vue'
+import { useModalStore } from '@/common/modals/store/modal.store'
 import banderaUs from '@/assets/banderas/us.png'
 import banderaFr from '@/assets/banderas/fr.png'
+
+const modal = useModalStore()
+
+function abrirModalProyecto() {
+  modal.openModal(NuevoProyecto, {}, [
+    { label: 'Cerrar', variant: 'outline' },
+    { label: 'Guardar', variant: 'primary', type: 'submit' },
+  ])
+}
 
 const { data: proyectos, isLoading } = useQuery({
   queryKey: ['proyectos'],
@@ -45,13 +56,6 @@ const columnas: DataTableColumns<BancoProyecto> = [
     meta: { thClass: 'w-80 text-center', tdClass: 'text-center align-middle' },
   },
   {
-    accessorKey: 'fechaModificacion',
-    header: 'Ultima modificacion',
-    sortFn: 'datetime',
-    sortDescFirst: true,
-    meta: { thClass: 'w-44 text-center', tdClass: 'text-center align-middle' },
-  },
-  {
     id: 'acciones',
     header: 'Acciones',
     meta: { thClass: 'w-24 text-center', tdClass: 'text-center align-middle overflow-visible' },
@@ -84,7 +88,7 @@ function getBandera(idiomaId: number): string {
         </p>
       </div>
       <div class="flex items-center gap-2">
-        <button class="btn btn-primary">
+        <button class="btn btn-primary" @click="abrirModalProyecto">
           <i class="fa-regular fa-plus"></i>
           Crear
         </button>
@@ -125,12 +129,6 @@ function getBandera(idiomaId: number): string {
         <WorkflowStepper :fases="row.fases" :estado="row.estado" :funciones="row.funciones" />
       </template>
 
-      <template #cell-fechaModificacion="{ row }">
-        <span class="text-sm">
-          {{ new Date(row.fechaModificacion).toLocaleDateString('es-ES', { dateStyle: 'medium' }) }}
-        </span>
-      </template>
-
       <template #cell-acciones>
         <div class="dropdown dropdown-end dropdown-left">
           <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
@@ -159,7 +157,7 @@ function getBandera(idiomaId: number): string {
           <p class="text-sm text-base-content/60 mt-1">
             Puedes crear un banco de reactivos con flujo de trabajo para comenzar
           </p>
-          <button class="btn btn-primary mt-5">
+          <button class="btn btn-primary mt-5" @click="abrirModalProyecto">
             <i class="fa-regular fa-plus"></i>
             Crear proyecto
           </button>
