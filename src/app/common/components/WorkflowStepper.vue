@@ -5,7 +5,6 @@ import type { Fase, Estado } from '@/api/proyectos/interfaces/proyecto.interface
 interface Props {
   fases: Fase[]
   estado: Estado
-  funciones: string[]
 }
 
 const props = defineProps<Props>()
@@ -40,12 +39,7 @@ function getStepIcon(stepNombre: string): string {
   return config?.icon || ''
 }
 
-function esMiFuncion(fase: Fase): boolean {
-  return fase.funcion != null && props.funciones.includes(fase.funcion)
-}
-
 function getStepLabel(fase: Fase): string {
-  if (esMiFuncion(fase)) return `Tu función: ${fase.funcion} (${fase.estado})`
   return `${fase.nombre} (${fase.estado})`
 }
 </script>
@@ -67,24 +61,21 @@ function getStepLabel(fase: Fase): string {
       >
         <div
           v-if="getStepState(fase) === 'completed'"
-          class="flex items-center justify-center text-white rounded-full bg-emerald-500 border-2 border-emerald-500 shadow-sm"
-          :class="esMiFuncion(fase) ? 'w-9 h-9 ring-2 ring-amber-400 ring-offset-1' : 'w-7 h-7'"
+          class="flex items-center justify-center text-white rounded-full w-7 h-7 bg-emerald-500 border-2 border-emerald-500 shadow-sm"
         >
           <i :class="getStepIcon(fase.nombre)" class="text-xs"></i>
         </div>
 
         <div
           v-else-if="getStepState(fase) === 'in_progress'"
-          class="flex items-center justify-center bg-white border-2 rounded-full border-blue-600 shadow-sm"
-          :class="esMiFuncion(fase) ? 'w-9 h-9 ring-2 ring-amber-400 ring-offset-1' : 'w-7 h-7'"
+          class="flex items-center justify-center bg-white border-2 rounded-full w-7 h-7 border-blue-600 shadow-sm"
         >
           <i :class="getStepIcon(fase.nombre)" class="text-xs text-blue-600"></i>
         </div>
 
         <div
           v-else
-          class="flex items-center justify-center bg-white border-2 rounded-full border-slate-300 shadow-sm"
-          :class="esMiFuncion(fase) ? 'w-9 h-9 ring-2 ring-amber-400 ring-offset-1' : 'w-7 h-7'"
+          class="flex items-center justify-center bg-white border-2 rounded-full w-7 h-7 border-slate-300 shadow-sm"
         >
           <i :class="getStepIcon(fase.nombre)" class="text-xs text-slate-400"></i>
         </div>

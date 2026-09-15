@@ -126,7 +126,7 @@ function getBandera(idiomaId: number): string {
       </template>
 
       <template #cell-flujo="{ row }">
-        <WorkflowStepper :fases="row.fases" :estado="row.estado" :funciones="row.funciones" />
+        <WorkflowStepper :fases="row.fases" :estado="row.estado" />
       </template>
 
       <template #cell-acciones>
