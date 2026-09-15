@@ -122,7 +122,7 @@ function getBandera(idiomaId: number): string {
       </template>
 
       <template #cell-flujo="{ row }">
-        <WorkflowStepper :fases="row.fases" :estado="row.estado" />
+        <WorkflowStepper :fases="row.fases" :estado="row.estado" :funciones="row.funciones" />
       </template>
 
       <template #cell-fechaModificacion="{ row }">
