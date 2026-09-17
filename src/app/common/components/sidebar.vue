@@ -12,25 +12,13 @@ const sidebar = useSidebarStore()
 const authStore = useAuthStore()
 const modal = useModalStore()
 
-const isBancosActive = computed(() => {
-  const path = route.path
-  return path.startsWith('/mis-bancos') || path.startsWith('/banco')
-})
+const isBancosActive = computed(() => route.path.startsWith('/mis-bancos'))
 
-const isCompartidosActive = computed(() => {
-  const path = route.path
-  return path.startsWith('/compartidos') || path.startsWith('/Compartidos')
-})
+const isCompartidosActive = computed(() => route.path.startsWith('/compartidos'))
 
-const isUsuariosActive = computed(() => {
-  const path = route.path
-  return path.startsWith('/usuarios') || path.startsWith('/Usuarios')
-})
+const isUsuariosActive = computed(() => route.path.startsWith('/usuarios'))
 
-const isProyectosActive = computed(() => {
-  const path = route.path
-  return path.startsWith('/Proyectos')
-})
+const isProyectosActive = computed(() => route.path.startsWith('/proyectos'))
 
 function cerrarSesion() {
   modal.openModal(CerrarSesion, {}, [

@@ -23,27 +23,27 @@ const router = createRouter({
         },
         ...bancoRoutes,
         {
-          path: 'Proyectos',
+          path: 'proyectos',
           name: 'proyectos',
           component: () => import('@/app/views/gestionProyectos.vue'),
         },
         {
-          path: 'Compartidos',
+          path: 'compartidos',
           name: 'compartidos',
           component: () => import('@/app/views/compartidos.vue'),
         },
         {
-          path: 'Usuarios',
+          path: 'usuarios',
           name: 'usuarios',
           component: () => import('@/app/views/usuarios.vue'),
         },
         {
-          path: 'Recursos',
+          path: 'recursos',
           name: 'recursos',
           component: () => import('@/app/views/recursos.vue'),
         },
         {
-          path: 'Perfil',
+          path: 'perfil',
           name: 'perfil',
           component: () => import('@/app/views/perfil.vue'),
         },
