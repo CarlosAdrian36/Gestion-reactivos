@@ -42,7 +42,7 @@ const columnas: DataTableColumns<BancoProyecto> = [
   },
   {
     id: 'idiomas',
-    accessorFn: (p) => p.idiomas.filter((i) => i.idiomaId !== 1).length,
+    accessorFn: (p) => p.idiomas.filter((i) => i.etiqueta !== 'es_MX').length,
     header: 'Idiomas',
     meta: { thClass: 'w-32 text-center', tdClass: 'text-center align-middle' },
   },
@@ -63,14 +63,14 @@ const columnas: DataTableColumns<BancoProyecto> = [
 ]
 
 const goToItem = (item: BancoProyecto) => {
-  router.push({ name: 'bancoDetalle', params: { id: item.idBanco } })
+  router.push({ name: 'bancoDetalle', params: { id: item.idProyecto } })
 }
 
-function getBandera(idiomaId: number): string {
-  switch (idiomaId) {
-    case 2:
+function getBandera(etiqueta: string): string {
+  switch (etiqueta) {
+    case 'en_US':
       return banderaUs
-    case 3:
+    case 'fr_FR':
       return banderaFr
     default:
       return ''
@@ -79,7 +79,7 @@ function getBandera(idiomaId: number): string {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4">
+  <div class="max-w-7xl mx-auto">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
       <div>
         <h1 class="text-2xl font-bold">Gestion de Proyectos</h1>
@@ -114,14 +114,18 @@ function getBandera(idiomaId: number): string {
       <template #cell-idiomas="{ row }">
         <div class="flex justify-center gap-1">
           <img
-            v-for="idioma in row.idiomas.filter((i) => i.idiomaId !== 1)"
-            :key="idioma.idiomaId"
-            :src="getBandera(idioma.idiomaId)"
+            v-for="idioma in row.idiomas.filter((i) => i.etiqueta !== 'es_MX')"
+            :key="idioma.etiqueta"
+            :src="getBandera(idioma.etiqueta)"
             :alt="idioma.descripcion"
             class="w-6 h-4 object-contain"
             :title="idioma.descripcion"
           />
-          <span v-if="row.idiomas.filter((i) => i.idiomaId !== 1).length === 0" class="text-base-content/40 text-sm">-</span>
+          <span
+            v-if="row.idiomas.filter((i) => i.etiqueta !== 'es_MX').length === 0"
+            class="text-base-content/40 text-sm"
+            >-</span
+          >
         </div>
       </template>
 
@@ -138,12 +142,22 @@ function getBandera(idiomaId: number): string {
             tabindex="0"
             class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
           >
-            <li><a><i class="fa-regular fa-eye"></i>Ver</a></li>
-            <li><a><i class="fa-regular fa-pen"></i>Editar</a></li>
-            <li><a><i class="fa-regular fa-pen"></i>Compartir</a></li>
-            <li><a><i class="fa-regular fa-copy"></i>Copiar</a></li>
+            <li>
+              <a><i class="fa-regular fa-eye"></i>Ver</a>
+            </li>
+            <li>
+              <a><i class="fa-regular fa-pen"></i>Editar</a>
+            </li>
+            <li>
+              <a><i class="fa-regular fa-pen"></i>Compartir</a>
+            </li>
+            <li>
+              <a><i class="fa-regular fa-copy"></i>Copiar</a>
+            </li>
             <div class="divider my-1"></div>
-            <li><a class="text-error"><i class="fa-regular fa-trash"></i>Eliminar</a></li>
+            <li>
+              <a class="text-error"><i class="fa-regular fa-trash"></i>Eliminar</a>
+            </li>
           </ul>
         </div>
       </template>

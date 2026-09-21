@@ -97,7 +97,6 @@ import {
   createProyectoAction,
   type CreateProyectoRequest,
 } from '@/api/proyectos/actions/create-proyecto.action'
-import type { Idioma } from '@/api/bancos/interfaces/banco.interface'
 import { useModalStore } from '@/common/modals/store/modal.store'
 
 import banderaUs from '@/assets/banderas/us.png'
@@ -108,13 +107,14 @@ const queryClient = useQueryClient()
 
 interface OpcionIdioma {
   idiomaId: number
+  etiqueta: string
   descripcion: string
   bandera: string
 }
 
 const opcionesIdiomas: OpcionIdioma[] = [
-  { idiomaId: 2, descripcion: 'Ingles', bandera: banderaUs },
-  { idiomaId: 3, descripcion: 'Frances', bandera: banderaFr },
+  { idiomaId: 2, etiqueta: 'en_US', descripcion: 'Ingles', bandera: banderaUs },
+  { idiomaId: 3, etiqueta: 'fr_FR', descripcion: 'Frances', bandera: banderaFr },
 ]
 
 const seleccionados = ref<number[]>([])
@@ -151,17 +151,14 @@ const [nombre, nombreAttrs] = defineField('nombre')
 const [descripcion, descripcionAttrs] = defineField('descripcion')
 
 const onSubmit = handleSubmit(async (values) => {
-  const idiomas: Idioma[] = [
-    { idiomaId: 1, descripcion: 'Espanol' },
-    ...opcionesIdiomas
-      .filter((opcion) => esSeleccionado(opcion.idiomaId))
-      .map(({ idiomaId, descripcion }) => ({ idiomaId, descripcion })),
-  ]
+  const idiomasSeleccionados = opcionesIdiomas
+    .filter((opcion) => esSeleccionado(opcion.idiomaId))
+    .map((opcion) => opcion.etiqueta)
 
   const proyecto: CreateProyectoRequest = {
     nombre: values.nombre,
     descripcion: values.descripcion,
-    idiomas,
+    ...(idiomasSeleccionados.length > 0 && { idiomas: idiomasSeleccionados }),
   }
 
   try {

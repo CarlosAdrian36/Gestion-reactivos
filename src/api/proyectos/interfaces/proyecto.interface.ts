@@ -1,32 +1,40 @@
-import type { Idioma, Propietario } from '@/api/bancos/interfaces/banco.interface'
+import type { Propietario } from '@/api/bancos/interfaces/banco.interface'
 
 export interface Estado {
-  idEstado: number
-  nombre: 'Pendiente' | 'En proceso' | 'Completada'
+  estadoId: number
+  nombre: string
+}
+
+export interface Funcion {
+  funcionId: number
+  nombre: string
 }
 
 export interface Fase {
-  nombre: 'Construccion' | 'Revision' | 'Traduccion' | 'Revision traduccion' | 'Finalizado'
-  estado: 'Pendiente' | 'En proceso' | 'Completada'
-  funcion: 'Elaborador' | 'Revisor' | 'Traductor' | 'Revisor de traduccion' | null
+  nombre: string
+  funcion: string | null
+  estado: string
+}
+
+export interface IdiomaProyecto {
+  etiqueta: string
+  descripcion: string
 }
 
 export interface BancoProyecto {
-  idBanco: string
+  idProyecto: string
+  tipoElementoId: number
+  notificaciones: boolean
+  fechaEntrega: string | null
+  estado: Estado
+  fases: Fase[]
+  funciones: Funcion[]
   nombre: string
   descripcion: string
-  cantidadReactivos: number
   fechaCreacion: string
   fechaModificacion: string
   propietario: Propietario
-  idiomas: Idioma[]
-  esProyecto: boolean
-  fechaEntrega: string
-  tipoElementoId: 2
-  estado: Estado
-  funciones: string[]
-  fases: Fase[]
-  notificaciones: boolean
+  idiomas: IdiomaProyecto[]
 }
 
 export interface ProyectosResponse {
