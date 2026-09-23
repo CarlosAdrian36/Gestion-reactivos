@@ -159,7 +159,7 @@ function getBandera(etiqueta: string): string {
       </template>
 
       <template #cell-acciones="{ row }">
-        <div class="dropdown dropdown-end dropdown-left">
+        <div class="dropdown dropdown-end dropdown-left" @click.stop>
           <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
             <i class="fa-regular fa-ellipsis-vertical"></i>
           </div>
