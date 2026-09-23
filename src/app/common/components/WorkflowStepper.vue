@@ -10,10 +10,10 @@ interface Props {
 const props = defineProps<Props>()
 
 const STEPS_CONFIG = [
-  { nombre: 'Construccion', icon: 'fa-solid fa-helmet-safety' },
+  { nombre: 'Construcción', icon: 'fa-solid fa-screwdriver-wrench' },
   { nombre: 'Revision', icon: 'fa-solid fa-magnifying-glass' },
   { nombre: 'Traduccion', icon: 'fa-solid fa-language' },
-  { nombre: 'Revision traduccion', icon: 'fa-solid fa-comments' },
+  { nombre: 'Revision Traduccion', icon: 'fa-solid fa-comments' },
   { nombre: 'Finalizado', icon: 'fa-solid fa-flag' },
 ]
 
