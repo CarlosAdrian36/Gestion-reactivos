@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useQuery } from '@tanstack/vue-query'
+import { computed } from 'vue'
 import { getProyectosAction } from '@/api/proyectos/actions/get-proyectos.actions'
 import type { BancoProyecto } from '@/api/proyectos/interfaces/proyecto.interface'
 import router from '@/router'
@@ -7,17 +8,41 @@ import DataTable from '@/app/common/components/table/DataTable.vue'
 import type { DataTableColumns } from '@/app/common/components/table/features'
 import WorkflowStepper from '@/app/common/components/WorkflowStepper.vue'
 import NuevoProyecto from '@/app/common/components/modals/nuevoProyecto.vue'
+import EliminarProyecto from '@/app/common/components/modals/eliminarProyecto.vue'
 import { useModalStore } from '@/common/modals/store/modal.store'
+import { useAuthStore } from '@/auth/store/auth.store'
 import banderaUs from '@/assets/banderas/us.png'
 import banderaFr from '@/assets/banderas/fr.png'
 
 const modal = useModalStore()
+const authStore = useAuthStore()
+
+const puedeEliminarProyectos = computed(
+  () =>
+    authStore.user?.roles.some((rol) => rol.nombre.trim().toLowerCase() === 'administrador') ??
+    false,
+)
 
 function abrirModalProyecto() {
   modal.openModal(NuevoProyecto, {}, [
     { label: 'Cerrar', variant: 'outline' },
     { label: 'Guardar', variant: 'primary', type: 'submit' },
   ])
+}
+function closeDropdown() {
+  ;(document.activeElement as HTMLElement)?.blur()
+}
+function abrirModalEliminarProyecto(proyecto: BancoProyecto) {
+  closeDropdown()
+  modal.openModal(
+    EliminarProyecto,
+    { proyecto },
+    [
+      { label: 'Cancelar', variant: 'outline' },
+      { label: 'Eliminar', variant: 'error', type: 'submit' },
+    ],
+    'max-w-md',
+  )
 }
 
 const { data: proyectos, isLoading } = useQuery({
@@ -133,7 +158,7 @@ function getBandera(etiqueta: string): string {
         <WorkflowStepper :fases="row.fases" :estado="row.estado" />
       </template>
 
-      <template #cell-acciones>
+      <template #cell-acciones="{ row }">
         <div class="dropdown dropdown-end dropdown-left">
           <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
             <i class="fa-regular fa-ellipsis-vertical"></i>
@@ -154,9 +179,11 @@ function getBandera(etiqueta: string): string {
             <li>
               <a><i class="fa-regular fa-copy"></i>Copiar</a>
             </li>
-            <div class="divider my-1"></div>
-            <li>
-              <a class="text-error"><i class="fa-regular fa-trash"></i>Eliminar</a>
+            <div v-if="puedeEliminarProyectos" class="divider my-1"></div>
+            <li v-if="puedeEliminarProyectos">
+              <a class="text-error" @click="abrirModalEliminarProyecto(row)">
+                <i class="fa-regular fa-trash"></i>Eliminar
+              </a>
             </li>
           </ul>
         </div>
