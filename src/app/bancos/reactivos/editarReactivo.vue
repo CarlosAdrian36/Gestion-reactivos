@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
+import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { storeToRefs } from 'pinia'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import OpcionMultipleForm from './forms/OpcionMultipleForm.vue'
@@ -13,6 +14,7 @@ import RelacionalForm from './forms/RelacionalForm.vue'
 const route = useRoute()
 const router = useRouter()
 const bancoId = String(route.params.id)
+const { routeNames } = useBancoNavigation()
 const store = useReactivoSeleccionadoStore()
 const { selectedReactivo } = storeToRefs(store)
 
@@ -25,7 +27,7 @@ const tipoReactivoId = computed(() => selectedReactivo.value?.tipoReactivoId)
 
 onMounted(() => {
   if (!selectedReactivo.value) {
-    router.replace({ name: 'reactivosList', params: { id: bancoId } })
+    router.replace({ name: routeNames.value.reactivos, params: { id: bancoId } })
   }
 })
 </script>
@@ -41,20 +43,20 @@ onMounted(() => {
       <div class="breadcrumbs text-sm mb-6">
         <ul>
           <li>
-            <RouterLink class="link link-hover" :to="{ name: 'misBancos' }">Inicio</RouterLink>
+              <RouterLink class="link link-hover" :to="{ name: routeNames.home }">Inicio</RouterLink>
           </li>
           <li>
-            <RouterLink
-              class="link link-hover"
-              :to="{ name: 'bancoDetalle', params: { id: bancoId } }"
-              >Banco Detalle</RouterLink
+              <RouterLink
+                class="link link-hover"
+                :to="{ name: routeNames.detail, params: { id: bancoId } }"
+                >Banco Detalle</RouterLink
             >
           </li>
           <li>
-            <RouterLink
-              class="link link-hover"
-              :to="{ name: 'reactivosList', params: { id: bancoId } }"
-            >
+              <RouterLink
+                class="link link-hover"
+                :to="{ name: routeNames.reactivos, params: { id: bancoId } }"
+              >
               Reactivo {{ selectedReactivo.posicion }}
             </RouterLink>
           </li>

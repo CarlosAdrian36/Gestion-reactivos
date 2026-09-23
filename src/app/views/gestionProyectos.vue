@@ -88,7 +88,7 @@ const columnas: DataTableColumns<BancoProyecto> = [
 ]
 
 const goToItem = (item: BancoProyecto) => {
-  router.push({ name: 'bancoDetalle', params: { id: item.idProyecto } })
+  router.push({ name: 'proyectoBancoDetalle', params: { id: item.idProyecto } })
 }
 
 function getBandera(etiqueta: string): string {

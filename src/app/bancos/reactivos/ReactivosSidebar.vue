@@ -7,6 +7,7 @@ import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import { stripHtmlToText } from '@/utils/html'
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 import { useInstruccionesGrupos } from '@/api/bancos/composable/useInstruccionesGrupos'
+import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { storeToRefs } from 'pinia'
 
 interface DisplayIndividual {
@@ -30,10 +31,11 @@ type DisplayItem = DisplayIndividual | DisplayGrupo
 const route = useRoute()
 const router = useRouter()
 const bancoId = route.params.id as string
+const { routeNames } = useBancoNavigation()
 
 function irACrear() {
   router.push({
-    name: 'crearReactivo',
+    name: routeNames.value.create,
     params: { id: bancoId },
   })
 }
@@ -41,7 +43,7 @@ function irACrear() {
 function seleccionarReactivo(r: Reactivo) {
   select(r)
   router.push({
-    name: 'reactivosList',
+    name: routeNames.value.reactivos,
     params: { id: bancoId },
   })
 }
@@ -49,7 +51,7 @@ function seleccionarReactivo(r: Reactivo) {
 function seleccionarGrupo(item: DisplayGrupo) {
   select(item.primerReactivo)
   router.push({
-    name: 'reactivosList',
+    name: routeNames.value.reactivos,
     params: { id: bancoId },
   })
 }

@@ -11,6 +11,7 @@ import { actualizarRespuestaAction } from '@/api/bancos/actions/actualizar-respu
 import { eliminarRespuestaAction } from '@/api/bancos/actions/eliminar-respuesta.action'
 import { crearInstruccionGrupoAction } from '@/api/bancos/actions/crear-instruccion-grupo.action'
 import { actualizarInstruccionGrupoAction } from '@/api/bancos/actions/actualizar-instruccion-grupo.action'
+import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { TIPO_REACTIVO } from './useTiposReactivo'
 
 export interface ReactivoRelacionalForm {
@@ -28,6 +29,7 @@ export interface RespuestaRelacionalForm {
 export function useGuardarRelacional(bancoId: string, grupoId?: number) {
   const queryClient = useQueryClient()
   const router = useRouter()
+  const { routeNames } = useBancoNavigation()
   const idiomaId = ref(1)
   const isGuardando = ref(false)
   const esEdicion = computed(() => grupoId != null && grupoId > 0)
@@ -41,7 +43,7 @@ export function useGuardarRelacional(bancoId: string, grupoId?: number) {
     })
 
   const volverALista = () => {
-    router.push({ name: 'reactivosList', params: { id: bancoId } })
+    router.push({ name: routeNames.value.reactivos, params: { id: bancoId } })
   }
 
   async function crearGrupo(instruccion: string, reactivos: ReactivoRelacionalForm[]) {

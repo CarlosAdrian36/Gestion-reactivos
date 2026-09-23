@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
+import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { storeToRefs } from 'pinia'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vue'
@@ -15,6 +16,7 @@ import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
 const route = useRoute()
 const router = useRouter()
 const bancoId = String(route.params.id)
+const { routeNames } = useBancoNavigation()
 const { data: reactivos, isLoading } = useReactivos(bancoId)
 const store = useReactivoSeleccionadoStore()
 const { selectedReactivo } = storeToRefs(store)
@@ -71,7 +73,7 @@ function abrirEliminar() {
 }
 
 function irAEditar() {
-  router.push({ name: 'editarReactivo', params: { id: bancoId } })
+  router.push({ name: routeNames.value.edit, params: { id: bancoId } })
 }
 
 function fmtDate(iso: string): string {
@@ -98,12 +100,12 @@ function fmtDate(iso: string): string {
         <div class="breadcrumbs text-sm mb-6">
           <ul>
             <li>
-              <RouterLink class="link link-hover" :to="{ name: 'misBancos' }">Inicio</RouterLink>
+              <RouterLink class="link link-hover" :to="{ name: routeNames.home }">Inicio</RouterLink>
             </li>
             <li>
               <RouterLink
                 class="link link-hover"
-                :to="{ name: 'bancoDetalle', params: { id: bancoId } }"
+                :to="{ name: routeNames.detail, params: { id: bancoId } }"
                 >Banco Detalle</RouterLink
               >
             </li>

@@ -31,4 +31,28 @@ export const bancoRoutes: RouteRecordRaw[] = [
     component: () => import('@/app/bancos/reactivos/crearReactivo.vue'),
     meta: { sidebar: 'reactivos' },
   },
+  {
+    path: 'proyectos/banco/:id',
+    name: 'proyectoBancoDetalle',
+    component: () => import('@/app/bancos/bancodetalle/bancoMenu.vue'),
+    meta: { sidebar: 'default', contexto: 'proyectos' },
+  },
+  {
+    path: 'proyectos/banco/:id/reactivos',
+    name: 'proyectoReactivosList',
+    component: () => import('@/app/bancos/reactivos/reactivosView.vue'),
+    meta: { sidebar: 'reactivos', contexto: 'proyectos' },
+  },
+  {
+    path: 'proyectos/banco/:id/reactivos/editar',
+    name: 'proyectoEditarReactivo',
+    component: () => import('@/app/bancos/reactivos/editarReactivo.vue'),
+    meta: { sidebar: 'reactivos', contexto: 'proyectos' },
+  },
+  {
+    path: 'proyectos/banco/:id/reactivos/crear',
+    name: 'proyectoCrearReactivo',
+    component: () => import('@/app/bancos/reactivos/crearReactivo.vue'),
+    meta: { sidebar: 'reactivos', contexto: 'proyectos' },
+  },
 ]
