@@ -104,7 +104,7 @@ function getBandera(etiqueta: string): string {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto">
+  <div class="max-w-9xl mx-auto">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
       <div>
         <h1 class="text-2xl font-bold">Gestion de Proyectos</h1>
