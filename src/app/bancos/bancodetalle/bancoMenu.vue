@@ -25,7 +25,7 @@ const { data, isLoading } = useQuery({
 
 <template>
   <div class="bg-base-200 min-h-screen">
-    <main class="max-w-7xl mx-auto px-6 py-8">
+    <main class="max-w-9xl mx-auto px-6 py-8">
       <template v-if="isLoading">
         <div class="space-y-4">
           <div class="skeleton h-10 w-72"></div>

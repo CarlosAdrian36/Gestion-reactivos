@@ -16,6 +16,16 @@ export interface Fase {
   estado: string
 }
 
+export interface Hallazgo {
+  idHallazgo: string
+  titulo: string
+  descripcion: string
+  estado: string
+  prioridad: string
+  autor?: Propietario
+  fechaCreacion: string
+}
+
 export interface IdiomaProyecto {
   etiqueta: string
   descripcion: string

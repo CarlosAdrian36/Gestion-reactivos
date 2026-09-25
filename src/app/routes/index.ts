@@ -34,7 +34,7 @@ export const bancoRoutes: RouteRecordRaw[] = [
   {
     path: 'proyectos/banco/:id',
     name: 'proyectoBancoDetalle',
-    component: () => import('@/app/bancos/bancodetalle/bancoMenu.vue'),
+    component: () => import('@/app/proyectos/views/proyectoBancoDetalle.vue'),
     meta: { sidebar: 'default', contexto: 'proyectos' },
   },
   {
