@@ -92,79 +92,131 @@ function getStepStateLabel(fase: Fase): string {
   if (state === 'in_progress') return 'En proceso'
   return 'Pendiente'
 }
+
+function getStateLabelClass(state: 'completed' | 'in_progress' | 'pending'): string {
+  if (state === 'completed')
+    return 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-success/15 text-success'
+  if (state === 'in_progress')
+    return 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-primary/15 text-primary'
+  return 'text-[11px] font-normal text-base-content/40'
+}
 </script>
 
 <template>
   <div class="flex flex-col items-center w-full">
-    <div class="relative flex items-center justify-between w-full py-2" :class="isLarge ? 'pb-16' : ''">
+    <div
+      class="relative flex w-full justify-between"
+      :class="isLarge ? 'items-start' : 'items-center py-2'"
+    >
+      <!-- Línea base de progreso -->
       <div
-        class="absolute -translate-y-1/2 h-0.5 bg-slate-200"
-        :class="isLarge ? 'top-5 left-14 right-14' : 'top-1/2 left-5 right-5'"
+        aria-hidden="true"
+        class="absolute -translate-y-1/2 rounded-full bg-base-200"
+        :class="isLarge ? 'left-14 right-14 top-6 h-1' : 'left-5 right-5 top-1/2 h-0.5'"
       />
+      <!-- Línea de avance -->
       <div
-        class="absolute -translate-y-1/2 h-0.5 bg-emerald-500 origin-left transition-transform duration-300"
-        :class="isLarge ? 'top-5 left-14 right-14' : 'top-1/2 left-5 right-5'"
+        aria-hidden="true"
+        class="absolute -translate-y-1/2 rounded-full bg-success origin-left transition-transform duration-300"
+        :class="isLarge ? 'left-14 right-14 top-6 h-1' : 'left-5 right-5 top-1/2 h-0.5'"
         :style="{ transform: `translateY(-50%) scaleX(${progressScale})` }"
       />
 
       <div
         v-for="(fase, idx) in workflowPhases"
         :key="idx"
-        class="relative z-10 flex items-center"
-        :class="isLarge ? 'w-28 h-20 flex-col justify-start gap-1' : 'w-10 h-10 justify-center'"
+        class="relative z-10 flex items-center group"
+        :class="isLarge ? 'w-28 flex-col justify-start' : 'w-10 h-10 justify-center'"
         :title="getStepLabel(fase)"
         :aria-current="getStepState(fase) === 'in_progress' ? 'step' : undefined"
       >
-        <div
-          v-if="getStepState(fase) === 'completed'"
-          class="flex items-center justify-center text-white rounded-full bg-emerald-500 border-2 border-emerald-500 shadow-sm"
-          :class="isLarge ? 'w-10 h-10' : 'w-7 h-7'"
-        >
-          <i :class="[getStepIcon(fase.nombre), isLarge ? 'text-sm' : 'text-xs']"></i>
-        </div>
-
-        <div
-          v-else-if="getStepState(fase) === 'in_progress'"
-          class="flex items-center justify-center bg-white border-2 rounded-full border-blue-600 shadow-md"
-          :class="isLarge ? 'w-12 h-12 ring-4 ring-blue-100' : 'w-10 h-10'"
-        >
-          <i :class="[getStepIcon(fase.nombre), 'text-blue-600', isLarge ? 'text-base' : 'text-sm']"></i>
-        </div>
-
-        <div
-          v-else
-          class="flex items-center justify-center bg-white border-2 rounded-full border-slate-300 shadow-sm"
-          :class="isLarge ? 'w-10 h-10' : 'w-7 h-7'"
-        >
-          <i :class="[getStepIcon(fase.nombre), 'text-slate-400', isLarge ? 'text-sm' : 'text-xs']"></i>
-        </div>
-
         <template v-if="isLarge">
-          <span class="text-xs font-semibold text-center leading-tight max-w-28">
+          <!-- Nodo completado -->
+          <div
+            v-if="getStepState(fase) === 'completed'"
+            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-success text-success-content shadow-sm"
+          >
+            <i :class="[getStepIcon(fase.nombre), 'text-base']"></i>
+          </div>
+
+          <!-- Nodo en proceso -->
+          <div
+            v-else-if="getStepState(fase) === 'in_progress'"
+            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-md shadow-primary/25 ring-4 ring-primary/10 transition transform hover:scale-105"
+          >
+            <i :class="[getStepIcon(fase.nombre), 'text-base']"></i>
+          </div>
+
+          <!-- Nodo pendiente -->
+          <div
+            v-else
+            class="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-base-300 bg-base-100 text-base-content/40 transition group-hover:border-base-content/25"
+          >
+            <i :class="[getStepIcon(fase.nombre), 'text-base']"></i>
+          </div>
+
+          <span
+            class="mt-3 text-xs sm:text-sm font-bold text-center leading-tight max-w-28"
+            :class="
+              getStepState(fase) === 'completed'
+                ? 'text-success'
+                : getStepState(fase) === 'in_progress'
+                  ? 'text-primary'
+                  : 'text-base-content/80 font-medium'
+            "
+          >
             {{ fase.nombre }}
           </span>
           <span
-            class="text-[10px] text-center leading-tight"
-            :class="
-              getStepState(fase) === 'completed'
-                ? 'text-emerald-600'
-                : getStepState(fase) === 'in_progress'
-                  ? 'text-blue-600'
-                  : 'text-slate-400'
-            "
+            class="mt-1 text-center leading-tight"
+            :class="getStateLabelClass(getStepState(fase))"
           >
             {{ getStepStateLabel(fase) }}
           </span>
         </template>
+
+        <template v-else>
+          <div
+            v-if="getStepState(fase) === 'completed'"
+            class="flex items-center justify-center text-white rounded-full bg-emerald-500 border-2 border-emerald-500 shadow-sm w-7 h-7"
+          >
+            <i :class="[getStepIcon(fase.nombre), 'text-xs']"></i>
+          </div>
+
+          <div
+            v-else-if="getStepState(fase) === 'in_progress'"
+            class="flex items-center justify-center bg-white border-2 rounded-full border-blue-600 shadow-md w-10 h-10"
+          >
+            <i :class="[getStepIcon(fase.nombre), 'text-blue-600', 'text-sm']"></i>
+          </div>
+
+          <div
+            v-else
+            class="flex items-center justify-center bg-white border-2 rounded-full border-slate-300 shadow-sm w-7 h-7"
+          >
+            <i :class="[getStepIcon(fase.nombre), 'text-slate-400', 'text-xs']"></i>
+          </div>
+        </template>
       </div>
     </div>
 
+    <!-- Contexto de fase actual -->
+    <div
+      v-if="isLarge"
+      class="mt-2 w-full pt-4 border-t border-base-200 flex items-center justify-center text-xs sm:text-sm text-base-content/70 font-medium"
+    >
+      <span>Fase actual:&nbsp;</span>
+      <strong class="font-semibold" :class="isFinalizado ? 'text-success' : 'text-primary'">
+        {{ displayedPhase }}
+      </strong>
+      <span>&nbsp;({{ workflowStatus }})</span>
+    </div>
     <span
+      v-else
       class="mt-1 text-xs font-semibold"
       :class="isFinalizado ? 'text-emerald-600' : 'text-blue-600'"
     >
-      <span v-if="isLarge">Fase actual: </span>{{ displayedPhase }}
-      <span v-if="isLarge" class="font-normal text-base-content/60">({{ workflowStatus }})</span>
+      {{ displayedPhase }}
     </span>
   </div>
 </template>
