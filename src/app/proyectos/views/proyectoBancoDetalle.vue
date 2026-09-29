@@ -89,7 +89,7 @@ async function copiarIdBanco(): Promise<void> {
 
 <template>
   <div class="min-h-full">
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+    <main class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
       <template v-if="isLoading">
         <div class="space-y-6">
           <div class="skeleton h-36 w-full rounded-2xl"></div>
