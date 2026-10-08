@@ -173,12 +173,6 @@ function getBandera(etiqueta: string): string {
             <li>
               <a><i class="fa-regular fa-pen"></i>Editar</a>
             </li>
-            <li>
-              <a><i class="fa-regular fa-pen"></i>Compartir</a>
-            </li>
-            <li>
-              <a><i class="fa-regular fa-copy"></i>Copiar</a>
-            </li>
             <div v-if="puedeEliminarProyectos" class="divider my-1"></div>
             <li v-if="puedeEliminarProyectos">
               <a class="text-error" @click="abrirModalEliminarProyecto(row)">

@@ -47,6 +47,15 @@ export interface BancoProyecto {
   idiomas: IdiomaProyecto[]
 }
 
+export interface ProyectoDetalle extends BancoProyecto {
+  cantidadReactivos: number
+  hallazgos: boolean
+}
+
+export interface ProyectoDetalleResponse {
+  proyecto: ProyectoDetalle
+}
+
 export interface ProyectosResponse {
   proyectos: BancoProyecto[]
 }

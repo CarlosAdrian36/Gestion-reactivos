@@ -15,6 +15,7 @@ coverage
 *.local
 stitch
 
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

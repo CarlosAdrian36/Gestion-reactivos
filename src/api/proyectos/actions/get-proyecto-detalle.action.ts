@@ -1,14 +1,11 @@
-import type { BancoProyecto } from '../interfaces/proyecto.interface'
-import { getProyectosAction } from './get-proyectos.actions'
+import { apiClient } from '@/api/http'
+import type { ProyectoDetalle, ProyectoDetalleResponse } from '../interfaces/proyecto.interface'
 
-// This action can later switch to GET /proyectos/:id without changing the detail view.
-export const getProyectoDetalleAction = async (idProyecto: string): Promise<BancoProyecto> => {
-  const proyectos = await getProyectosAction()
-  const proyecto = proyectos.find((item) => item.idProyecto === idProyecto)
-
-  if (!proyecto) {
-    throw new Error('Proyecto no encontrado')
+export const getProyectoDetalleAction = async (id: string): Promise<ProyectoDetalle> => {
+  try {
+    const { data } = await apiClient.get<ProyectoDetalleResponse>(`/proyectos/${id}`)
+    return data.proyecto
+  } catch {
+    throw new Error('Error al obtener el proyecto')
   }
-
-  return proyecto
 }

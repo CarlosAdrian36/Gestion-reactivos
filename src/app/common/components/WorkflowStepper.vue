@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import type { Fase, Estado } from '@/api/proyectos/interfaces/proyecto.interface'
+import type { Fase } from '@/api/proyectos/interfaces/proyecto.interface'
 
 interface Props {
   fases: Fase[]
-  estado: Estado
   size?: 'compact' | 'large'
 }
 
@@ -30,7 +29,11 @@ const allPhasesCompleted = computed(
 
 const isFinalizado = computed(() => allPhasesCompleted.value)
 const isLarge = computed(() => props.size === 'large')
-const workflowStatus = computed(() => (isFinalizado.value ? 'Completada' : props.estado.nombre))
+const workflowStatus = computed(() =>
+  isFinalizado.value
+    ? 'Completada'
+    : props.fases.find((fase) => fase.estado === 'En proceso')?.estado || 'Pendiente',
+)
 
 const workflowPhases = computed<Fase[]>(() => [
   ...projectPhases.value,
