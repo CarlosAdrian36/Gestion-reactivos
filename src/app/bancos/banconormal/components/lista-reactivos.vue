@@ -63,6 +63,7 @@ import type { Banco } from '@/api/bancos/interfaces/banco.interface'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
+import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { stripHtmlToText } from '@/utils/html'
 
 const props = defineProps<{
@@ -70,6 +71,7 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
+const { routeNames } = useBancoNavigation()
 
 const { data: reactivos, isLoading } = useReactivos(props.banco.idBanco)
 const { select } = useReactivoSeleccionadoStore()
@@ -81,21 +83,21 @@ function preview(r: Reactivo): string {
 function irAReactivo(r: Reactivo) {
   select(r)
   router.push({
-    name: 'reactivosList',
+    name: routeNames.value.reactivos,
     params: { id: props.banco.idBanco },
   })
 }
 
 function irAListado() {
   router.push({
-    name: 'reactivosList',
+    name: routeNames.value.reactivos,
     params: { id: props.banco.idBanco },
   })
 }
 
 function irACrear() {
   router.push({
-    name: 'crearReactivo',
+    name: routeNames.value.create,
     params: { id: props.banco.idBanco },
   })
 }

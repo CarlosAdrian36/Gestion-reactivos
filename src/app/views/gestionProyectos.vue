@@ -88,7 +88,7 @@ const columnas: DataTableColumns<BancoProyecto> = [
 ]
 
 const goToItem = (item: BancoProyecto) => {
-  router.push({ name: 'bancoDetalle', params: { id: item.idProyecto } })
+  router.push({ name: 'proyectoBancoDetalle', params: { id: item.idProyecto } })
 }
 
 function getBandera(etiqueta: string): string {
@@ -172,12 +172,6 @@ function getBandera(etiqueta: string): string {
             </li>
             <li>
               <a><i class="fa-regular fa-pen"></i>Editar</a>
-            </li>
-            <li>
-              <a><i class="fa-regular fa-pen"></i>Compartir</a>
-            </li>
-            <li>
-              <a><i class="fa-regular fa-copy"></i>Copiar</a>
             </li>
             <div v-if="puedeEliminarProyectos" class="divider my-1"></div>
             <li v-if="puedeEliminarProyectos">

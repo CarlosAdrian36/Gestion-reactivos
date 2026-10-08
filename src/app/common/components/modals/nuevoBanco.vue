@@ -40,7 +40,7 @@
         <span
           class="absolute left-3 top-2 text-neutral-600 bg-base-100 px-1 leading-none transition-all pointer-events-none peer-focus:top-1 peer-focus:text-xs peer-focus:text-primary peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
         >
-          Descripción del Banco
+          Descripción del Banco (Opcional)
         </span>
       </label>
       <p v-if="errors.descripcion" class="text-error text-sm mt-1">
@@ -113,6 +113,11 @@ const onSubmit = handleSubmit(async (values) => {
     await queryClient.invalidateQueries({
       queryKey: ['items-unificados'],
     })
+    if (props.banco?.idBanco) {
+      await queryClient.invalidateQueries({
+        queryKey: ['BancoById', props.banco.idBanco],
+      })
+    }
     modal.closeModal()
   } catch (error) {
     toast.error('Algo ocurrio y no se pudo completar la operacion')

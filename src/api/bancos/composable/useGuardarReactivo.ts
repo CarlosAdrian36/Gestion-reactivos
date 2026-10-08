@@ -9,6 +9,7 @@ import { actualizarReactivoAction } from '@/api/bancos/actions/actualizar-reacti
 import { actualizarRespuestaAction } from '@/api/bancos/actions/actualizar-respuesta.action'
 import { eliminarRespuestaAction } from '@/api/bancos/actions/eliminar-respuesta.action'
 import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
+import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { storeToRefs } from 'pinia'
 import { TIPO_REACTIVO } from './useTiposReactivo'
 import type { Reactivo } from '../interfaces/reactivo.interface'
@@ -24,6 +25,7 @@ export interface OpcionForm {
 export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idReactivo?: string) {
   const queryClient = useQueryClient()
   const router = useRouter()
+  const { routeNames } = useBancoNavigation()
   const idiomaId = ref(1)
   const reactivoCreado = ref<{ idReactivo: string } | null>(null)
   const esEdicion = computed(() => Boolean(idReactivo))
@@ -38,7 +40,7 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
   })
 
   const volverALista = () => {
-    router.push({ name: 'reactivosList', params: { id: bancoId } })
+    router.push({ name: routeNames.value.reactivos, params: { id: bancoId } })
   }
 
   const sincronizarReactivo = async (descripcion?: string) => {

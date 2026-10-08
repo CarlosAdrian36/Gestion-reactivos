@@ -16,6 +16,16 @@ export interface Fase {
   estado: string
 }
 
+export interface Hallazgo {
+  idHallazgo: string
+  titulo: string
+  descripcion: string
+  estado: string
+  prioridad: string
+  autor?: Propietario
+  fechaCreacion: string
+}
+
 export interface IdiomaProyecto {
   etiqueta: string
   descripcion: string
@@ -35,6 +45,15 @@ export interface BancoProyecto {
   fechaModificacion: string
   propietario: Propietario
   idiomas: IdiomaProyecto[]
+}
+
+export interface ProyectoDetalle extends BancoProyecto {
+  cantidadReactivos: number
+  hallazgos: boolean
+}
+
+export interface ProyectoDetalleResponse {
+  proyecto: ProyectoDetalle
 }
 
 export interface ProyectosResponse {
