@@ -19,6 +19,7 @@
       </template>
 
       <div v-else-if="reactivos && reactivos.length === 0">
+        este va a cambiar
         <div
           class="size-20 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-5"
         >
