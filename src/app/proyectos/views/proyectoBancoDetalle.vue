@@ -24,15 +24,18 @@ function formatearFecha(fecha: string): string {
 
 <template>
   <div class="min-h-full">
-    <main class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+    <main class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 sm:py-8 space-y-5">
       <template v-if="isLoading">
         <div class="space-y-6">
-          <div class="skeleton h-36 w-full rounded-2xl"></div>
-          <div class="skeleton h-72 w-full rounded-2xl"></div>
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div v-for="i in 3" :key="i" class="skeleton h-96 rounded-2xl"></div>
+          <div class="skeleton h-36 w-full rounded-xl"></div>
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+            <div class="skeleton h-72 rounded-xl xl:col-span-4"></div>
+            <div class="skeleton h-72 rounded-xl xl:col-span-8"></div>
           </div>
-          <div class="skeleton h-44 w-full rounded-2xl"></div>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div class="skeleton h-72 rounded-xl lg:col-span-8"></div>
+            <div class="skeleton h-72 rounded-xl lg:col-span-4"></div>
+          </div>
         </div>
       </template>
 
@@ -52,96 +55,133 @@ function formatearFecha(fecha: string): string {
       </div>
 
       <template v-else>
-        <!-- Encabezado del proyecto -->
-        <header class="card bg-base-100 border border-base-300 shadow-sm p-6 sm:p-8">
-          <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div class="space-y-3 min-w-0">
+        <header class="card bg-base-100 border border-base-300 shadow-sm p-5 sm:p-6">
+          <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+            <div class="min-w-0 space-y-3">
               <div class="flex flex-wrap items-center gap-3">
                 <h1 class="text-2xl sm:text-3xl font-bold tracking-tight wrap-break-word">
                   {{ data.nombre }}
                 </h1>
-                <span
-                  class="inline-flex items-center rounded-full bg-base-200 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-base-content/70 border border-base-300"
-                >
-                  Proyecto
-                </span>
+                <span class="badge badge-outline">Proyecto</span>
               </div>
-              <p
-                v-if="data.descripcion"
-                class="text-sm text-base-content/70 max-w-4xl leading-relaxed"
-              >
+
+              <p v-if="data.descripcion" class="max-w-4xl text-sm text-base-content/70">
                 {{ data.descripcion }}
               </p>
 
-              <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                 <span
-                  class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium ring-1 ring-inset"
+                  class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 font-medium ring-1 ring-inset"
                   :class="
                     data.estado.nombre === 'En Proceso'
                       ? 'bg-info/10 text-info ring-info/30'
                       : 'bg-success/10 text-success ring-success/30'
                   "
                 >
-                  <span>
-                    <div
-                      aria-label="status"
-                      class="status status-info status-lg animate-spin"
-                    ></div>
-                  </span>
+                  <span
+                    class="size-2 rounded-full"
+                    :class="data.estado.nombre === 'En Proceso' ? 'bg-info' : 'bg-success'"
+                  ></span>
                   {{ data.estado.nombre }}
                 </span>
 
-                <span class="inline-flex items-center gap-1.5 text-xs text-base-content/50 pl-1">
+                <span class="inline-flex items-center gap-2 text-xs text-base-content/60">
                   <i class="fa-regular fa-clock"></i>
                   Actualizado {{ formatearFecha(data.fechaModificacion) }}
                 </span>
               </div>
             </div>
 
-            <div class="flex items-center gap-2.5 self-start md:self-center">
-              <button type="button" title="Disponible próximamente" class="btn">
-                <i class="fa-solid fa-pen-to-square"></i>
-                Editar proyecto
-              </button>
-            </div>
+            <button
+              type="button"
+              title="Disponible próximamente"
+              class="btn self-start xl:self-center"
+            >
+              <i class="fa-solid fa-pen-to-square"></i>
+              Editar proyecto
+            </button>
           </div>
         </header>
 
-        <!-- Flujo de trabajo -->
-        <section class="card bg-base-100 border border-base-300 shadow-sm p-6 sm:p-7">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6">
-            <div class="flex items-center gap-2.5">
-              <div class="p-2 bg-primary/10 text-primary rounded-lg">
+        <!-- Zona operativa: flujo y hallazgos como contenido principal -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
+          <section
+            class="card min-w-0 bg-base-100 border border-primary/20 shadow-sm p-5 sm:p-6 xl:col-span-4"
+          >
+            <div class="flex items-center gap-3 pb-5 border-b border-base-200">
+              <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+              >
                 <i class="fa-solid fa-arrow-progress"></i>
               </div>
               <div>
-                <h2 class="text-sm font-bold tracking-wider uppercase">Flujo de Trabajo</h2>
-                <p class="text-xs sm:text-sm text-base-content/60">
-                  Consulta el avance y la fase actual del ciclo de vida del proyecto.
-                </p>
+                <h2 class="text-sm font-bold uppercase tracking-wider">Flujo de trabajo</h2>
+                <p class="mt-1 text-xs text-base-content/60">Fases del proyecto</p>
               </div>
             </div>
 
-            <div
-              class="flex items-center gap-2 text-xs font-medium text-base-content/60 bg-base-200/60 px-3 py-1.5 rounded-full border border-base-200 self-start sm:self-auto"
-            >
-              <span class="h-2 w-2 rounded-full bg-primary"></span>
-              <!-- <span>Paso {{ pasoActual }} de {{ totalPasos }}</span> -->
-              <span class="text-base-content/30">•</span>
+            <div class="flex min-h-52 items-center py-5">
+              <WorkflowStepper :fases="data.fases" :estado="data.estado" size="compact" />
             </div>
-          </div>
+          </section>
 
-          <WorkflowStepper :fases="data.fases" size="compact" />
-        </section>
-
-        <!-- Paneles de contenido -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <!-- <PanelReactivos :banco="data" />
-          <ListaMiembros :propietario="data.propietario" /> -->
-          <!-- <PanelInformacion :banco="data " /> -->
+          <section
+            class="card min-w-0 bg-base-100 border border-base-300 shadow-sm p-5 sm:p-6 xl:col-span-8"
+          >
+            <div class="flex items-center gap-3 pb-5 border-b border-base-200">
+              <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-warning"
+              >
+                <i class="fa-regular fa-note-sticky"></i>
+              </div>
+              <div>
+                <h2 class="text-sm font-bold uppercase tracking-wider">Hallazgos y auditoría</h2>
+                <p class="mt-1 text-xs text-base-content/60">Área de contenido</p>
+              </div>
+            </div>
+            <!-- Espacio reservado para conectar los datos de hallazgos. -->
+            <div class="min-h-52 flex-1"></div>
+          </section>
         </div>
 
-        <!-- <HallazgosPanel :hallazgos="hallazgos" /> -->
+        <!-- Secciones secundarias del proyecto -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+          <section
+            class="card min-w-0 bg-base-100 border border-base-300 shadow-sm p-5 sm:p-6 lg:col-span-8"
+          >
+            <div class="flex items-center gap-3 pb-5 border-b border-base-200">
+              <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+              >
+                <i class="fa-regular fa-file-lines"></i>
+              </div>
+              <div>
+                <h2 class="text-sm font-bold uppercase tracking-wider">Reactivos</h2>
+                <p class="mt-1 text-xs text-base-content/60">Contenido del banco</p>
+              </div>
+            </div>
+            <!-- Espacio reservado para conectar los datos de reactivos. -->
+            <div class="min-h-56 flex-1"></div>
+          </section>
+
+          <section
+            class="card min-w-0 bg-base-100 border border-base-300 shadow-sm p-5 sm:p-6 lg:col-span-4"
+          >
+            <div class="flex items-center gap-3 pb-5 border-b border-base-200">
+              <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary"
+              >
+                <i class="fa-regular fa-users"></i>
+              </div>
+              <div>
+                <h2 class="text-sm font-bold uppercase tracking-wider">Equipo</h2>
+                <p class="mt-1 text-xs text-base-content/60">Personas del proyecto</p>
+              </div>
+            </div>
+            <!-- Espacio reservado para conectar los datos del equipo. -->
+            <div class="min-h-56 flex-1"></div>
+          </section>
+        </div>
       </template>
     </main>
   </div>
