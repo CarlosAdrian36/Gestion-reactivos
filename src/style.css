@@ -3,6 +3,13 @@
   themes: all;
 }
 
+/* Variante por altura de viewport: se activa en pantallas bajas (p. ej. laptops). */
+@custom-variant short {
+  @media (max-height: 50rem) {
+    @slot;
+  }
+}
+
 @theme {
   --font-sans: 'Lexend', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;

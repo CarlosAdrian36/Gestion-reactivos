@@ -10,8 +10,8 @@ const { data, isLoading, isError } = useProyectoDetalle(proyectoId)
 </script>
 
 <template>
-  <div class="min-h-full">
-    <main class="min-h-full">
+  <div class="h-full">
+    <main class="h-full">
       <template v-if="isLoading">
         <div class="mx-auto max-w-9xl px-4 py-5 sm:px-6 lg:px-8 space-y-5">
           <div class="skeleton h-36 w-full rounded-xl"></div>

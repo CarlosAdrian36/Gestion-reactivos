@@ -54,19 +54,23 @@ const nombrePropietario = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-full">
-    <main class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-5">
+  <div class="h-full">
+    <main
+      class="mx-auto flex h-full max-w-9xl flex-col space-y-5 px-4 py-5 sm:px-6 sm:py-8 lg:px-8 short:py-3"
+    >
       <!--
         Grid base: 1 columna en móvil, 6 en tablet y 12 en escritorio.
+        Ocupa toda la altura disponible del área de contenido (main h-full + grid flex-1),
+        así las filas se reparten el alto y no se genera scroll.
         En xl hay tres filas: encabezado y dos filas de contenido.
         Ajusta col-start, col-span, row-start y row-end para mover o dimensionar cada card.
       -->
       <div
-        class="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12 xl:grid-rows-[auto_minmax(12rem,auto)_minmax(12rem,auto)] gap-4 xl:gap-5 items-stretch"
+        class="grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-6 xl:grid-cols-12 xl:grid-rows-[auto_minmax(0,1fr)_minmax(0,1fr)] xl:gap-5 items-stretch short:gap-2"
       >
         <!-- Encabezado: fila 1. -->
         <header
-          class="card min-h-32 border border-base-300 bg-base-100 col-span-full xl:row-start-1 xl:col-span-9 p-5 sm:p-6"
+          class="card min-h-32 border border-base-300 bg-base-100 col-span-full md:min-h-0 xl:row-start-1 xl:col-span-9 p-5 sm:p-6 short:p-3"
         >
           <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div class="min-w-0 space-y-3">
@@ -148,7 +152,7 @@ const nombrePropietario = computed(() => {
 
         <!-- Card 1: reactivos, fila 2. -->
         <section
-          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-3 xl:col-start-1 xl:col-span-4 xl:row-start-2 p-5 sm:p-6"
+          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-3 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-2 p-5 sm:p-6 short:p-3"
         >
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-bold uppercase tracking-wider">Reactivos</h2>
@@ -175,11 +179,11 @@ const nombrePropietario = computed(() => {
 
         <!-- Card 2: flujo de trabajo, columna derecha y filas 1-3. -->
         <section
-          class="card flex h-full min-h-72 flex-col border border-base-300 bg-base-100 md:col-span-3 xl:col-start-10 xl:col-span-3 xl:row-start-1 xl:row-end-4"
+          class="card flex h-full min-h-72 flex-col border border-base-300 bg-base-100 md:col-span-3 md:min-h-0 xl:col-start-10 xl:col-span-3 xl:row-start-1 xl:row-end-4"
         >
-          <div class="flex h-full flex-1 flex-col p-4 sm:p-5">
+          <div class="flex h-full flex-1 flex-col overflow-hidden p-4 sm:p-5 short:p-3">
             <h2 class="text-center text-sm font-bold uppercase tracking-wider">Flujo de trabajo</h2>
-            <div class="mt-5 flex min-h-0 flex-1 items-center justify-center">
+            <div class="mt-5 flex min-h-0 flex-1 items-center justify-center overflow-y-auto short:mt-2">
               <ol class="relative w-full max-w-xs">
                 <div
                   aria-hidden="true"
@@ -236,7 +240,7 @@ const nombrePropietario = computed(() => {
 
         <!-- Card 3: miembros, fila 2. -->
         <section
-          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-6 xl:col-start-5 xl:col-span-5 xl:row-start-2 p-5 sm:p-6"
+          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-5 xl:col-span-5 xl:row-start-2 p-5 sm:p-6 short:p-3"
         >
           <h2 class="text-sm font-bold uppercase tracking-wider">Miembros</h2>
 
@@ -259,7 +263,7 @@ const nombrePropietario = computed(() => {
 
         <!-- Card 4: comentarios y observaciones, fila 3. -->
         <section
-          class="card min-h-56 border border-base-300 bg-base-100 md:col-span-6 xl:col-start-1 xl:col-span-9 xl:row-start-3 p-5 sm:p-6"
+          class="card min-h-56 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-9 xl:row-start-3 p-5 sm:p-6 short:p-3"
         >
           <h2 class="text-sm font-bold uppercase tracking-wider">Comentarios y observaciones</h2>
 
