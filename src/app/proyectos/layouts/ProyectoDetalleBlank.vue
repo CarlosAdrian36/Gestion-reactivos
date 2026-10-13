@@ -39,11 +39,12 @@ const nombrePropietario = computed(() => {
         Grid base: 1 columna en móvil, 6 en tablet y 12 en escritorio.
         Ocupa toda la altura disponible del área de contenido (main h-full + grid flex-1),
         así las filas se reparten el alto y no se genera scroll.
-        En xl hay tres filas: encabezado y dos filas de contenido.
+        En xl hay 6 filas (prueba): la 1 y la 6 son `auto` (encabezado y comentarios
+        miden su contenido) y las 4 del medio son flexibles (reactivos y miembros).
         Ajusta col-start, col-span, row-start y row-end para mover o dimensionar cada card.
       -->
       <div
-        class="grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-6 xl:grid-cols-12 xl:grid-rows-[auto_minmax(0,1fr)_minmax(0,1fr)] xl:gap-5 items-stretch short:gap-2"
+        class="grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-6 xl:grid-cols-12 xl:grid-rows-[auto_repeat(4,minmax(0,1fr))_auto] xl:gap-5 items-stretch short:gap-2"
       >
         <!-- Encabezado: fila 1. -->
         <header
@@ -131,18 +132,18 @@ const nombrePropietario = computed(() => {
         <ListaReactivosProyecto
           :id-proyecto="proyecto.idProyecto"
           :total="proyecto.cantidadReactivos"
-          class="md:col-span-3 xl:col-start-1 xl:col-span-4 xl:row-start-2"
+          class="md:col-span-3 xl:col-start-1 xl:col-span-4 xl:row-start-2 xl:row-end-6"
         />
 
         <!-- Card 2: flujo de trabajo, columna derecha y filas 1-3. -->
         <FlujoDeTrabajo
           :fases="proyecto.fases"
-          class="md:col-span-3 md:min-h-0 xl:col-start-10 xl:col-span-3 xl:row-start-1 xl:row-end-4"
+          class="md:col-span-3 md:min-h-0 xl:col-start-10 xl:col-span-3 xl:row-start-1 xl:row-end-7"
         />
 
         <!-- Card 3: miembros, fila 2. -->
         <section
-          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-5 xl:col-span-5 xl:row-start-2 p-5 sm:p-6 short:p-3"
+          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-5 xl:col-span-5 xl:row-start-2 xl:row-end-6 p-5 sm:p-6 short:p-3"
         >
           <h2 class="text-sm font-bold uppercase tracking-wider">Miembros</h2>
 
@@ -165,7 +166,7 @@ const nombrePropietario = computed(() => {
 
         <!-- Card 4: comentarios y observaciones, fila 3. -->
         <section
-          class="card min-h-56 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-9 xl:row-start-3 p-5 sm:p-6 short:p-3"
+          class="card min-h-56 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-9 xl:row-start-6 p-5 sm:p-6 short:p-3"
         >
           <h2 class="text-sm font-bold uppercase tracking-wider">Comentarios y observaciones</h2>
 

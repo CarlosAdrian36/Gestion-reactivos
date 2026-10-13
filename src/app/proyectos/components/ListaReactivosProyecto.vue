@@ -130,7 +130,7 @@ function irACrear(): void {
     <div class="mt-4 border-t border-base-200 pt-4">
       <button
         type="button"
-        class="w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/40 transition-all"
+        class="btn btn-dash btn-primary w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold"
         @click="irACrear"
       >
         <i class="fa-regular fa-plus"></i>
