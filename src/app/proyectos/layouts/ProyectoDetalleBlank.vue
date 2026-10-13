@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { ProyectoDetalle } from '@/api/proyectos/interfaces/proyecto.interface'
 import FlujoDeTrabajo from '@/app/proyectos/components/FlujoDeTrabajo.vue'
+import ListaReactivosProyecto from '@/app/proyectos/components/ListaReactivosProyecto.vue'
 import banderaUs from '@/assets/banderas/us.png'
 import banderaFr from '@/assets/banderas/fr.png'
 
@@ -126,32 +127,12 @@ const nombrePropietario = computed(() => {
           </div>
         </header>
 
-        <!-- Card 1: reactivos, fila 2. -->
-        <section
-          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-3 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-2 p-5 sm:p-6 short:p-3"
-        >
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-bold uppercase tracking-wider">Reactivos</h2>
-            <span class="badge badge-outline">{{ proyecto.cantidadReactivos }}</span>
-          </div>
-
-          <div
-            class="mt-6 flex flex-1 items-center justify-center text-center text-sm text-base-content/60"
-          >
-            {{ proyecto.cantidadReactivos }}
-            {{ proyecto.cantidadReactivos === 1 ? 'reactivo' : 'reactivos' }} en este proyecto
-          </div>
-
-          <button
-            type="button"
-            disabled
-            title="Disponible próximamente"
-            class="mt-4 w-full rounded-2xl border-2 border-dashed border-base-300 py-4 text-sm font-semibold text-base-content/60"
-          >
-            <i class="fa-regular fa-plus"></i>
-            Crear reactivo
-          </button>
-        </section>
+        <!-- Card Reactivos: columnas 1-4, fila 2. -->
+        <ListaReactivosProyecto
+          :id-proyecto="proyecto.idProyecto"
+          :total="proyecto.cantidadReactivos"
+          class="md:col-span-3 xl:col-start-1 xl:col-span-4 xl:row-start-2"
+        />
 
         <!-- Card 2: flujo de trabajo, columna derecha y filas 1-3. -->
         <FlujoDeTrabajo
