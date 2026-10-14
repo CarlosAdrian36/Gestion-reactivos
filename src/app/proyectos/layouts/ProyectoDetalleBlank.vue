@@ -2,13 +2,20 @@
 import { computed } from 'vue'
 import type { ProyectoDetalle } from '@/api/proyectos/interfaces/proyecto.interface'
 import FlujoDeTrabajo from '@/app/proyectos/components/FlujoDeTrabajo.vue'
+import ListaMiembrosProyecto from '@/app/proyectos/components/ListaMiembrosProyecto.vue'
 import ListaReactivosProyecto from '@/app/proyectos/components/ListaReactivosProyecto.vue'
+import EditarProyecto from '@/app/common/components/modals/editarProyecto.vue'
+import { useAuthStore } from '@/auth/store/auth.store'
+import { useModalStore } from '@/common/modals/store/modal.store'
 import banderaUs from '@/assets/banderas/us.png'
 import banderaFr from '@/assets/banderas/fr.png'
 
 const props = defineProps<{
   proyecto: ProyectoDetalle
 }>()
+
+const authStore = useAuthStore()
+const modal = useModalStore()
 
 const BANDERAS: Record<string, string> = {
   en_US: banderaUs,
@@ -19,15 +26,16 @@ const idiomasSinEspanol = computed(() =>
   props.proyecto.idiomas.filter((idioma) => idioma.etiqueta !== 'es_MX'),
 )
 
-const iniciales = computed(() => {
-  const { nombre, apellidoPaterno } = props.proyecto.propietario
-  return `${nombre.charAt(0)}${apellidoPaterno.charAt(0)}`.toUpperCase()
-})
-
-const nombrePropietario = computed(() => {
-  const { nombre, apellidoPaterno, apellidoMaterno } = props.proyecto.propietario
-  return `${nombre} ${apellidoPaterno} ${apellidoMaterno}`
-})
+function abrirModalEditarProyecto(): void {
+  modal.openModal(
+    EditarProyecto,
+    { proyecto: props.proyecto },
+    [
+      { label: 'Cancelar', variant: 'outline' },
+      { label: 'Guardar', variant: 'primary', type: 'submit' },
+    ],
+  )
+}
 </script>
 
 <template>
@@ -98,6 +106,15 @@ const nombrePropietario = computed(() => {
 
             <div class="flex flex-wrap gap-2">
               <button
+                v-if="authStore.esAdministrador"
+                type="button"
+                class="btn btn-sm btn-primary rounded-full"
+                @click="abrirModalEditarProyecto"
+              >
+                <i class="fa-regular fa-pen"></i>
+                Editar
+              </button>
+              <button
                 type="button"
                 disabled
                 title="Disponible próximamente"
@@ -141,28 +158,12 @@ const nombrePropietario = computed(() => {
           class="md:col-span-3 md:min-h-0 xl:col-start-10 xl:col-span-3 xl:row-start-1 xl:row-end-7"
         />
 
-        <!-- Card 3: miembros, fila 2. -->
-        <section
-          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-5 xl:col-span-5 xl:row-start-2 xl:row-end-6 p-5 sm:p-6 short:p-3"
-        >
-          <h2 class="text-sm font-bold uppercase tracking-wider">Miembros</h2>
-
-          <div
-            class="mt-6 flex items-center gap-3 rounded-2xl border border-base-200 bg-base-200/50 p-3"
-          >
-            <div
-              class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-content"
-            >
-              {{ iniciales }}
-            </div>
-            <div class="min-w-0">
-              <p class="truncate text-sm font-semibold" :title="nombrePropietario">
-                {{ nombrePropietario }}
-              </p>
-              <p class="text-xs text-base-content/60">Propietario</p>
-            </div>
-          </div>
-        </section>
+        <!-- Card Miembros: columnas 5-9, filas 2-5. -->
+        <ListaMiembrosProyecto
+          :id-proyecto="proyecto.idProyecto"
+          :propietario="proyecto.propietario"
+          class="md:col-span-6 xl:col-start-5 xl:col-span-5 xl:row-start-2 xl:row-end-6"
+        />
 
         <!-- Card 4: comentarios y observaciones, fila 3. -->
         <section

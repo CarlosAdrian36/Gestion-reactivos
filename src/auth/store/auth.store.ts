@@ -165,6 +165,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     isChecking: computed(() => authStatus.value === AuthStatus.Checking),
     isAuthenticated: computed(() => authStatus.value === AuthStatus.Authenticated),
+    esAdministrador: computed(
+      () =>
+        user.value?.roles.some((rol) => rol.nombre.trim().toLowerCase() === 'administrador') ?? false,
+    ),
 
     //Actions
     login,

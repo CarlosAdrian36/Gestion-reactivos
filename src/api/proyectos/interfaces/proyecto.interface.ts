@@ -59,3 +59,42 @@ export interface ProyectoDetalleResponse {
 export interface ProyectosResponse {
   proyectos: BancoProyecto[]
 }
+
+export interface UpdateProyectoRequest {
+  nombre: string
+  descripcion: string
+  idiomas?: string[] | null
+  notificaciones?: boolean | null
+  fechaEntrega?: string | null
+}
+
+export interface UpdateProyectoResponse {
+  proyectos: BancoProyecto
+}
+
+export interface Integrante {
+  idProyecto: string
+  idCuenta: string
+  nombre: string
+  apellidoPaterno: string
+  apellidoMaterno: string
+  fechaCreacion: string
+  fechaModificacion: string
+  funciones: Funcion[]
+}
+
+export interface ConsultarIntegrantesResponse {
+  integrantes: Integrante[]
+}
+
+export interface ConsultarFuncionesResponse {
+  funciones: Funcion[]
+}
+
+export interface AsignarFuncionRequest {
+  funcionId: number | string
+}
+
+export interface AsignarFuncionResponse {
+  funcionAsignada: boolean
+}
