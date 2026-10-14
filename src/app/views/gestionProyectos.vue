@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
 import { getProyectosAction } from '@/api/proyectos/actions/get-proyectos.actions'
 import type { BancoProyecto } from '@/api/proyectos/interfaces/proyecto.interface'
 import router from '@/router'
@@ -8,6 +7,7 @@ import DataTable from '@/app/common/components/table/DataTable.vue'
 import type { DataTableColumns } from '@/app/common/components/table/features'
 import WorkflowStepper from '@/app/common/components/WorkflowStepper.vue'
 import NuevoProyecto from '@/app/common/components/modals/nuevoProyecto.vue'
+import EditarProyecto from '@/app/common/components/modals/editarProyecto.vue'
 import EliminarProyecto from '@/app/common/components/modals/eliminarProyecto.vue'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { useAuthStore } from '@/auth/store/auth.store'
@@ -17,12 +17,6 @@ import banderaFr from '@/assets/banderas/fr.png'
 const modal = useModalStore()
 const authStore = useAuthStore()
 
-const puedeEliminarProyectos = computed(
-  () =>
-    authStore.user?.roles.some((rol) => rol.nombre.trim().toLowerCase() === 'administrador') ??
-    false,
-)
-
 function abrirModalProyecto() {
   modal.openModal(NuevoProyecto, {}, [
     { label: 'Cerrar', variant: 'outline' },
@@ -31,6 +25,17 @@ function abrirModalProyecto() {
 }
 function closeDropdown() {
   ;(document.activeElement as HTMLElement)?.blur()
+}
+function abrirModalEditarProyecto(proyecto: BancoProyecto) {
+  closeDropdown()
+  modal.openModal(
+    EditarProyecto,
+    { proyecto },
+    [
+      { label: 'Cancelar', variant: 'outline' },
+      { label: 'Guardar', variant: 'primary', type: 'submit' },
+    ],
+  )
 }
 function abrirModalEliminarProyecto(proyecto: BancoProyecto) {
   closeDropdown()
@@ -170,11 +175,13 @@ function getBandera(etiqueta: string): string {
             <li>
               <a><i class="fa-regular fa-eye"></i>Ver</a>
             </li>
-            <li>
-              <a><i class="fa-regular fa-pen"></i>Editar</a>
+            <li v-if="authStore.esAdministrador">
+              <a @click="abrirModalEditarProyecto(row)">
+                <i class="fa-regular fa-pen"></i>Editar
+              </a>
             </li>
-            <div v-if="puedeEliminarProyectos" class="divider my-1"></div>
-            <li v-if="puedeEliminarProyectos">
+            <div v-if="authStore.esAdministrador" class="divider my-1"></div>
+            <li v-if="authStore.esAdministrador">
               <a class="text-error" @click="abrirModalEliminarProyecto(row)">
                 <i class="fa-regular fa-trash"></i>Eliminar
               </a>

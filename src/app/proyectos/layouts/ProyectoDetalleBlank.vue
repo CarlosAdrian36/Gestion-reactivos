@@ -2,12 +2,20 @@
 import { computed } from 'vue'
 import type { ProyectoDetalle } from '@/api/proyectos/interfaces/proyecto.interface'
 import FlujoDeTrabajo from '@/app/proyectos/components/FlujoDeTrabajo.vue'
+import ListaMiembrosProyecto from '@/app/proyectos/components/ListaMiembrosProyecto.vue'
+import ListaReactivosProyecto from '@/app/proyectos/components/ListaReactivosProyecto.vue'
+import EditarProyecto from '@/app/common/components/modals/editarProyecto.vue'
+import { useAuthStore } from '@/auth/store/auth.store'
+import { useModalStore } from '@/common/modals/store/modal.store'
 import banderaUs from '@/assets/banderas/us.png'
 import banderaFr from '@/assets/banderas/fr.png'
 
 const props = defineProps<{
   proyecto: ProyectoDetalle
 }>()
+
+const authStore = useAuthStore()
+const modal = useModalStore()
 
 const BANDERAS: Record<string, string> = {
   en_US: banderaUs,
@@ -18,15 +26,16 @@ const idiomasSinEspanol = computed(() =>
   props.proyecto.idiomas.filter((idioma) => idioma.etiqueta !== 'es_MX'),
 )
 
-const iniciales = computed(() => {
-  const { nombre, apellidoPaterno } = props.proyecto.propietario
-  return `${nombre.charAt(0)}${apellidoPaterno.charAt(0)}`.toUpperCase()
-})
-
-const nombrePropietario = computed(() => {
-  const { nombre, apellidoPaterno, apellidoMaterno } = props.proyecto.propietario
-  return `${nombre} ${apellidoPaterno} ${apellidoMaterno}`
-})
+function abrirModalEditarProyecto(): void {
+  modal.openModal(
+    EditarProyecto,
+    { proyecto: props.proyecto },
+    [
+      { label: 'Cancelar', variant: 'outline' },
+      { label: 'Guardar', variant: 'primary', type: 'submit' },
+    ],
+  )
+}
 </script>
 
 <template>
@@ -38,11 +47,12 @@ const nombrePropietario = computed(() => {
         Grid base: 1 columna en móvil, 6 en tablet y 12 en escritorio.
         Ocupa toda la altura disponible del área de contenido (main h-full + grid flex-1),
         así las filas se reparten el alto y no se genera scroll.
-        En xl hay tres filas: encabezado y dos filas de contenido.
+        En xl hay 6 filas (prueba): la 1 y la 6 son `auto` (encabezado y comentarios
+        miden su contenido) y las 4 del medio son flexibles (reactivos y miembros).
         Ajusta col-start, col-span, row-start y row-end para mover o dimensionar cada card.
       -->
       <div
-        class="grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-6 xl:grid-cols-12 xl:grid-rows-[auto_minmax(0,1fr)_minmax(0,1fr)] xl:gap-5 items-stretch short:gap-2"
+        class="grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-6 xl:grid-cols-12 xl:grid-rows-[auto_repeat(4,minmax(0,1fr))_auto] xl:gap-5 items-stretch short:gap-2"
       >
         <!-- Encabezado: fila 1. -->
         <header
@@ -96,6 +106,15 @@ const nombrePropietario = computed(() => {
 
             <div class="flex flex-wrap gap-2">
               <button
+                v-if="authStore.esAdministrador"
+                type="button"
+                class="btn btn-sm btn-primary rounded-full"
+                @click="abrirModalEditarProyecto"
+              >
+                <i class="fa-regular fa-pen"></i>
+                Editar
+              </button>
+              <button
                 type="button"
                 disabled
                 title="Disponible próximamente"
@@ -126,65 +145,29 @@ const nombrePropietario = computed(() => {
           </div>
         </header>
 
-        <!-- Card 1: reactivos, fila 2. -->
-        <section
-          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-3 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-2 p-5 sm:p-6 short:p-3"
-        >
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-bold uppercase tracking-wider">Reactivos</h2>
-            <span class="badge badge-outline">{{ proyecto.cantidadReactivos }}</span>
-          </div>
-
-          <div
-            class="mt-6 flex flex-1 items-center justify-center text-center text-sm text-base-content/60"
-          >
-            {{ proyecto.cantidadReactivos }}
-            {{ proyecto.cantidadReactivos === 1 ? 'reactivo' : 'reactivos' }} en este proyecto
-          </div>
-
-          <button
-            type="button"
-            disabled
-            title="Disponible próximamente"
-            class="mt-4 w-full rounded-2xl border-2 border-dashed border-base-300 py-4 text-sm font-semibold text-base-content/60"
-          >
-            <i class="fa-regular fa-plus"></i>
-            Crear reactivo
-          </button>
-        </section>
+        <!-- Card Reactivos: columnas 1-4, fila 2. -->
+        <ListaReactivosProyecto
+          :id-proyecto="proyecto.idProyecto"
+          :total="proyecto.cantidadReactivos"
+          class="md:col-span-3 xl:col-start-1 xl:col-span-4 xl:row-start-2 xl:row-end-6"
+        />
 
         <!-- Card 2: flujo de trabajo, columna derecha y filas 1-3. -->
         <FlujoDeTrabajo
           :fases="proyecto.fases"
-          class="md:col-span-3 md:min-h-0 xl:col-start-10 xl:col-span-3 xl:row-start-1 xl:row-end-4"
+          class="md:col-span-3 md:min-h-0 xl:col-start-10 xl:col-span-3 xl:row-start-1 xl:row-end-7"
         />
 
-        <!-- Card 3: miembros, fila 2. -->
-        <section
-          class="card min-h-72 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-5 xl:col-span-5 xl:row-start-2 p-5 sm:p-6 short:p-3"
-        >
-          <h2 class="text-sm font-bold uppercase tracking-wider">Miembros</h2>
-
-          <div
-            class="mt-6 flex items-center gap-3 rounded-2xl border border-base-200 bg-base-200/50 p-3"
-          >
-            <div
-              class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-content"
-            >
-              {{ iniciales }}
-            </div>
-            <div class="min-w-0">
-              <p class="truncate text-sm font-semibold" :title="nombrePropietario">
-                {{ nombrePropietario }}
-              </p>
-              <p class="text-xs text-base-content/60">Propietario</p>
-            </div>
-          </div>
-        </section>
+        <!-- Card Miembros: columnas 5-9, filas 2-5. -->
+        <ListaMiembrosProyecto
+          :id-proyecto="proyecto.idProyecto"
+          :propietario="proyecto.propietario"
+          class="md:col-span-6 xl:col-start-5 xl:col-span-5 xl:row-start-2 xl:row-end-6"
+        />
 
         <!-- Card 4: comentarios y observaciones, fila 3. -->
         <section
-          class="card min-h-56 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-9 xl:row-start-3 p-5 sm:p-6 short:p-3"
+          class="card min-h-56 border border-base-300 bg-base-100 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-9 xl:row-start-6 p-5 sm:p-6 short:p-3"
         >
           <h2 class="text-sm font-bold uppercase tracking-wider">Comentarios y observaciones</h2>
 
