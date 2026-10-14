@@ -36,7 +36,7 @@ const pasos = computed(() =>
   <section class="card flex h-full min-h-72 flex-col border border-base-300 bg-base-100 md:min-h-0">
     <div class="flex h-full flex-1 flex-col overflow-hidden p-4 sm:p-5 short:p-3">
       <h2 class="text-center text-sm font-bold uppercase tracking-wider">Flujo de trabajo</h2>
-
+      <!-- paso  -->
       <div class="mt-5 flex min-h-0 flex-1 items-center justify-center overflow-y-auto short:mt-2">
         <ol class="relative w-full max-w-xs">
           <div aria-hidden="true" class="absolute left-5 top-5 bottom-5 w-px bg-base-300"></div>
