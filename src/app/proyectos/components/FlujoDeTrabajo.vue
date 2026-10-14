@@ -60,9 +60,9 @@ const lineaHorizontal = computed(() => {
         Flujo de trabajo
       </h2>
 
-      <div class="mt-5 flex min-h-0 flex-1 overflow-hidden sm:items-center short:mt-2">
+      <div class="mt-5 flex min-h-0 flex-1 justify-center overflow-hidden sm:items-center short:mt-2">
         <ol
-          class="relative flex w-full flex-row items-start justify-between sm:flex-col sm:items-stretch"
+          class="relative flex w-full flex-row items-start justify-between sm:w-auto sm:flex-col sm:items-stretch"
           :class="esCompacto ? 'sm:justify-center sm:gap-28' : 'sm:h-full sm:justify-between'"
         >
           <!-- Línea horizontal (teléfono) -->
