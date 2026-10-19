@@ -127,6 +127,7 @@ const onSubmit = handleSubmit(async () => {
             <router-link
               :to="{ name: 'EnviodeCorreo' }"
               class="text-xs font-semibold text-primary hover:underline"
+              tabindex="1"
             >
               ¿Olvidaste tu contraseña?
             </router-link>
@@ -161,7 +162,10 @@ const onSubmit = handleSubmit(async () => {
               @click="togglePassword"
               class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"
             >
-              <i :class="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+              <i
+                tabindex="1"
+                :class="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"
+              ></i>
             </button>
           </div>
         </div>
