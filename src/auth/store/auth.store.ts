@@ -41,6 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const loginResp = await loginAction(data)
+      console.log('loginResp', loginResp)
       if (!loginResp.ok) {
         clearSession()
         return { ok: false, message: loginResp.message }
@@ -167,7 +168,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated: computed(() => authStatus.value === AuthStatus.Authenticated),
     esAdministrador: computed(
       () =>
-        user.value?.roles.some((rol) => rol.nombre.trim().toLowerCase() === 'administrador') ?? false,
+        user.value?.roles.some((rol) => rol.nombre.trim().toLowerCase() === 'administrador') ??
+        false,
     ),
 
     //Actions
