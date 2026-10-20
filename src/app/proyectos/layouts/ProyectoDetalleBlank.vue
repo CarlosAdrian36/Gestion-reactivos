@@ -27,14 +27,10 @@ const idiomasSinEspanol = computed(() =>
 )
 
 function abrirModalEditarProyecto(): void {
-  modal.openModal(
-    EditarProyecto,
-    { proyecto: props.proyecto },
-    [
-      { label: 'Cancelar', variant: 'outline' },
-      { label: 'Guardar', variant: 'primary', type: 'submit' },
-    ],
-  )
+  modal.openModal(EditarProyecto, { proyecto: props.proyecto }, [
+    { label: 'Cancelar', variant: 'outline' },
+    { label: 'Guardar', variant: 'primary', type: 'submit' },
+  ])
 }
 </script>
 
@@ -121,7 +117,7 @@ function abrirModalEditarProyecto(): void {
                 class="btn btn-sm btn-outline rounded-full"
               >
                 <i class="fa-regular fa-user-group"></i>
-                Miembros
+                Miembross
               </button>
               <button
                 type="button"

@@ -6,9 +6,11 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { toast } from 'vue-sonner'
 
 import { useAuthStore } from '../store/auth.store'
+import { useModalStore } from '@/common/modals/store/modal.store'
+import TumbarSesion from '@/app/common/components/modals/tumbarSesion.vue'
 
 const authStore = useAuthStore()
-
+const modal = useModalStore()
 const loginSchema = z.object({
   usuario: z.string().min(1, 'El usuario es requerido'),
   contrasena: z.string().min(1, 'La contraseña es requerida'),
@@ -31,31 +33,50 @@ const { handleSubmit, errors, meta, defineField, isSubmitting } = useForm<LoginF
 const [usuario, usaurioatributos] = defineField('usuario')
 const [contrasena, contrasenaatributos] = defineField('contrasena')
 
-const onSubmit = handleSubmit(async () => {
-  if (authStore.hasActiveSession()) {
-    const tiempo = authStore.getRemainingTime()
-    toast.warning(`Ya tienes una sesión activa. Espera ${tiempo} para que expire.`)
-    return
-  }
+// const onSubmit = handleSubmit(async () => {
+//   if (authStore.hasActiveSession()) {
+//     const tiempo = authStore.getRemainingTime()
+//     toast.warning(
+//       `${tiempo} minutos restantes de sesión activa. Cierre sesión antes de iniciar una nueva.`,
+//     )
+//     return
+//   }
 
+//   const result = await authStore.login({
+//     nombreUsuario: usuario.value,
+//     password: contrasena.value,
+//   })
+//   if (result.ok) return
+//   toast.error(result.message || 'Ocurrió un error al iniciar sesión. Intente nuevamente.')
+// })
+
+const onSubmit = handleSubmit(async () => {
+  console.log('Iniciando sesión con:', usuario.value, contrasena.value)
   const result = await authStore.login({
     nombreUsuario: usuario.value,
     password: contrasena.value,
   })
-  if (result.ok) return
-
-  const esErrorServidor =
-    !result.message ||
-    result.message.includes('servidor') ||
-    result.message.includes('conectar') ||
-    result.message.includes('500') ||
-    result.message.includes('Internal')
-
-  toast.error(
-    esErrorServidor
-      ? 'El servicio no está disponible. Intente más tarde.'
-      : 'Ususario o contraseña incorrectos. Verifique sus credenciales e intente nuevamente.',
-  )
+  console.log('Resultado del inicio de sesión:', result.message)
+  if (!result.ok) {
+    if (result.message === 'Ya existe una sesión activa para este usuario.') {
+      modal.openModal(
+        TumbarSesion,
+        {
+          usuario: usuario.value,
+          contrasena: contrasena.value,
+        },
+        [
+          { label: 'Cerrar', variant: 'outline' },
+          { label: 'Aceptar', variant: 'primary', type: 'submit' },
+        ],
+        'max-w-2xl',
+      )
+    } else {
+      toast.error(result.message || 'Ocurrió un error al iniciar sesión. Intente nuevamente.')
+    }
+  }
+  if (result.ok) {
+  }
 })
 </script>
 
@@ -127,6 +148,7 @@ const onSubmit = handleSubmit(async () => {
             <router-link
               :to="{ name: 'EnviodeCorreo' }"
               class="text-xs font-semibold text-primary hover:underline"
+              tabindex="1"
             >
               ¿Olvidaste tu contraseña?
             </router-link>
@@ -161,7 +183,10 @@ const onSubmit = handleSubmit(async () => {
               @click="togglePassword"
               class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"
             >
-              <i :class="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"></i>
+              <i
+                tabindex="1"
+                :class="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'"
+              ></i>
             </button>
           </div>
         </div>

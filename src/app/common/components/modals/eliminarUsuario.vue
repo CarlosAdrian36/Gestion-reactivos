@@ -22,8 +22,8 @@
         <i class="fa-regular fa-circle-info"></i>
       </div>
       <p class="text-slate-700 text-sm leading-relaxed">
-        Esta acción eliminará el usuario y todos sus datos asociados. Esta acción no se puede
-        deshacer.
+        El usuario y sus datos vinculados serán eliminados definitivamente. Esta operación es
+        irreversible.
       </p>
     </div>
   </main>

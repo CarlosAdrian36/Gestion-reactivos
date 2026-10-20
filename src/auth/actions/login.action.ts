@@ -17,10 +17,13 @@ export const loginAction = async (data: LoginCredentials): Promise<LoginSuccess 
   } catch (error) {
     if (isAxiosError(error)) {
       if (!error.response || error.response.status >= 500) {
-        return { ok: false, message: '' }
+        return { ok: false, message: 'El servicio no pudo conectar con el servidor.' }
       }
-      return { ok: false, message: error.response?.data?.detail ?? '' }
+      return {
+        ok: false,
+        message: error.response?.data?.detail ?? 'Ocurrió un error al intentar iniciar sesión.',
+      }
     }
-    return { ok: false, message: '' }
+    return { ok: false, message: 'Ocurrió un error al intentar iniciar sesión.' }
   }
 }
