@@ -7,7 +7,7 @@ export interface Cuenta {
   nombreUsuario: string
   esCuentaAcademica: boolean
   vigencia: boolean
-  fechaExpiracion: null
+  fechaExpiracion: string | null
   identidad: Identidad
   correos: Correo[]
   roles: Role[]

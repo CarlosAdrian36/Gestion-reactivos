@@ -23,13 +23,27 @@
               <i class="fa-regular fa-rotate-right"></i>
             </button>
           </div>
-          <div class="tooltip" data-tip="Editar">
-            <button class="btn btn-soft btn-info" @click="editarUsuario(row)">
+          <div
+            class="tooltip"
+            :data-tip="esAdministrador(row) ? 'No se puede editar un administrador' : 'Editar'"
+          >
+            <button
+              class="btn btn-soft btn-info"
+              :disabled="esAdministrador(row)"
+              @click="editarUsuario(row)"
+            >
               <i class="fa-regular fa-pen-to-square"></i>
             </button>
           </div>
-          <div class="tooltip" data-tip="Eliminar">
-            <button class="btn btn-soft btn-error" @click="eliminarUsuario(row)">
+          <div
+            class="tooltip"
+            :data-tip="esAdministrador(row) ? 'No se puede eliminar un administrador' : 'Eliminar'"
+          >
+            <button
+              class="btn btn-soft btn-error"
+              :disabled="esAdministrador(row)"
+              @click="eliminarUsuario(row)"
+            >
               <i class="fa-regular fa-trash"></i>
             </button>
           </div>
@@ -114,6 +128,10 @@ const columnas: DataTableColumns<Cuenta> = [
 
 const modal = useModalStore()
 
+function esAdministrador(usuario: Cuenta): boolean {
+  return usuario.roles.some((rol) => rol.nombre.trim().toLowerCase() === 'administrador')
+}
+
 function NuevoUsuario() {
   modal.openModal(
     CrearUsuario,
@@ -127,6 +145,8 @@ function NuevoUsuario() {
 }
 
 function editarUsuario(usuario: Cuenta) {
+  if (esAdministrador(usuario)) return
+
   modal.openModal(
     CrearUsuario,
     { usuario },
@@ -139,6 +159,8 @@ function editarUsuario(usuario: Cuenta) {
 }
 
 function eliminarUsuario(usuario: Cuenta) {
+  if (esAdministrador(usuario)) return
+
   modal.openModal(
     EliminarUsuario,
     { usuario },

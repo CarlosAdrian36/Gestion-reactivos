@@ -206,7 +206,7 @@ import { updateUser } from '@/api/usuarios/actions/update-user.action'
 
 import type { CreateUserRequest } from '@/api/usuarios/interfaces/createUser.interface'
 import type { UpdateUserRequest } from '@/api/usuarios/interfaces/updateUser.interface'
-import type { Cuenta } from '@/api/usuarios/interfaces/user-response.interface'
+import type { Cuenta } from '@/api/usuarios/interfaces/ususarios.interface'
 
 const props = defineProps<{
   usuario?: Cuenta
@@ -272,7 +272,8 @@ const { data: roles } = useQuery({
   refetchOnReconnect: true, // refetch al recuperar red
 })
 const updateUserMutation = useMutation({
-  mutationFn: ({ guid, data }: { guid: string; data: UpdateUserRequest }) => updateUser(guid, data),
+  mutationFn: ({ idCuenta, data }: { idCuenta: string; data: UpdateUserRequest }) =>
+    updateUser(idCuenta, data),
 
   onSuccess: () => {
     toast.success('Usuario actualizado correctamente')
@@ -313,7 +314,7 @@ const onSubmit = handleSubmit(async (values) => {
       }
 
       await updateUserMutation.mutateAsync({
-        guid: props.usuario.guid,
+        idCuenta: props.usuario.idCuenta,
         data: user,
       })
     } else {

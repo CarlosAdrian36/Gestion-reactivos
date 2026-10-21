@@ -3,9 +3,13 @@ import { isAxiosError } from 'axios'
 import type { UpdateUserRequest } from '../interfaces/updateUser.interface'
 import type { CreateUserResponse } from '../interfaces/user-response.interface'
 
-export const updateUser = async (guid: string, user: UpdateUserRequest): Promise<CreateUserResponse> => {
+export const updateUser = async (
+  idCuenta: string,
+  user: UpdateUserRequest,
+): Promise<CreateUserResponse> => {
   try {
-    const { data } = await apiClient.patch<CreateUserResponse>(`/cuentas/${guid}`, user)
+    console.warn('updateUser', idCuenta, user)
+    const { data } = await apiClient.patch<CreateUserResponse>(`/cuentas/${idCuenta}`, user)
     return data
   } catch (error) {
     if (isAxiosError(error)) {
