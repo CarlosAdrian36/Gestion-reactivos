@@ -7,6 +7,8 @@ import { useLocalStorage } from '@vueuse/core'
 import { logoutApi } from '../api/auth.api'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { queryClient } from '@/api/queryClient'
+import ExtenderSesion from '@/app/common/components/modals/extenderSesion.vue'
+import { extenderSesionAction } from '../actions/extenderSesion'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')
@@ -15,6 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<Cuenta | null>(null)
   const modal = useModalStore()
   const now = ref(Date.now())
+  const avisoExtenisonMostrado = ref(false)
 
   setInterval(() => {
     now.value = Date.now()
@@ -53,6 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = loginResp.token
       authStatus.value = AuthStatus.Authenticated
       expiracion.value = Date.now() + loginResp.tiempoRestante * 1000
+      avisoExtenisonMostrado.value = false
       await loadUserProfile()
 
       return { ok: true }
@@ -125,6 +129,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
     return `${secs} segundo${secs !== 1 ? 's' : ''}`
   }
+  const extenderSesion = async () => {
+    const { sesionDTO } = await extenderSesionAction()
+    token.value = sesionDTO.token
+    expiracion.value = Date.now() + sesionDTO.tiempoRestante * 1000
+    avisoExtenisonMostrado.value = false
+  }
 
   const clearSession = () => {
     modal.isOpen = false
@@ -137,7 +147,17 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('expiracion')
     queryClient.clear()
     user.value = null
+    avisoExtenisonMostrado.value = false
   }
+  watch(remainingSeconds, (value) => {
+    if (value <= 300 && value > 0 && token.value && !avisoExtenisonMostrado.value) {
+      avisoExtenisonMostrado.value = true
+      modal.openModal(ExtenderSesion, {}, [
+        { label: 'No', variant: 'outline' },
+        { label: 'Extender', variant: 'primary', type: 'submit' },
+      ])
+    }
+  })
   watch(remainingSeconds, async (value) => {
     if (value <= 0 && token.value && !isLoggingOut) {
       isLoggingOut = true
@@ -183,5 +203,6 @@ export const useAuthStore = defineStore('auth', () => {
     clearSession,
     hasActiveSession,
     getRemainingTime,
+    extenderSesion,
   }
 })
