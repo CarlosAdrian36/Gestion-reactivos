@@ -36,11 +36,14 @@ export const useAuthStore = defineStore('auth', () => {
   let authCheckPromise: Promise<boolean> | null = null
   let isLoggingOut = false
 
-  const login = async (data: LoginCredentials): Promise<{ ok: boolean; message?: string }> => {
+  const login = async (
+    data: LoginCredentials,
+    Imperative = false,
+  ): Promise<{ ok: boolean; message?: string }> => {
     authStatus.value = AuthStatus.Checking
 
     try {
-      const loginResp = await loginAction(data)
+      const loginResp = await loginAction(data, Imperative)
       console.log('loginResp', loginResp)
       if (!loginResp.ok) {
         clearSession()

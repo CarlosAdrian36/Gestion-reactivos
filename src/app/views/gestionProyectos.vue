@@ -28,14 +28,10 @@ function closeDropdown() {
 }
 function abrirModalEditarProyecto(proyecto: BancoProyecto) {
   closeDropdown()
-  modal.openModal(
-    EditarProyecto,
-    { proyecto },
-    [
-      { label: 'Cancelar', variant: 'outline' },
-      { label: 'Guardar', variant: 'primary', type: 'submit' },
-    ],
-  )
+  modal.openModal(EditarProyecto, { proyecto }, [
+    { label: 'Cancelar', variant: 'outline' },
+    { label: 'Guardar', variant: 'primary', type: 'submit' },
+  ])
 }
 function abrirModalEliminarProyecto(proyecto: BancoProyecto) {
   closeDropdown()
@@ -109,7 +105,7 @@ function getBandera(etiqueta: string): string {
 </script>
 
 <template>
-  <div class="max-w-8xl mx-auto">
+  <div class="max-w-8xl mx-auto p-8">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
       <div>
         <h1 class="text-2xl font-bold">Gestion de Proyectos</h1>
