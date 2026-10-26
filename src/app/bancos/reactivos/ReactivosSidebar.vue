@@ -174,7 +174,7 @@ function fmtDate(iso: string): string {
             :class="
               isActive(item)
                 ? 'bg-primary/8 border-primary/30 shadow-sm shadow-primary/10'
-                : 'border-transparent hover:bg-white hover:border-base-300 hover:shadow-sm'
+                : 'border-transparent hover:bg-base-100 hover:border-base-300 hover:shadow-sm'
             "
           >
             <div
@@ -246,7 +246,7 @@ function fmtDate(iso: string): string {
             :class="
               isActive(item)
                 ? 'bg-primary/8 border-primary/30 shadow-sm shadow-primary/10'
-                : 'border-transparent hover:bg-white hover:border-base-300 hover:shadow-sm'
+                : 'border-transparent hover:bg-base-200 hover:border-base-300 hover:shadow-sm'
             "
           >
             <div
