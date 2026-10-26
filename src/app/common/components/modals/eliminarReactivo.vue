@@ -50,7 +50,17 @@ const props = defineProps<{
 
 const onSubmit = async () => {
   try {
-    await deleteReactivoAction(props.bancoId, props.reactivo.idReactivo)
+    console.warn(props.bancoId, props.reactivo)
+    const result = await deleteReactivoAction(
+      props.bancoId,
+      props.reactivo.idReactivo,
+      props.reactivo.grupo,
+    )
+    if (!result.reactivoEliminado) {
+      toast.error('No se pudo eliminar el reactivo')
+      return
+    }
+
     toast.success('Se eliminó el reactivo correctamente')
     clear()
     await queryClient.invalidateQueries({

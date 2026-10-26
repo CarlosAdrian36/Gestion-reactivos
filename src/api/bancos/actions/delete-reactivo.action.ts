@@ -7,15 +7,14 @@ export const deleteReactivoAction = async (
   idGrupo?: number | null,
 ): Promise<{ reactivoEliminado: boolean }> => {
   try {
-    const config =
-      idGrupo != null && idGrupo > 0 ? { data: { idGrupo } } : undefined
     const { data } = await apiClient.delete<{ reactivoEliminado: boolean }>(
       `/bancos/${bancoId}/reactivos/${idReactivo}`,
-      config,
+      { data: { idGrupo: idGrupo ?? 0 } },
     )
     return data
   } catch (error) {
     if (isAxiosError(error)) {
+      console.log(error)
       throw new Error(
         error.response?.data?.detail ?? `Error del servidor (${error.response?.status})`,
       )
