@@ -193,7 +193,7 @@ const onSubmit = handleSubmit(async () => {
       <div class="flex justify-center gap-4 mt-2">
         <a class="hover:text-white" href="#">Aviso de Privacidad</a>
         <span class="text-white/20">•</span>
-        <a class="hover:text-white" href="#">v.0.0.1</a>
+        <a class="hover:text-white" href="#">v.0.2.1</a>
       </div>
     </div>
   </div>
