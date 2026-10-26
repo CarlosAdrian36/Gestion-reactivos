@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const bancoId = route.params.id as string
-const { guardarPregunta, guardandoPregunta } = useGuardarReactivo(
+const { guardarTodo, isGuardando } = useGuardarReactivo(
   bancoId,
   TIPO_REACTIVO.preguntaAbierta,
   props.reactivo?.idReactivo,
@@ -20,12 +20,12 @@ const { guardarPregunta, guardandoPregunta } = useGuardarReactivo(
 
 const pregunta = ref(props.reactivo?.descripcion ?? '')
 
-function guardarPreguntaForm() {
+async function guardarPreguntaForm() {
   if (!pregunta.value.trim()) {
     toast.error('La pregunta no puede estar vacía')
     return
   }
-  guardarPregunta(pregunta.value)
+  await guardarTodo(pregunta.value)
 }
 </script>
 
@@ -43,11 +43,11 @@ function guardarPreguntaForm() {
       <div class="flex gap-3 pt-4">
         <button
           class="btn btn-primary"
-          :disabled="guardandoPregunta"
+          :disabled="isGuardando"
           @click="guardarPreguntaForm"
         >
-          <span v-if="guardandoPregunta" class="loading loading-spinner"></span>
-          {{ guardandoPregunta ? 'Guardando...' : 'Guardar' }}
+          <span v-if="isGuardando" class="loading loading-spinner"></span>
+          {{ isGuardando ? 'Guardando...' : 'Guardar' }}
         </button>
       </div>
     </div>

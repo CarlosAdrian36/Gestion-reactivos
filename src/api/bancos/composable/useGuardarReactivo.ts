@@ -1,5 +1,5 @@
 import { computed, onMounted, ref } from 'vue'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { getBancoById } from '@/api/bancos/actions/getBancoById.action'
@@ -8,6 +8,7 @@ import { crearRespuestaAction } from '@/api/bancos/actions/crear-respuesta.actio
 import { actualizarReactivoAction } from '@/api/bancos/actions/actualizar-reactivo.action'
 import { actualizarRespuestaAction } from '@/api/bancos/actions/actualizar-respuesta.action'
 import { eliminarRespuestaAction } from '@/api/bancos/actions/eliminar-respuesta.action'
+import { deleteReactivoAction } from '@/api/bancos/actions/delete-reactivo.action'
 import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
 import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { storeToRefs } from 'pinia'
@@ -22,12 +23,27 @@ export interface OpcionForm {
   correcta: boolean
 }
 
+async function ejecutarEnParalelo(operaciones: Promise<unknown>[], mensajeError: string) {
+  const resultados = await Promise.allSettled(operaciones)
+  const resultadoFallido = resultados.find((resultado) => resultado.status === 'rejected')
+
+  if (resultadoFallido?.status === 'rejected') {
+    throw resultadoFallido.reason instanceof Error
+      ? resultadoFallido.reason
+      : new Error(mensajeError)
+  }
+}
+
+function obtenerMensajeError(error: unknown, mensajeAlternativo: string): string {
+  return error instanceof Error ? error.message : mensajeAlternativo
+}
+
 export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idReactivo?: string) {
   const queryClient = useQueryClient()
   const router = useRouter()
   const { routeNames } = useBancoNavigation()
   const idiomaId = ref(1)
-  const reactivoCreado = ref<{ idReactivo: string } | null>(null)
+  const isGuardando = ref(false)
   const esEdicion = computed(() => Boolean(idReactivo))
 
   onMounted(async () => {
@@ -43,219 +59,157 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
     router.push({ name: routeNames.value.reactivos, params: { id: bancoId } })
   }
 
-  const sincronizarReactivo = async (descripcion?: string) => {
-    queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
+  const refrescarReactivos = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
     await queryClient.refetchQueries({ queryKey: ['reactivos', bancoId] })
+  }
+
+  const seleccionarReactivoActualizado = (id: string, descripcion?: string) => {
     const lista = queryClient.getQueryData<Reactivo[]>(['reactivos', bancoId])
     const reactivosStore = useReactivoSeleccionadoStore()
     const { selectedReactivo } = storeToRefs(reactivosStore)
-    const fresco = lista?.find((r) => r.idReactivo === idReactivo)
-    if (fresco) {
-      reactivosStore.select(fresco)
+    const reactivoActualizado = lista?.find((reactivo) => reactivo.idReactivo === id)
+
+    if (reactivoActualizado) {
+      reactivosStore.select(reactivoActualizado)
     } else if (descripcion && selectedReactivo.value) {
       reactivosStore.select({ ...selectedReactivo.value, descripcion })
     }
   }
 
-  const crearReactivoMutation = useMutation({
-    mutationFn: (descripcion: string) =>
-      crearReactivoAction(bancoId, {
-        idiomaId: idiomaId.value,
-        nivelCognitivoId: 1,
-        subTemaId: 1,
-        tipoReactivoId,
-        descripcion,
-      }),
-    onSuccess: (data) => {
-      reactivoCreado.value = data.reactivo
-      toast.success('Reactivo creado. Ahora guarda las respuestas.')
-      queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Error al crear el reactivo')
-    },
-  })
+  const crearRespuestas = async (id: string, opciones: OpcionForm[]) => {
+    const opcionesConTexto = opciones
+      .map((opcion, index) => ({ opcion, posicion: index + 1 }))
+      .filter(({ opcion }) => opcion.texto.trim().length > 0)
 
-  const actualizarReactivoMutation = useMutation({
-    mutationFn: (descripcion: string) =>
-      actualizarReactivoAction(bancoId, idReactivo!, { tipoReactivoId, descripcion }),
-    onSuccess: async (_data, descripcion) => {
-      await sincronizarReactivo(descripcion)
-      toast.success('Reactivo actualizado correctamente')
-      volverALista()
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Error al actualizar el reactivo')
-    },
-  })
-
-  const crearRespuestasMutation = useMutation({
-    mutationFn: async (opciones: OpcionForm[]) => {
-      const enviadas: boolean[] = []
-      for (let i = 0; i < opciones.length; i++) {
-        const opcion = opciones[i]!
-        if (opcion.texto.trim().length === 0) continue
-        console.error(i)
-        const res = await crearRespuestaAction(bancoId, reactivoCreado.value!.idReactivo, {
-          // idiomaId: idiomaId.value,
-          posicion: i + 1,
+    await ejecutarEnParalelo(
+      opcionesConTexto.map(({ opcion, posicion }) =>
+        crearRespuestaAction(bancoId, id, {
+          posicion,
           esCorrecta: opcion.correcta,
           respuesta: opcion.texto,
-        })
-        enviadas.push(res.respuestaCreada)
-      }
-      return enviadas
-    },
-    onSuccess: (enviadas) => {
-      toast.success(`${enviadas.length} respuesta(s) guardada(s) correctamente`)
-      queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Error al guardar las respuestas')
-    },
-  })
+        }),
+      ),
+      'Error al guardar las respuestas',
+    )
 
-  const sincronizarRespuestasMutation = useMutation({
-    mutationFn: async (payload: { opciones: OpcionForm[]; idsActuales: string[] }) => {
-      const { opciones, idsActuales } = payload
-      const idsConservados = opciones
-        .filter((o) => o.idRespuesta)
-        .map((o) => o.idRespuesta as string)
-      const idsEliminar = idsActuales.filter((id) => !idsConservados.includes(id))
-
-      for (const id of idsEliminar) {
-        await eliminarRespuestaAction(bancoId, idReactivo!, id)
-      }
-
-      let posicion = idsActuales.length + 1
-      for (const opcion of opciones) {
-        if (opcion.texto.trim().length === 0) continue
-        if (opcion.idRespuesta) {
-          await actualizarRespuestaAction(bancoId, idReactivo!, opcion.idRespuesta, {
-            esCorrecta: opcion.correcta,
-            respuesta: opcion.texto,
-          })
-        } else {
-          await crearRespuestaAction(bancoId, idReactivo!, {
-            posicion: posicion++,
-            esCorrecta: opcion.correcta,
-            respuesta: opcion.texto,
-          })
-        }
-      }
-    },
-    onSuccess: async () => {
-      await sincronizarReactivo()
-      queryClient.invalidateQueries({ queryKey: ['respuestas', bancoId, idReactivo] })
-      toast.success('Respuestas actualizadas correctamente')
-      volverALista()
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Error al guardar las respuestas')
-    },
-  })
-
-  const guardarPregunta = (descripcion: string) => {
-    if (esEdicion.value) actualizarReactivoMutation.mutate(descripcion)
-    else crearReactivoMutation.mutate(descripcion)
+    return opcionesConTexto.length
   }
 
-  const guardarRespuestas = (opciones: OpcionForm[], idsActuales: string[] = []) => {
-    if (esEdicion.value) sincronizarRespuestasMutation.mutate({ opciones, idsActuales })
-    else crearRespuestasMutation.mutate(opciones)
-  }
+  const sincronizarRespuestas = async (
+    idReactivoActual: string,
+    opciones: OpcionForm[],
+    idsActuales: string[],
+  ) => {
+    const idsConservados = new Set(
+      opciones.flatMap((opcion) => (opcion.idRespuesta ? [opcion.idRespuesta] : [])),
+    )
+    const idsEliminar = idsActuales.filter((id) => !idsConservados.has(id))
 
-  const isGuardando = ref(false)
+    await ejecutarEnParalelo(
+      idsEliminar.map((idRespuesta) =>
+        eliminarRespuestaAction(bancoId, idReactivoActual, idRespuesta),
+      ),
+      'Error al eliminar las respuestas',
+    )
 
-  const guardarCreacion = async (descripcion: string, opciones: OpcionForm[]): Promise<boolean> => {
-    if (!descripcion.trim()) {
-      toast.error('La pregunta no puede estar vacía')
-      return false
-    }
-    isGuardando.value = true
-    try {
-      await new Promise<void>((resolve, reject) => {
-        crearReactivoMutation.mutate(descripcion, {
-          onSuccess: () => resolve(),
-          onError: (error) => reject(error),
-        })
-      })
-
-      const enviadas: boolean[] = []
-      for (let i = 0; i < opciones.length; i++) {
-        const opcion = opciones[i]!
-        if (opcion.texto.trim().length === 0) continue
-        const res = await crearRespuestaAction(bancoId, reactivoCreado.value!.idReactivo, {
-          posicion: i + 1,
+    const opcionesExistentes = opciones.filter(
+      (opcion) => opcion.idRespuesta && opcion.texto.trim().length > 0,
+    )
+    await ejecutarEnParalelo(
+      opcionesExistentes.map((opcion) =>
+        actualizarRespuestaAction(bancoId, idReactivoActual, opcion.idRespuesta!, {
           esCorrecta: opcion.correcta,
           respuesta: opcion.texto,
-        })
-        enviadas.push(res.respuestaCreada)
-      }
+        }),
+      ),
+      'Error al actualizar las respuestas',
+    )
 
-      toast.success(`${enviadas.length} respuesta(s) guardada(s) correctamente`)
-      queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
-      await queryClient.refetchQueries({ queryKey: ['reactivos', bancoId] })
-
-      const lista = queryClient.getQueryData<Reactivo[]>(['reactivos', bancoId])
-      const reactivosStore = useReactivoSeleccionadoStore()
-      const fresco = lista?.find((r) => r.idReactivo === reactivoCreado.value!.idReactivo)
-      if (fresco) reactivosStore.select(fresco)
-
-      volverALista()
-      return true
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error al guardar el reactivo')
-      return false
-    } finally {
-      isGuardando.value = false
-    }
+    let posicion = idsActuales.length + 1
+    const opcionesNuevas = opciones.filter(
+      (opcion) => !opcion.idRespuesta && opcion.texto.trim().length > 0,
+    )
+    await ejecutarEnParalelo(
+      opcionesNuevas.map((opcion) =>
+        crearRespuestaAction(bancoId, idReactivoActual, {
+          posicion: posicion++,
+          esCorrecta: opcion.correcta,
+          respuesta: opcion.texto,
+        }),
+      ),
+      'Error al crear las respuestas nuevas',
+    )
   }
 
   const guardarTodo = async (
     descripcion: string,
     opciones?: OpcionForm[],
-    idsActuales?: string[],
+    idsActuales: string[] = [],
   ): Promise<boolean> => {
-    if (!esEdicion.value) return false
+    const descripcionLimpia = descripcion.trim()
+    if (!descripcionLimpia) {
+      toast.error('La pregunta no puede estar vacía')
+      return false
+    }
+
     isGuardando.value = true
     try {
-      await actualizarReactivoAction(bancoId, idReactivo!, { tipoReactivoId, descripcion })
+      if (esEdicion.value && idReactivo) {
+        await actualizarReactivoAction(bancoId, idReactivo, {
+          tipoReactivoId,
+          descripcion,
+        })
 
-      if (opciones && idsActuales) {
-        const idsConservados = opciones
-          .filter((o) => o.idRespuesta)
-          .map((o) => o.idRespuesta as string)
-        const idsEliminar = idsActuales.filter((id) => !idsConservados.includes(id))
-
-        for (const id of idsEliminar) {
-          await eliminarRespuestaAction(bancoId, idReactivo!, id)
+        if (opciones) {
+          await sincronizarRespuestas(idReactivo, opciones, idsActuales)
         }
 
-        let posicion = idsActuales.length + 1
-        for (const opcion of opciones) {
-          if (opcion.texto.trim().length === 0) continue
-          if (opcion.idRespuesta) {
-            await actualizarRespuestaAction(bancoId, idReactivo!, opcion.idRespuesta, {
-              esCorrecta: opcion.correcta,
-              respuesta: opcion.texto,
-            })
-          } else {
-            await crearRespuestaAction(bancoId, idReactivo!, {
-              posicion: posicion++,
-              esCorrecta: opcion.correcta,
-              respuesta: opcion.texto,
-            })
+        await refrescarReactivos()
+        seleccionarReactivoActualizado(idReactivo, descripcion)
+        await queryClient.invalidateQueries({ queryKey: ['respuestas', bancoId, idReactivo] })
+        toast.success('Reactivo actualizado correctamente')
+      } else {
+        const respuestaCreacion = await crearReactivoAction(bancoId, {
+          idiomaId: idiomaId.value,
+          nivelCognitivoId: 1,
+          subTemaId: 1,
+          tipoReactivoId,
+          descripcion,
+        })
+        const nuevoIdReactivo = respuestaCreacion.reactivo.idReactivo
+        let cantidadRespuestas = 0
+
+        if (opciones?.length) {
+          try {
+            cantidadRespuestas = await crearRespuestas(nuevoIdReactivo, opciones)
+          } catch (error) {
+            try {
+              await deleteReactivoAction(bancoId, nuevoIdReactivo)
+            } catch (errorRollback) {
+              throw new Error(
+                `${obtenerMensajeError(error, 'Error al guardar las respuestas')}. ` +
+                  `No se pudo revertir el reactivo incompleto: ${obtenerMensajeError(errorRollback, 'error desconocido')}`,
+              )
+            }
+            throw error
           }
         }
+
+        await refrescarReactivos()
+        seleccionarReactivoActualizado(nuevoIdReactivo, descripcion)
+        toast.success(
+          opciones?.length
+            ? `Reactivo y ${cantidadRespuestas} respuesta(s) guardados correctamente`
+            : 'Reactivo creado correctamente',
+        )
       }
 
-      await sincronizarReactivo(descripcion)
-      toast.success('Reactivo actualizado correctamente')
       volverALista()
       return true
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error al guardar el reactivo')
+      toast.error(obtenerMensajeError(error, 'Error al guardar el reactivo'))
+      await queryClient.invalidateQueries({ queryKey: ['reactivos', bancoId] })
       return false
     } finally {
       isGuardando.value = false
@@ -263,21 +217,7 @@ export function useGuardarReactivo(bancoId: string, tipoReactivoId: number, idRe
   }
 
   return {
-    reactivoCreado,
-    guardandoPregunta: computed(() =>
-      esEdicion.value
-        ? actualizarReactivoMutation.isPending.value
-        : crearReactivoMutation.isPending.value,
-    ),
-    guardandoRespuestas: computed(() =>
-      esEdicion.value
-        ? sincronizarRespuestasMutation.isPending.value
-        : crearRespuestasMutation.isPending.value,
-    ),
     isGuardando,
-    guardarPregunta,
-    guardarRespuestas,
-    guardarCreacion,
     guardarTodo,
   }
 }

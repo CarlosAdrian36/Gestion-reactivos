@@ -15,8 +15,11 @@ const props = defineProps<{
 
 const route = useRoute()
 const bancoId = route.params.id as string
-const { isGuardando, guardarCreacion, guardarTodo } =
-  useGuardarReactivo(bancoId, TIPO_REACTIVO.respuestaMultiple, props.reactivo?.idReactivo)
+const { isGuardando, guardarTodo } = useGuardarReactivo(
+  bancoId,
+  TIPO_REACTIVO.respuestaMultiple,
+  props.reactivo?.idReactivo,
+)
 
 const pregunta = ref(props.reactivo?.descripcion ?? '')
 const opciones = ref<OpcionForm[]>(
@@ -51,14 +54,6 @@ function quitarOpcion(index: number) {
   }
 }
 
-async function guardar() {
-  if (props.reactivo?.idReactivo) {
-    guardarTodoForm()
-  } else {
-    await guardarCreacion(pregunta.value, opciones.value)
-  }
-}
-
 const opcionConfig = {
   toolbarInline: false,
 
@@ -74,7 +69,7 @@ const opcionConfig = {
   toolbarSticky: false,
 }
 
-function guardarTodoForm() {
+async function guardar() {
   if (!pregunta.value.trim()) {
     toast.error('La pregunta no puede estar vacía')
     return
@@ -91,7 +86,7 @@ function guardarTodoForm() {
     return
   }
   erroresOpciones.value = []
-  guardarTodo(
+  await guardarTodo(
     pregunta.value,
     result.data.map((o, i) => ({
       idRespuesta: opciones.value[i]?.idRespuesta,
