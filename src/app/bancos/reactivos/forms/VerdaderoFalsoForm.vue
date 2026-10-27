@@ -36,10 +36,6 @@ async function guardarTodoForm() {
     toast.error('La afirmación no puede estar vacía')
     return
   }
-  if (respuestaCorrecta.value === null) {
-    toast.error('Selecciona la respuesta correcta')
-    return
-  }
   const idVerdadero = props.respuestas?.find(
     (r) => r.respuesta.trim().toLowerCase() === 'verdadero',
   )?.idRespuesta
@@ -103,7 +99,7 @@ async function guardarTodoForm() {
     <div class="flex gap-3 pt-4">
       <button
         class="btn btn-primary"
-        :disabled="isGuardando || respuestaCorrecta === null || !pregunta.trim()"
+        :disabled="isGuardando || !pregunta.trim()"
         @click="guardarTodoForm"
       >
         <span v-if="isGuardando" class="loading loading-spinner"></span>

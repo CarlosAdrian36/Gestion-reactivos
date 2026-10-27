@@ -89,7 +89,11 @@
             :disabled="isLoadingFunciones"
           >
             <option :value="null" disabled>Selecciona una función</option>
-            <option v-for="funcion in funciones" :key="funcion.funcionId" :value="funcion.funcionId">
+            <option
+              v-for="funcion in funciones"
+              :key="funcion.funcionId"
+              :value="funcion.funcionId"
+            >
               {{ funcion.nombre }}
             </option>
           </select>
@@ -120,14 +124,15 @@ const props = defineProps<{
 
 const modal = useModalStore()
 const queryClient = useQueryClient()
+const ROL_DOCENTE_ID = 3
 
 const busqueda = ref('')
 const funcionId = ref<number | null>(null)
 const usuarioSeleccionado = ref<Cuenta | null>(null)
 
 const { data: usuarios } = useQuery({
-  queryKey: ['usuarios'],
-  queryFn: getUsuariosAction,
+  queryKey: ['usuarios', 'rol', ROL_DOCENTE_ID],
+  queryFn: () => getUsuariosAction(ROL_DOCENTE_ID),
   staleTime: 1000 * 60,
   refetchOnWindowFocus: true,
 })
