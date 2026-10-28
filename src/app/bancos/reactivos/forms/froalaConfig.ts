@@ -24,7 +24,6 @@ export const preguntaConfig = {
     'formatUL',
     '|',
     'clearFormatting',
-    '|',
   ],
   placeholderText: 'Escribe la pregunta aquí...',
   heightMin: 120,
@@ -40,7 +39,7 @@ export const opcionConfig = {
   toolbarButtonsXS: ['bold'],
   placeholderText: 'Respuesta',
   heightMin: 80,
-  heightMax: 120,
+  editorClass: 'break-words',
   quickInsertEnabled: false,
   toolbarSticky: false,
 }

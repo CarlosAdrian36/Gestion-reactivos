@@ -250,7 +250,7 @@ async function guardarForm() {
         </div>
 
         <div class="overflow-x-auto">
-          <table class="table table-bordered w-full">
+          <table class="table table-bordered table-fixed w-full">
             <thead>
               <tr>
                 <th class="w-[40%] bg-base-200 text-xs font-semibold uppercase tracking-wider">
@@ -287,7 +287,7 @@ async function guardarForm() {
                     <div
                       v-for="(respuesta, respIndex) in reactivo.respuestas"
                       :key="respIndex"
-                      class="flex items-center gap-2"
+                      class="flex min-w-0 items-center gap-2"
                     >
                       <button
                         class="btn btn-xs cursor-pointer select-none transition-colors shrink-0 min-w-16 justify-center"
@@ -308,6 +308,7 @@ async function guardarForm() {
 
                       <div class="flex-1 min-w-0">
                         <FroalaEditor
+                          class="w-full min-w-0"
                           v-model="respuesta.texto"
                           :config="{
                             ...opcionConfig,

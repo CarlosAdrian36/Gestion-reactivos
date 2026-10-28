@@ -336,7 +336,7 @@ function fmtDate(iso: string): string {
                 </div>
 
                 <div v-else-if="reactivosGrupo.length" class="overflow-x-auto">
-                  <table class="table table-bordered w-full">
+                  <table class="table table-bordered table-fixed w-full">
                     <thead>
                       <tr>
                         <th class="bg-base-200 text-xs font-semibold uppercase tracking-wider w-[40%]">
@@ -357,7 +357,7 @@ function fmtDate(iso: string): string {
                       <tr v-for="reactivo in reactivosGrupo" :key="reactivo.idReactivo">
                         <td>
                           <div
-                            class="fr-view text-sm text-base-content leading-relaxed [&_p]:m-0"
+                            class="fr-view min-w-0 text-sm text-base-content leading-relaxed [overflow-wrap:anywhere] [&_p]:m-0"
                             v-html="reactivo.descripcion"
                           ></div>
                         </td>
@@ -379,7 +379,7 @@ function fmtDate(iso: string): string {
                                 {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
                               </span>
                               <span
-                                class="fr-view [&_p]:m-0"
+                                class="fr-view min-w-0 flex-1 [overflow-wrap:anywhere] [&_p]:m-0"
                                 :class="
                                   r.esCorrecta
                                     ? 'text-success font-medium'
