@@ -4,7 +4,7 @@
     <div>
       <h2 class="text-lg font-bold">Agregar integrante al proyecto</h2>
       <p class="text-sm text-base-content/60 mt-1">
-        Busca un usuario del sistema y asígnale una función.
+        Busca un usuario del sistema y asígnale una o varias funciones.
       </p>
     </div>
 
@@ -70,7 +70,7 @@
           <button
             type="button"
             class="btn btn-ghost btn-xs btn-circle text-base-content/60 hover:text-error"
-            @click="usuarioSeleccionado = null"
+            @click="limpiarUsuarioSeleccionado"
           >
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
@@ -78,25 +78,45 @@
 
         <!-- Función -->
         <div class="mt-4">
-          <label class="label" for="funcion-select">
-            <span class="label-text font-semibold">Función en el proyecto</span>
-          </label>
+          <p class="mb-3 text-sm font-semibold">
+            Seleccione las funciones en el proyecto para el usuario:
+          </p>
 
-          <select
-            id="funcion-select"
-            v-model.number="funcionId"
-            class="select select-bordered w-full"
-            :disabled="isLoadingFunciones || isLoadingProyecto"
+          <div
+            v-if="isLoadingFunciones || isLoadingProyecto"
+            class="flex items-center gap-2 text-sm text-base-content/60"
+            role="status"
           >
-            <option :value="null" disabled>Selecciona una función</option>
-            <option
+            <span class="loading loading-spinner loading-sm"></span>
+            Cargando funciones...
+          </div>
+
+          <div
+            v-else-if="funcionesDisponibles.length"
+            class="flex flex-wrap gap-2"
+            role="group"
+            aria-label="Funciones en el proyecto"
+          >
+            <button
               v-for="funcion in funcionesDisponibles"
               :key="funcion.funcionId"
-              :value="funcion.funcionId"
+              type="button"
+              class="badge badge-lg cursor-pointer transition-colors"
+              :class="
+                funcionesSeleccionadas.includes(funcion.funcionId)
+                  ? 'badge-primary'
+                  : 'badge-outline hover:badge-primary'
+              "
+              :aria-pressed="funcionesSeleccionadas.includes(funcion.funcionId)"
+              @click="alternarFuncion(funcion.funcionId)"
             >
               {{ funcion.nombre }}
-            </option>
-          </select>
+            </button>
+          </div>
+
+          <p v-else class="text-sm text-base-content/50">
+            No hay funciones disponibles para este proyecto.
+          </p>
         </div>
       </div>
     </div>
@@ -128,7 +148,7 @@ const queryClient = useQueryClient()
 const ROL_DOCENTE_ID = 3
 
 const busqueda = ref('')
-const funcionId = ref<number | null>(null)
+const funcionesSeleccionadas = ref<number[]>([])
 const usuarioSeleccionado = ref<Cuenta | null>(null)
 
 const { data: usuarios } = useQuery({
@@ -166,12 +186,8 @@ const funcionesDisponibles = computed(() =>
 )
 
 watch(funcionesDisponibles, (disponibles) => {
-  if (
-    funcionId.value !== null &&
-    !disponibles.some((funcion) => funcion.funcionId === funcionId.value)
-  ) {
-    funcionId.value = null
-  }
+  const idsDisponibles = new Set(disponibles.map((funcion) => funcion.funcionId))
+  funcionesSeleccionadas.value = funcionesSeleccionadas.value.filter((id) => idsDisponibles.has(id))
 })
 
 const resultados = computed(() => {
@@ -209,7 +225,22 @@ const resultados = computed(() => {
 
 function seleccionarUsuario(usuario: Cuenta) {
   usuarioSeleccionado.value = usuario
+  funcionesSeleccionadas.value = []
   busqueda.value = ''
+}
+
+function limpiarUsuarioSeleccionado() {
+  usuarioSeleccionado.value = null
+  funcionesSeleccionadas.value = []
+}
+
+function alternarFuncion(funcionId: number) {
+  if (funcionesSeleccionadas.value.includes(funcionId)) {
+    funcionesSeleccionadas.value = funcionesSeleccionadas.value.filter((id) => id !== funcionId)
+    return
+  }
+
+  funcionesSeleccionadas.value.push(funcionId)
 }
 
 async function agregar() {
@@ -218,28 +249,63 @@ async function agregar() {
     return
   }
 
-  if (funcionId.value === null) {
-    toast.error('Selecciona una función para el miembro')
+  if (funcionesSeleccionadas.value.length === 0) {
+    toast.error('Selecciona al menos una función para el miembro')
     return
   }
 
-  if (!funcionesDisponibles.value.some((funcion) => funcion.funcionId === funcionId.value)) {
-    toast.error('La función seleccionada no está disponible para este proyecto')
-    funcionId.value = null
+  const idsDisponibles = new Set(funcionesDisponibles.value.map((funcion) => funcion.funcionId))
+  const idsValidos = funcionesSeleccionadas.value.filter((id) => idsDisponibles.has(id))
+
+  if (idsValidos.length !== funcionesSeleccionadas.value.length) {
+    funcionesSeleccionadas.value = idsValidos
+    toast.error('Una o más funciones seleccionadas ya no están disponibles para este proyecto')
     return
   }
 
   try {
-    await asignarFuncionAction(props.idProyecto, usuarioSeleccionado.value.idCuenta, {
-      funcionId: funcionId.value,
-    })
+    const idsFallidos: number[] = []
+    let funcionesAsignadas = 0
+    let primerError: unknown
+
+    for (const funcionId of idsValidos) {
+      try {
+        await asignarFuncionAction(props.idProyecto, usuarioSeleccionado.value.idCuenta, {
+          funcionId,
+        })
+        funcionesAsignadas++
+      } catch (error) {
+        idsFallidos.push(funcionId)
+        primerError ??= error
+      }
+    }
 
     await queryClient.invalidateQueries({
       queryKey: ['integrantes-proyecto', props.idProyecto],
     })
 
+    if (idsFallidos.length > 0) {
+      funcionesSeleccionadas.value = idsFallidos
+      if (funcionesAsignadas > 0) {
+        const textoAsignadas = funcionesAsignadas === 1 ? 'función' : 'funciones'
+        const textoPendientes =
+          idsFallidos.length === 1 ? 'función quedó pendiente' : 'funciones quedaron pendientes'
+        toast.error(
+          `Se asignaron ${funcionesAsignadas} ${textoAsignadas}, pero ${idsFallidos.length} ${textoPendientes}. Puedes reintentarlo.`,
+        )
+      } else {
+        toast.error(
+          primerError instanceof Error
+            ? primerError.message
+            : 'No se pudieron asignar las funciones seleccionadas',
+        )
+      }
+      return
+    }
+
     modal.closeModal()
-    toast.success('Miembro agregado correctamente')
+    const textoFunciones = funcionesAsignadas === 1 ? 'función' : 'funciones'
+    toast.success(`Integrante agregado con ${funcionesAsignadas} ${textoFunciones}`)
   } catch (error) {
     toast.error(error instanceof Error ? error.message : 'Ocurrió un error al agregar el miembro')
   }
