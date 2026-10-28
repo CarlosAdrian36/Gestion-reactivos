@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { AuthStatus, type Cuenta, type LoginCredentials } from '../interface'
-import { checkAuthAction, loginAction } from '../actions'
+import { actualizarRolSesionAction, checkAuthAction, loginAction } from '../actions'
 import { getPerfilAction } from '@/api/usuarios/actions/get-perfil.action'
 import { useLocalStorage } from '@vueuse/core'
 import { logoutApi } from '../api/auth.api'
@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')
   const authStatus = ref<AuthStatus>(AuthStatus.Checking)
   const expiracion = useLocalStorage('expiracion', 0)
+  const rolActivoId = useLocalStorage<number | null>('rolActivoId', null)
   const user = ref<Cuenta | null>(null)
   const modal = useModalStore()
   const now = ref(Date.now())
@@ -56,6 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = loginResp.token
       authStatus.value = AuthStatus.Authenticated
       expiracion.value = Date.now() + loginResp.tiempoRestante * 1000
+      rolActivoId.value = null
       avisoExtenisonMostrado.value = false
       await loadUserProfile()
 
@@ -95,9 +97,29 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const perfil = await getPerfilAction()
       user.value = perfil
+      if (!perfil.roles.some((rol) => rol.rolId === rolActivoId.value)) {
+        rolActivoId.value = perfil.roles[0]?.rolId ?? null
+      }
     } catch (error) {
       console.error('Error al cargar perfil:', error)
     }
+  }
+
+  const actualizarRolSesion = async (rolId: number) => {
+    if (!user.value?.roles.some((rol) => rol.rolId === rolId)) {
+      throw new Error('No tienes asignado este rol')
+    }
+
+    const sesion = await actualizarRolSesionAction(rolId)
+    if (!sesion?.token || !Number.isFinite(sesion.tiempoRestante)) {
+      throw new Error('El servidor devolvió datos de sesión incompletos')
+    }
+
+    token.value = sesion.token
+    expiracion.value = Date.now() + sesion.tiempoRestante * 1000
+    rolActivoId.value = rolId
+    avisoExtenisonMostrado.value = false
+    queryClient.clear()
   }
 
   const logout = async () => {
@@ -141,10 +163,12 @@ export const useAuthStore = defineStore('auth', () => {
     modal.closeModal()
     token.value = ''
     expiracion.value = 0
+    rolActivoId.value = null
     user.value = null
     authStatus.value = AuthStatus.NotAuthenticated
     localStorage.removeItem('token')
     localStorage.removeItem('expiracion')
+    localStorage.removeItem('rolActivoId')
     queryClient.clear()
     user.value = null
     avisoExtenisonMostrado.value = false
@@ -182,6 +206,7 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     authStatus,
     user,
+    rolActivoId,
     remainingSeconds,
     minutes,
     seconds,
@@ -191,8 +216,11 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated: computed(() => authStatus.value === AuthStatus.Authenticated),
     esAdministrador: computed(
       () =>
-        user.value?.roles.some((rol) => rol.nombre.trim().toLowerCase() === 'administrador') ??
-        false,
+        user.value?.roles.some(
+          (rol) =>
+            rol.rolId === rolActivoId.value &&
+            rol.nombre.trim().toLowerCase() === 'administrador',
+        ) ?? false,
     ),
 
     //Actions
@@ -204,5 +232,6 @@ export const useAuthStore = defineStore('auth', () => {
     hasActiveSession,
     getRemainingTime,
     extenderSesion,
+    actualizarRolSesion,
   }
 })

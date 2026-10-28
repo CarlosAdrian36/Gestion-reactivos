@@ -232,7 +232,7 @@ const busqueda = ref('')
 const permiso = ref('lectura')
 const { data: usuarios } = useQuery({
   queryKey: ['usuarios'],
-  queryFn: getUsuariosAction,
+  queryFn: () => getUsuariosAction(),
   staleTime: 1000 * 60,
   refetchOnMount: true,
   refetchOnWindowFocus: true,

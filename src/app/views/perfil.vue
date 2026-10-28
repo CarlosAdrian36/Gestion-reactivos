@@ -3,9 +3,11 @@ import { useAuthStore } from '@/auth/store/auth.store'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { ref, watch, onMounted } from 'vue'
 import cambiarContrasenaModal from '@/app/common/components/modals/cambiarContrasenaModal.vue'
+import { toast } from 'vue-sonner'
 
 const authStore = useAuthStore()
 const modal = useModalStore()
+const rolCambiandoId = ref<number | null>(null)
 
 const themes = [
   { value: 'light', label: 'Claro' },
@@ -51,14 +53,24 @@ watch(temaActual, (val) => {
 })
 
 function abrirCambiarContrasena() {
-  modal.openModal(
-    cambiarContrasenaModal,
-    {},
-    [
-      { label: 'Cancelar', variant: 'outline' },
-      { label: 'Cambiar contraseña', variant: 'primary', type: 'submit' },
-    ],
-  )
+  modal.openModal(cambiarContrasenaModal, {}, [
+    { label: 'Cancelar', variant: 'outline' },
+    { label: 'Cambiar contraseña', variant: 'primary', type: 'submit' },
+  ])
+}
+
+async function cambiarRol(rolId: number) {
+  if (rolId === authStore.rolActivoId || rolCambiandoId.value !== null) return
+
+  rolCambiandoId.value = rolId
+  try {
+    await authStore.actualizarRolSesion(rolId)
+    toast.success('Rol de sesión actualizado correctamente')
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : 'No se pudo cambiar el rol de sesión')
+  } finally {
+    rolCambiandoId.value = null
+  }
 }
 
 onMounted(async () => {
@@ -167,13 +179,27 @@ onMounted(async () => {
           <h3 class="font-semibold mb-4">Roles</h3>
 
           <div class="flex flex-wrap gap-2">
-            <span
+            <button
               v-for="rol in authStore.user.roles"
               :key="rol.rolId"
-              class="badge badge-primary badge-outline"
+              type="button"
+              class="badge badge-lg cursor-pointer transition-colors"
+              :class="
+                authStore.rolActivoId === rol.rolId
+                  ? 'badge-primary'
+                  : 'badge-outline hover:badge-primary'
+              "
+              :disabled="rolCambiandoId !== null"
+              :aria-pressed="authStore.rolActivoId === rol.rolId"
+              @click="cambiarRol(rol.rolId)"
             >
               {{ rol.nombre }}
-            </span>
+              <!-- <span v-if="authStore.rolActivoId === rol.rolId" class="ml-1 text-xs">Activo</span> -->
+              <span
+                v-if="rolCambiandoId === rol.rolId"
+                class="loading loading-spinner loading-xs ml-1"
+              ></span>
+            </button>
           </div>
         </div>
       </div>
@@ -181,9 +207,7 @@ onMounted(async () => {
       <div class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden mb-6">
         <div class="p-6">
           <h3 class="font-semibold mb-4">Seguridad</h3>
-          <p class="text-sm text-base-content/60 mb-4">
-            Actualiza la contraseña de tu cuenta.
-          </p>
+          <p class="text-sm text-base-content/60 mb-4">Actualiza la contraseña de tu cuenta.</p>
           <button class="btn btn-primary" @click="abrirCambiarContrasena">
             <i class="fa-regular fa-lock"></i>
             Cambiar contraseña
