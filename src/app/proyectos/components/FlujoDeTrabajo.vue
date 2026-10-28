@@ -4,6 +4,7 @@ import type { Fase } from '@/api/proyectos/interfaces/proyecto.interface'
 
 const props = defineProps<{
   fases: Fase[]
+  orientacion?: 'horizontal' | 'vertical'
 }>()
 
 type EstadoFase = 'completada' | 'en_proceso' | 'pendiente'
@@ -62,28 +63,65 @@ const lineaHorizontal = computed(() => {
 
       <div class="mt-5 flex min-h-0 flex-1 justify-center overflow-hidden sm:items-center short:mt-2">
         <ol
-          class="relative flex w-full flex-row items-start justify-between sm:w-auto sm:flex-col sm:items-stretch"
-          :class="esCompacto ? 'sm:justify-center sm:gap-28' : 'sm:h-full sm:justify-between'"
+          class="relative flex"
+          :class="[
+            props.orientacion === 'horizontal'
+              ? 'w-full flex-row items-start justify-between'
+              : props.orientacion === 'vertical'
+                ? 'h-full w-auto flex-col items-stretch'
+                : 'w-full flex-row items-start justify-between sm:w-auto sm:flex-col sm:items-stretch',
+            props.orientacion === 'horizontal'
+              ? ''
+              : props.orientacion === 'vertical'
+                ? esCompacto
+                  ? 'justify-center gap-28'
+                  : 'justify-between'
+                : esCompacto
+                  ? 'sm:justify-center sm:gap-28'
+                  : 'sm:h-full sm:justify-between',
+          ]"
         >
-          <!-- Línea horizontal (teléfono) -->
+          <!-- Línea horizontal -->
           <div
+            v-if="props.orientacion !== 'vertical'"
             aria-hidden="true"
-            class="absolute top-6 h-0.5 rounded-full bg-base-300 sm:hidden"
+            class="absolute h-0.5 rounded-full bg-base-300"
+            :class="
+              props.orientacion === 'horizontal'
+                ? esCompacto
+                  ? 'top-6'
+                  : 'top-7'
+                : 'top-6 sm:hidden'
+            "
             :style="lineaHorizontal"
           ></div>
-          <!-- Línea vertical (sm en adelante) -->
+          <!-- Línea vertical -->
           <div
+            v-if="props.orientacion !== 'horizontal'"
             aria-hidden="true"
-            class="absolute hidden w-0.5 rounded-full bg-base-300 sm:block"
+            class="absolute w-0.5 rounded-full bg-base-300"
             :class="
-              esCompacto ? 'sm:left-6 sm:top-6 sm:bottom-6' : 'sm:left-7 sm:top-7 sm:bottom-7'
+              props.orientacion === 'vertical'
+                ? esCompacto
+                  ? 'left-6 top-6 bottom-6'
+                  : 'left-7 top-7 bottom-7'
+                : esCompacto
+                  ? 'hidden sm:left-6 sm:top-6 sm:bottom-6 sm:block'
+                  : 'hidden sm:left-7 sm:top-7 sm:bottom-7 sm:block'
             "
           ></div>
 
           <li
             v-for="paso in pasos"
             :key="paso.nombre"
-            class="relative z-10 flex min-w-0 flex-1 flex-col items-center gap-2 text-center sm:flex-none sm:flex-row sm:gap-5 sm:text-left"
+            class="relative z-10 flex min-w-0"
+            :class="
+              props.orientacion === 'horizontal'
+                ? 'flex-1 flex-col items-center gap-2 text-center'
+                : props.orientacion === 'vertical'
+                  ? 'flex-none flex-row items-center gap-5 text-left'
+                  : 'flex-1 flex-col items-center gap-2 text-center sm:flex-none sm:flex-row sm:gap-5 sm:text-left'
+            "
             :aria-current="paso.estado === 'en_proceso' ? 'step' : undefined"
           >
             <span
