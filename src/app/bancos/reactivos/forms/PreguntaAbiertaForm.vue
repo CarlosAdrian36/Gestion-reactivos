@@ -5,6 +5,7 @@ import { toast } from 'vue-sonner'
 import FroalaEditor from '@/components/FroalaEditor.vue'
 import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
+import { preguntaConfig } from './froalaConfig'
 
 const props = defineProps<{
   reactivo?: Reactivo
@@ -35,11 +36,7 @@ async function guardarPreguntaForm() {
 
     <div>
       <label class="label font-semibold">Pregunta</label>
-      <FroalaEditor v-model="pregunta" :config="{
-        toolbarButtons: ['bold', 'italic', 'underline', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'undo', 'redo'],
-        placeholderText: 'Escribe la pregunta aquí...',
-        heightMin: 120,
-      }" />
+      <FroalaEditor v-model="pregunta" :config="preguntaConfig" />
       <div class="flex gap-3 pt-4">
         <button
           class="btn btn-primary"

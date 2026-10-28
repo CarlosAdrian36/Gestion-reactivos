@@ -12,6 +12,7 @@ import {
 import { useInstruccionesGrupos } from '@/api/bancos/composable/useInstruccionesGrupos'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { getRespuestasAction } from '@/api/bancos/actions/get-respuestas.action'
+import { opcionConfig, preguntaConfig } from './froalaConfig'
 
 const props = defineProps<{
   grupoId?: number
@@ -215,64 +216,6 @@ async function guardarForm() {
   )
 }
 
-const instruccionConfig = {
-  quickInsertEnabled: false,
-  toolbarButtons: [
-    'bold',
-    'italic',
-    'underline',
-    '|',
-    'fontFamily',
-    'fontSize',
-    '|',
-    'textColor',
-    'backgroundColor',
-    '|',
-    'alignLeft',
-    'alignCenter',
-    'alignRight',
-    '|',
-    'insertTable',
-    '|',
-    'outdent',
-    'indent',
-    '|',
-    'formatOL',
-    'formatUL',
-    '|',
-    'clearFormatting',
-    '|',
-    'undo',
-    'redo',
-  ],
-  placeholderText: 'Escribe la instrucción del grupo aquí...',
-  heightMin: 120,
-  charCounterCount: true,
-}
-
-const reactivoConfig = {
-  toolbarInline: false,
-  toolbarButtons: ['bold', 'italic', 'underline', '|', 'undo', 'redo'],
-  toolbarButtonsSM: ['bold', 'italic'],
-  toolbarButtonsXS: ['bold'],
-  placeholderText: 'Reactivo',
-  heightMin: 80,
-  heightMax: 120,
-  quickInsertEnabled: false,
-  toolbarSticky: false,
-}
-
-const respuestaConfig = {
-  toolbarInline: false,
-  toolbarButtons: ['bold', 'italic', 'underline', '|', 'undo', 'redo'],
-  toolbarButtonsSM: ['bold', 'italic'],
-  toolbarButtonsXS: ['bold'],
-  placeholderText: 'Respuesta',
-  heightMin: 60,
-  heightMax: 100,
-  quickInsertEnabled: false,
-  toolbarSticky: false,
-}
 </script>
 
 <template>
@@ -287,7 +230,10 @@ const respuestaConfig = {
     <template v-else>
       <div>
         <label class="label font-semibold">Instrucción del grupo</label>
-        <FroalaEditor v-model="instruccion" :config="instruccionConfig" />
+        <FroalaEditor
+          v-model="instruccion"
+          :config="{ ...preguntaConfig, placeholderText: 'Escribe la instrucción del grupo aquí...' }"
+        />
       </div>
 
       <div>
@@ -328,7 +274,7 @@ const respuestaConfig = {
                   <FroalaEditor
                     v-model="reactivo.descripcion"
                     :config="{
-                      ...reactivoConfig,
+                      ...preguntaConfig,
                       placeholderText: `Reactivo ${String.fromCharCode(65 + rIndex)}`,
                     }"
                   />
@@ -366,7 +312,7 @@ const respuestaConfig = {
                         <FroalaEditor
                           v-model="respuesta.texto"
                           :config="{
-                            ...respuestaConfig,
+                            ...opcionConfig,
                             placeholderText: `Respuesta ${respIndex + 1}`,
                           }"
                         />

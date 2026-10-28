@@ -7,6 +7,7 @@ import FroalaEditor from '@/components/FroalaEditor.vue'
 import { TIPO_REACTIVO, useGuardarReactivo, type OpcionForm } from '@/api/bancos/composable/useGuardarReactivo'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
+import { opcionConfig, preguntaConfig } from './froalaConfig'
 
 const props = defineProps<{
   reactivo?: Reactivo
@@ -54,21 +55,6 @@ function quitarOpcion(index: number) {
   }
 }
 
-const opcionConfig = {
-  toolbarInline: false,
-
-  toolbarButtons: ['bold', 'italic', 'underline', '|', 'undo', 'redo'],
-  toolbarButtonsSM: ['bold', 'italic'],
-  toolbarButtonsXS: ['bold'],
-
-  placeholderText: 'Respuesta',
-
-  heightMin: 80,
-  heightMax: 120,
-  quickInsertEnabled: false,
-  toolbarSticky: false,
-}
-
 async function guardar() {
   if (!pregunta.value.trim()) {
     toast.error('La pregunta no puede estar vacía')
@@ -104,11 +90,7 @@ async function guardar() {
 
     <div>
       <label class="label font-semibold">Pregunta</label>
-      <FroalaEditor v-model="pregunta" :config="{
-        toolbarButtons: ['bold', 'italic', 'underline', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'undo', 'redo'],
-        placeholderText: 'Escribe la pregunta aquí...',
-        heightMin: 120,
-      }" />
+      <FroalaEditor v-model="pregunta" :config="preguntaConfig" />
     </div>
 
     <div>

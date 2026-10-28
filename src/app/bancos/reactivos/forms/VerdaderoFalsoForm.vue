@@ -6,6 +6,7 @@ import FroalaEditor from '@/components/FroalaEditor.vue'
 import { TIPO_REACTIVO, useGuardarReactivo } from '@/api/bancos/composable/useGuardarReactivo'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
+import { preguntaConfig } from './froalaConfig'
 
 const props = defineProps<{
   reactivo?: Reactivo
@@ -63,11 +64,7 @@ async function guardarTodoForm() {
 
     <div>
       <label class="label font-semibold">Afirmación</label>
-      <FroalaEditor v-model="pregunta" :config="{
-        toolbarButtons: ['bold', 'italic', 'underline', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'undo', 'redo'],
-        placeholderText: 'Escribe la afirmación aquí...',
-        heightMin: 120,
-      }" />
+      <FroalaEditor v-model="pregunta" :config="preguntaConfig" />
     </div>
 
     <div>

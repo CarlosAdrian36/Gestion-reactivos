@@ -11,6 +11,7 @@ import {
 } from '@/api/bancos/composable/useGuardarReactivo'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
+import { opcionConfig, preguntaConfig } from './froalaConfig'
 
 const props = defineProps<{
   reactivo?: Reactivo
@@ -98,58 +99,6 @@ async function guardar() {
   )
 }
 
-const preguntaConfig = {
-  quickInsertEnabled: false,
-  toolbarButtons: [
-    'bold',
-    'italic',
-    'underline',
-    '|',
-    'fontFamily',
-    'fontSize',
-    '|', // Botones para Tipografía y Tamaño
-    'textColor',
-    'backgroundColor', // Botones para Colores
-    '|',
-    'alignLeft',
-    'alignCenter',
-    'alignRight',
-    '|',
-    'insertTable',
-    '|',
-    'outdent',
-    'indent',
-    '|',
-    'formatOL',
-    'formatUL',
-    '|',
-    'clearFormatting',
-    '|',
-    'undo',
-    'redo',
-  ],
-  placeholderText: 'Escribe la pregunta aquí...',
-  heightMin: 120,
-  charCounterCount: true,
-
-  wordPasteFormat: 'keep',
-  wordPasteKeepFormatting: true,
-}
-
-const opcionConfig = {
-  toolbarInline: false,
-
-  toolbarButtons: ['bold', 'italic', 'underline', '|', 'undo', 'redo'],
-  toolbarButtonsSM: ['bold', 'italic'],
-  toolbarButtonsXS: ['bold'],
-
-  placeholderText: 'Respuesta',
-
-  heightMin: 80,
-  heightMax: 120,
-  quickInsertEnabled: false,
-  toolbarSticky: false,
-}
 </script>
 
 <template>
