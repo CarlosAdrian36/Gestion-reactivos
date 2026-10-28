@@ -86,11 +86,11 @@
             id="funcion-select"
             v-model.number="funcionId"
             class="select select-bordered w-full"
-            :disabled="isLoadingFunciones"
+            :disabled="isLoadingFunciones || isLoadingProyecto"
           >
             <option :value="null" disabled>Selecciona una función</option>
             <option
-              v-for="funcion in funciones"
+              v-for="funcion in funcionesDisponibles"
               :key="funcion.funcionId"
               :value="funcion.funcionId"
             >
@@ -109,13 +109,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { toast } from 'vue-sonner'
 import type { Cuenta } from '@/api/usuarios/interfaces/ususarios.interface'
 import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
 import { asignarFuncionAction } from '@/api/proyectos/actions/asignar-funcion.action'
 import { useFunciones } from '@/api/proyectos/composable/useFunciones'
+import { useProyectoDetalle } from '@/api/proyectos/composable/useProyectoDetalle'
 import { useModalStore } from '@/common/modals/store/modal.store'
 
 const props = defineProps<{
@@ -138,7 +139,39 @@ const { data: usuarios } = useQuery({
 })
 
 const { data: funcionesData, isLoading: isLoadingFunciones } = useFunciones()
+const { data: proyecto, isLoading: isLoadingProyecto } = useProyectoDetalle(
+  () => props.idProyecto,
+)
 const funciones = computed(() => funcionesData.value ?? [])
+const tieneIdiomasDeTraduccion = computed(() =>
+  (proyecto.value?.idiomas ?? []).some(
+    (idioma) => idioma.etiqueta.trim().toLowerCase().replace('-', '_') !== 'es_mx',
+  ),
+)
+
+function esFuncionDeTraduccion(nombre: string): boolean {
+  const nombreNormalizado = nombre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  return (
+    nombreNormalizado.includes('traductor') ||
+    (nombreNormalizado.includes('revisor') && nombreNormalizado.includes('traduccion'))
+  )
+}
+
+const funcionesDisponibles = computed(() =>
+  tieneIdiomasDeTraduccion.value
+    ? funciones.value
+    : funciones.value.filter((funcion) => !esFuncionDeTraduccion(funcion.nombre)),
+)
+
+watch(funcionesDisponibles, (disponibles) => {
+  if (funcionId.value !== null && !disponibles.some((funcion) => funcion.funcionId === funcionId.value)) {
+    funcionId.value = null
+  }
+})
 
 const resultados = computed(() => {
   const q = busqueda.value.toLowerCase().trim()
@@ -186,6 +219,12 @@ async function agregar() {
 
   if (funcionId.value === null) {
     toast.error('Selecciona una función para el miembro')
+    return
+  }
+
+  if (!funcionesDisponibles.value.some((funcion) => funcion.funcionId === funcionId.value)) {
+    toast.error('La función seleccionada no está disponible para este proyecto')
+    funcionId.value = null
     return
   }
 
