@@ -57,7 +57,7 @@ function abrirModal(): void {
     class="card flex h-full min-h-72 flex-col border border-base-300 bg-base-100 md:min-h-0 p-5 sm:p-6 short:p-3"
   >
     <!-- Encabezado -->
-    <div class="flex items-center justify-between pb-4 border-b border-base-200">
+    <div class="flex items-center justify-between pb-2 border-b border-base-200">
       <div class="flex items-center gap-2.5">
         <div class="p-2 bg-primary/10 text-primary rounded-lg">
           <i class="fa-regular fa-user-group"></i>

@@ -59,12 +59,12 @@ watch(temaOscuro, (val) => {
       :class="sidebar.isOpen ? 'p-4 items-stretch' : 'p-2 items-center'"
     >
       <!-- Navigation label -->
-      <p
+      <!-- <p
         v-show="sidebar.isOpen"
         class="px-3 text-[11px] font-bold uppercase tracking-widest text-(--color-texto) mb-2 w-full"
       >
         Navegación
-      </p>
+      </p> -->
 
       <!-- Nav items -->
       <ul class="flex flex-col gap-1 w-full">

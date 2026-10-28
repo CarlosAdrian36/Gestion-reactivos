@@ -141,7 +141,7 @@ function abrirModalEditarProyecto(): void {
         <section
           class="card min-h-56 border border-base-300 bg-base-100 p-5 sm:p-6 short:p-3 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-3 xl:row-span-4"
         >
-          <div class="flex items-center gap-2.5 border-b border-base-200 pb-4">
+          <div class="flex items-center gap-2.5 border-b border-base-200 pb-2">
             <div class="rounded-lg bg-primary/10 p-2 text-primary">
               <i class="fa-regular fa-comments"></i>
             </div>

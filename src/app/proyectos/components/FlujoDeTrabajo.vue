@@ -59,7 +59,7 @@ const lineaHorizontal = computed(() => {
     class="workflow-card card flex h-full min-h-0 flex-col border border-base-300 bg-base-100"
   >
     <div class="flex min-h-0 flex-1 flex-col p-3 sm:p-4">
-      <div class="flex items-center gap-2.5 border-b border-base-200 pb-4">
+      <div class="flex items-center gap-2.5 border-b border-base-200 pb-2">
         <div class="rounded-lg bg-primary/10 p-2 text-primary">
           <i class="fa-regular fa-diagram-project"></i>
         </div>
