@@ -62,12 +62,12 @@ function abrirModal(): void {
         <div class="p-2 bg-primary/10 text-primary rounded-lg">
           <i class="fa-regular fa-user-group"></i>
         </div>
-        <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider">Miembros</h2>
+        <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider">Integrantes</h2>
       </div>
       <span
         class="inline-flex items-center rounded-full bg-base-200 px-2.5 py-0.5 text-xs font-semibold text-base-content/70"
       >
-        {{ totalMiembros }} {{ totalMiembros === 1 ? 'miembro' : 'miembros' }}
+        {{ totalMiembros }} {{ totalMiembros === 1 ? 'integrante' : 'integrantes' }}
       </span>
     </div>
 
@@ -133,7 +133,7 @@ function abrirModal(): void {
         @click="abrirModal"
       >
         <i class="fa-regular fa-user-plus"></i>
-        Agregar miembro
+        Agregar integrante
       </button>
     </div>
   </section>

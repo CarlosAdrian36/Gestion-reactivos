@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <!-- Título -->
     <div>
-      <h2 class="text-lg font-bold">Agregar miembro al proyecto</h2>
+      <h2 class="text-lg font-bold">Agregar integrante al proyecto</h2>
       <p class="text-sm text-base-content/60 mt-1">
         Busca un usuario del sistema y asígnale una función.
       </p>
@@ -139,9 +139,7 @@ const { data: usuarios } = useQuery({
 })
 
 const { data: funcionesData, isLoading: isLoadingFunciones } = useFunciones()
-const { data: proyecto, isLoading: isLoadingProyecto } = useProyectoDetalle(
-  () => props.idProyecto,
-)
+const { data: proyecto, isLoading: isLoadingProyecto } = useProyectoDetalle(() => props.idProyecto)
 const funciones = computed(() => funcionesData.value ?? [])
 const tieneIdiomasDeTraduccion = computed(() =>
   (proyecto.value?.idiomas ?? []).some(
@@ -168,7 +166,10 @@ const funcionesDisponibles = computed(() =>
 )
 
 watch(funcionesDisponibles, (disponibles) => {
-  if (funcionId.value !== null && !disponibles.some((funcion) => funcion.funcionId === funcionId.value)) {
+  if (
+    funcionId.value !== null &&
+    !disponibles.some((funcion) => funcion.funcionId === funcionId.value)
+  ) {
     funcionId.value = null
   }
 })
