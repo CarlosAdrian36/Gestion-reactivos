@@ -120,7 +120,7 @@ watch(temaOscuro, (val) => {
             </div>
           </RouterLink>
         </li>
-        <li v-if="authStore.user?.roles?.some((r) => r.nombre === 'Administrador')">
+        <li v-if="authStore.esAdministrador">
           <RouterLink v-slot="{ navigate }" :to="{ name: 'usuarios' }">
             <div class="relative">
               <div
@@ -208,7 +208,7 @@ watch(temaOscuro, (val) => {
                   {{ authStore.user.identidad.nombre }}
                 </p>
                 <p class="text-[10px] text-base-content/60 truncate">
-                  {{ authStore.user.roles?.[0]?.nombre || '@' + authStore.user.nombreUsuario }}
+                  {{ authStore.rolActivo?.nombre || '@' + authStore.user.nombreUsuario }}
                 </p>
               </div>
             </div>

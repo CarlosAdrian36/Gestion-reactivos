@@ -209,7 +209,6 @@ onMounted(async () => {
         <div class="p-6">
           <h3 class="font-semibold mb-4">Seguridad</h3>
           <p class="text-sm text-base-content/60 mb-4">Actualiza la contraseña de tu cuenta.</p>
-          <p class="text-sm text-base-content/60 mb-4">Actualiza la contraseña de tu cuenta.</p>
           <button class="btn btn-primary" @click="abrirCambiarContrasena">
             <i class="fa-regular fa-lock"></i>
             Cambiar contraseña

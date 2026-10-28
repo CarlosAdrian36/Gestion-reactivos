@@ -25,8 +25,6 @@ export const preguntaConfig = {
     '|',
     'clearFormatting',
     '|',
-    'undo',
-    'redo',
   ],
   placeholderText: 'Escribe la pregunta aquí...',
   heightMin: 120,
@@ -37,7 +35,7 @@ export const preguntaConfig = {
 
 export const opcionConfig = {
   toolbarInline: false,
-  toolbarButtons: ['bold', 'italic', 'underline', '|', 'undo', 'redo'],
+  toolbarButtons: ['bold', 'italic', 'underline'],
   toolbarButtonsSM: ['bold', 'italic'],
   toolbarButtonsXS: ['bold'],
   placeholderText: 'Respuesta',

@@ -61,9 +61,7 @@ onMounted(async () => {
 
     await Promise.all([instrucciones, listaReactivos])
 
-    const instruccionGrupo = instrucciones.value?.find(
-      (i) => i.grupo === props.grupoId,
-    )
+    const instruccionGrupo = instrucciones.value?.find((i) => i.grupo === props.grupoId)
     instruccion.value = instruccionGrupo?.descripcion ?? ''
 
     const reactivosGrupo = (listaReactivos.value ?? [])
@@ -215,7 +213,6 @@ async function guardarForm() {
     idsReactivoActuales.value,
   )
 }
-
 </script>
 
 <template>
@@ -232,7 +229,10 @@ async function guardarForm() {
         <label class="label font-semibold">Instrucción del grupo</label>
         <FroalaEditor
           v-model="instruccion"
-          :config="{ ...preguntaConfig, placeholderText: 'Escribe la instrucción del grupo aquí...' }"
+          :config="{
+            ...preguntaConfig,
+            placeholderText: 'Escribe la instrucción del grupo aquí...',
+          }"
         />
       </div>
 
@@ -274,7 +274,7 @@ async function guardarForm() {
                   <FroalaEditor
                     v-model="reactivo.descripcion"
                     :config="{
-                      ...preguntaConfig,
+                      ...opcionConfig,
                       placeholderText: `Reactivo ${String.fromCharCode(65 + rIndex)}`,
                     }"
                   />
@@ -300,9 +300,7 @@ async function guardarForm() {
                       >
                         <i
                           :class="
-                            respuesta.correcta
-                              ? 'fa-solid fa-circle-check'
-                              : 'fa-regular fa-circle'
+                            respuesta.correcta ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'
                           "
                         ></i>
                         {{ respuesta.correcta ? 'Correcta' : 'Correcta' }}

@@ -210,6 +210,9 @@ export const useAuthStore = defineStore('auth', () => {
     remainingSeconds,
     minutes,
     seconds,
+    rolActivo: computed(
+      () => user.value?.roles.find((rol) => rol.rolId === rolActivoId.value) ?? null,
+    ),
     //Getters
 
     isChecking: computed(() => authStatus.value === AuthStatus.Checking),
