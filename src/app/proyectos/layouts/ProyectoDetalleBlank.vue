@@ -38,16 +38,15 @@ function abrirModalEditarProyecto(): void {
     <main
       class="mx-auto flex h-full max-w-9xl flex-col space-y-5 px-4 py-5 sm:px-6 sm:py-8 lg:px-8 short:py-3"
     >
-
       <div
-        class="grid min-h-0 flex-1 grid-cols-1 items-stretch gap-4 short:gap-2 md:grid-cols-6 xl:grid-cols-[repeat(4,minmax(0,3fr))_minmax(0,4fr)] xl:grid-rows-[auto_minmax(18rem,auto)_repeat(4,minmax(0,1fr))] xl:gap-5"
+        class="grid min-h-0 flex-1 grid-cols-1 items-stretch gap-4 short:gap-2 md:grid-cols-6 xl:grid-cols-[repeat(4,minmax(0,3fr))_minmax(0,4fr)] xl:grid-rows-[auto_auto_repeat(4,minmax(0,1fr))] xl:gap-5"
       >
         <header
           class="card col-span-full bg-base-100 p-6 shadow-sm md:col-span-6 xl:col-start-1 xl:col-span-4 xl:row-start-1"
         >
           <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div class="flex min-w-0 max-w-3xl flex-col gap-1 font-hanken">
-              <div class="mb-1 flex flex-wrap items-center gap-2 text-[11px] leading-[14px]">
+              <div class="mb-1 flex flex-wrap items-center gap-2 text-[11px] leading-3.5">
                 <img
                   v-for="idioma in idiomasSinEspanol"
                   :key="idioma.etiqueta"
@@ -80,7 +79,7 @@ function abrirModalEditarProyecto(): void {
                   {{ proyecto.nombre }}
                 </h1>
                 <span
-                  class="inline-flex items-center rounded-full border border-base-300 bg-base-200 px-2 py-0.5 text-[11px] leading-[14px] font-semibold uppercase tracking-[0.04em] text-base-content/70"
+                  class="inline-flex items-center rounded-full border border-base-300 bg-base-200 px-2 py-0.5 text-[11px] leading-3.5 font-semibold uppercase tracking-[0.04em] text-base-content/70"
                 >
                   Proyecto
                 </span>
@@ -129,7 +128,7 @@ function abrirModalEditarProyecto(): void {
 
         <FlujoDeTrabajo
           :fases="proyecto.fases"
-          orientacion="horizontal"
+          orientacion="auto"
           class="md:col-span-3 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-2"
         />
 
@@ -142,7 +141,14 @@ function abrirModalEditarProyecto(): void {
         <section
           class="card min-h-56 border border-base-300 bg-base-100 p-5 sm:p-6 short:p-3 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-3 xl:row-span-4"
         >
-          <h2 class="text-sm font-bold uppercase tracking-wider">Comentarios y observaciones</h2>
+          <div class="flex items-center gap-2.5 border-b border-base-200 pb-4">
+            <div class="rounded-lg bg-primary/10 p-2 text-primary">
+              <i class="fa-regular fa-comments"></i>
+            </div>
+            <h2 class="text-xs font-bold uppercase tracking-wider sm:text-sm">
+              Comentarios y observaciones
+            </h2>
+          </div>
 
           <div class="mt-5 flex gap-4 overflow-x-auto pb-2">
             <p v-if="!proyecto.hallazgos" class="self-center text-sm text-base-content/60">
