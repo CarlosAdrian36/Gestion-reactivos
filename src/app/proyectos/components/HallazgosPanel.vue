@@ -34,6 +34,25 @@ function alternarHallazgo(id: string | number): void {
 function idPanelHallazgo(id: string | number): string {
   return `hallazgo-${id}`
 }
+
+function clasesFuncion(nombre: string): string {
+  const nombreNormalizado = nombre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  if (
+    nombreNormalizado.includes('revisor') &&
+    (nombreNormalizado.includes('traductor') || nombreNormalizado.includes('traduccion'))
+  ) {
+    return 'bg-warning-content text-warning'
+  }
+  if (nombreNormalizado.includes('elaborador')) return 'badge-primary'
+  if (nombreNormalizado.includes('revisor')) return 'badge-warning'
+  if (nombreNormalizado.includes('traductor')) return 'badge-secondary'
+
+  return 'badge-outline'
+}
 </script>
 
 <template>
@@ -101,11 +120,10 @@ function idPanelHallazgo(id: string | number): string {
           </span>
 
           <span class="min-w-0 flex-1">
-            <span class="flex flex-wrap items-center gap-2">
-              <span class="font-semibold text-base-content">{{ hallazgo.nombre }}</span>
-              <span class="badge badge-outline badge-sm">{{ hallazgo.funcion.nombre }}</span>
-            </span>
-            <span class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-base-content/60">
+            <span class="font-semibold text-base-content">{{ hallazgo.nombre }}</span>
+            <span
+              class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-base-content/60"
+            >
               <span class="inline-flex items-center gap-1.5">
                 <i class="fa-regular fa-user"></i>
                 {{ hallazgo.propietario.nombre }} {{ hallazgo.propietario.apellidoPaterno }}
@@ -117,15 +135,24 @@ function idPanelHallazgo(id: string | number): string {
             </span>
           </span>
 
-          <i
-            class="fa-regular mt-1 shrink-0 text-base-content/50 transition-transform"
-            :class="
-              hallazgosExpandidos.includes(hallazgo.hallazgoId)
-                ? 'fa-chevron-up'
-                : 'fa-chevron-down'
-            "
-            aria-hidden="true"
-          ></i>
+          <span class="mt-1 flex shrink-0 items-center gap-2">
+            <span
+              class="badge badge-soft h-6 w-24 justify-center truncate"
+              :class="clasesFuncion(hallazgo.funcion.nombre)"
+              :title="hallazgo.funcion.nombre"
+            >
+              {{ hallazgo.funcion.nombre }}
+            </span>
+            <i
+              class="fa-regular text-base-content/50 transition-transform"
+              :class="
+                hallazgosExpandidos.includes(hallazgo.hallazgoId)
+                  ? 'fa-chevron-up'
+                  : 'fa-chevron-down'
+              "
+              aria-hidden="true"
+            ></i>
+          </span>
         </button>
 
         <div
@@ -136,7 +163,9 @@ function idPanelHallazgo(id: string | number): string {
           <p class="whitespace-pre-line text-sm leading-relaxed text-base-content/80">
             {{ hallazgo.descripcion }}
           </p>
-          <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-base-content/50">
+          <div
+            class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-base-content/50"
+          >
             <span>Reactivo: {{ hallazgo.idReactivo }}</span>
             <span>Actualizado: {{ formatearFecha(hallazgo.fechaModificacion) }}</span>
           </div>

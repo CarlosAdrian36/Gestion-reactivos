@@ -7,14 +7,6 @@
       </p>
     </div>
 
-    <div class="alert alert-info text-sm">
-      <i class="fa-regular fa-circle-info"></i>
-      <span>
-        Este formulario es una vista previa. El servicio para guardar hallazgos todavía no está
-        disponible, por lo que la información no se guardará.
-      </span>
-    </div>
-
     <div class="space-y-4">
       <label class="form-control w-full">
         <span class="label-text mb-2 font-semibold">Título</span>

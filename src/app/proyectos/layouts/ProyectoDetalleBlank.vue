@@ -157,7 +157,7 @@ function abrirModalAgregarHallazgo(): void {
 
         <HallazgosPanel
           :hallazgos="hallazgos"
-          class="min-h-56 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-3 xl:row-span-4"
+          class="h-max w-full self-start md:col-span-6 xl:col-start-1 xl:col-span-4 xl:row-start-3 xl:row-span-4"
           @agregar-hallazgo="abrirModalAgregarHallazgo"
         />
       </div>
