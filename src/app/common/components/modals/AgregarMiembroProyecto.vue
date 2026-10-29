@@ -135,6 +135,7 @@ import { toast } from 'vue-sonner'
 import type { Cuenta } from '@/api/usuarios/interfaces/ususarios.interface'
 import { getUsuariosAction } from '@/api/usuarios/actions/get-usuarios.actions'
 import { asignarFuncionAction } from '@/api/proyectos/actions/asignar-funcion.action'
+import { actualizarFuncionesMiembroAction } from '@/api/proyectos/actions/actualizar-funciones-miembro.action'
 import { useFunciones } from '@/api/proyectos/composable/useFunciones'
 import { useProyectoDetalle } from '@/api/proyectos/composable/useProyectoDetalle'
 import { useModalStore } from '@/common/modals/store/modal.store'
@@ -150,6 +151,7 @@ const ROL_DOCENTE_ID = 3
 const busqueda = ref('')
 const funcionesSeleccionadas = ref<number[]>([])
 const usuarioSeleccionado = ref<Cuenta | null>(null)
+const cuentaConFuncionInicialAsignada = ref<string | null>(null)
 
 const { data: usuarios } = useQuery({
   queryKey: ['usuarios', 'rol', ROL_DOCENTE_ID],
@@ -224,6 +226,9 @@ const resultados = computed(() => {
 })
 
 function seleccionarUsuario(usuario: Cuenta) {
+  if (usuarioSeleccionado.value?.idCuenta !== usuario.idCuenta) {
+    cuentaConFuncionInicialAsignada.value = null
+  }
   usuarioSeleccionado.value = usuario
   funcionesSeleccionadas.value = []
   busqueda.value = ''
@@ -232,6 +237,7 @@ function seleccionarUsuario(usuario: Cuenta) {
 function limpiarUsuarioSeleccionado() {
   usuarioSeleccionado.value = null
   funcionesSeleccionadas.value = []
+  cuentaConFuncionInicialAsignada.value = null
 }
 
 function alternarFuncion(funcionId: number) {
@@ -263,20 +269,30 @@ async function agregar() {
     return
   }
 
-  try {
-    const idsFallidos: number[] = []
-    let funcionesAsignadas = 0
-    let primerError: unknown
+  const idCuenta = usuarioSeleccionado.value.idCuenta
 
-    for (const funcionId of idsValidos) {
-      try {
-        await asignarFuncionAction(props.idProyecto, usuarioSeleccionado.value.idCuenta, {
-          funcionId,
-        })
-        funcionesAsignadas++
-      } catch (error) {
-        idsFallidos.push(funcionId)
-        primerError ??= error
+  try {
+    const integranteYaAgregado = cuentaConFuncionInicialAsignada.value === idCuenta
+
+    if (!integranteYaAgregado) {
+      const resultado = await asignarFuncionAction(props.idProyecto, idCuenta, {
+        funcionId: idsValidos[0]!,
+      })
+
+      if (!resultado.funcionAsignada) {
+        throw new Error('No se pudo agregar el integrante con la función inicial')
+      }
+
+      cuentaConFuncionInicialAsignada.value = idCuenta
+    }
+
+    if (idsValidos.length > 1 || integranteYaAgregado) {
+      const resultado = await actualizarFuncionesMiembroAction(props.idProyecto, idCuenta, {
+        funcionesId: idsValidos,
+      })
+
+      if (!resultado.funcionActualizada) {
+        throw new Error('No se pudieron guardar todas las funciones seleccionadas')
       }
     }
 
@@ -284,29 +300,15 @@ async function agregar() {
       queryKey: ['integrantes-proyecto', props.idProyecto],
     })
 
-    if (idsFallidos.length > 0) {
-      funcionesSeleccionadas.value = idsFallidos
-      if (funcionesAsignadas > 0) {
-        const textoAsignadas = funcionesAsignadas === 1 ? 'función' : 'funciones'
-        const textoPendientes =
-          idsFallidos.length === 1 ? 'función quedó pendiente' : 'funciones quedaron pendientes'
-        toast.error(
-          `Se asignaron ${funcionesAsignadas} ${textoAsignadas}, pero ${idsFallidos.length} ${textoPendientes}. Puedes reintentarlo.`,
-        )
-      } else {
-        toast.error(
-          primerError instanceof Error
-            ? primerError.message
-            : 'No se pudieron asignar las funciones seleccionadas',
-        )
-      }
-      return
-    }
-
     modal.closeModal()
-    const textoFunciones = funcionesAsignadas === 1 ? 'función' : 'funciones'
-    toast.success(`Integrante agregado con ${funcionesAsignadas} ${textoFunciones}`)
+    const textoFunciones = idsValidos.length === 1 ? 'función' : 'funciones'
+    toast.success(`Integrante agregado con ${idsValidos.length} ${textoFunciones}`)
   } catch (error) {
+    if (cuentaConFuncionInicialAsignada.value === idCuenta) {
+      await queryClient.invalidateQueries({
+        queryKey: ['integrantes-proyecto', props.idProyecto],
+      })
+    }
     toast.error(error instanceof Error ? error.message : 'Ocurrió un error al agregar el miembro')
   }
 }

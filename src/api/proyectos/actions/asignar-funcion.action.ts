@@ -12,7 +12,7 @@ export const asignarFuncionAction = async (
 ): Promise<AsignarFuncionResponse> => {
   try {
     const { data } = await apiClient.put<AsignarFuncionResponse>(
-      `/proyectos/${idProyecto}/Funciones/${idCuenta}`,
+      `/proyectos/${idProyecto}/Integrantes/${idCuenta}`,
       body,
     )
     return data

@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { Hallazgo } from '@/api/proyectos/interfaces/proyecto.interface'
+
+const emit = defineEmits<{
+  agregarHallazgo: []
+}>()
 
 withDefaults(
   defineProps<{
@@ -10,12 +15,24 @@ withDefaults(
   },
 )
 
+const hallazgosExpandidos = ref<Array<string | number>>([])
+
 function formatearFecha(fecha: string): string {
   return new Date(fecha).toLocaleDateString('es-MX', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   })
+}
+
+function alternarHallazgo(id: string | number): void {
+  hallazgosExpandidos.value = hallazgosExpandidos.value.includes(id)
+    ? hallazgosExpandidos.value.filter((idExpandido) => idExpandido !== id)
+    : [...hallazgosExpandidos.value, id]
+}
+
+function idPanelHallazgo(id: string | number): string {
+  return `hallazgo-${id}`
 }
 </script>
 
@@ -39,12 +56,11 @@ function formatearFecha(fecha: string): string {
 
       <button
         type="button"
-        disabled
-        title="Disponible próximamente"
-        class="inline-flex items-center gap-1.5 rounded-xl bg-base-200 px-3.5 py-2 text-xs sm:text-sm font-semibold text-base-content/80 hover:bg-base-300/60 transition-colors self-start sm:self-auto disabled:cursor-not-allowed disabled:opacity-70"
+        class="btn btn-primary btn-sm gap-2 self-start sm:self-auto"
+        @click="emit('agregarHallazgo')"
       >
         <i class="fa-regular fa-plus"></i>
-        Nuevo hallazgo
+        Agregar hallazgo
       </button>
     </div>
 
@@ -60,8 +76,7 @@ function formatearFecha(fecha: string): string {
       </div>
       <h3 class="text-sm sm:text-base font-semibold">Aún no hay hallazgos</h3>
       <p class="mt-1 text-xs sm:text-sm text-base-content/60 max-w-sm mx-auto">
-        Cuando esta sección esté habilitada, aquí aparecerán las notas y observaciones registradas
-        por el equipo.
+        Aquí aparecerán las notas y observaciones registradas por el equipo.
       </p>
     </div>
 
@@ -69,17 +84,62 @@ function formatearFecha(fecha: string): string {
     <div v-else class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
       <article
         v-for="hallazgo in hallazgos"
-        :key="hallazgo.idHallazgo"
-        class="rounded-xl border border-base-200 bg-base-200/40 p-4"
+        :key="hallazgo.hallazgoId"
+        class="overflow-hidden rounded-xl border border-base-200 bg-base-100 transition-colors hover:border-base-300"
       >
-        <div class="flex items-start justify-between gap-3">
-          <h3 class="font-semibold">{{ hallazgo.titulo }}</h3>
-          <span class="badge badge-sm">{{ hallazgo.estado }}</span>
-        </div>
-        <p class="text-sm text-base-content/70 mt-2">{{ hallazgo.descripcion }}</p>
-        <div class="flex items-center justify-between gap-3 mt-4 text-xs text-base-content/50">
-          <span>{{ hallazgo.prioridad }}</span>
-          <span>{{ formatearFecha(hallazgo.fechaCreacion) }}</span>
+        <button
+          type="button"
+          class="flex w-full items-start gap-3 p-4 text-left transition-colors hover:bg-base-200/40 sm:p-5"
+          :aria-expanded="hallazgosExpandidos.includes(hallazgo.hallazgoId)"
+          :aria-controls="idPanelHallazgo(hallazgo.hallazgoId)"
+          @click="alternarHallazgo(hallazgo.hallazgoId)"
+        >
+          <span
+            class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+          >
+            <i class="fa-regular fa-note-sticky"></i>
+          </span>
+
+          <span class="min-w-0 flex-1">
+            <span class="flex flex-wrap items-center gap-2">
+              <span class="font-semibold text-base-content">{{ hallazgo.nombre }}</span>
+              <span class="badge badge-outline badge-sm">{{ hallazgo.funcion.nombre }}</span>
+            </span>
+            <span class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-base-content/60">
+              <span class="inline-flex items-center gap-1.5">
+                <i class="fa-regular fa-user"></i>
+                {{ hallazgo.propietario.nombre }} {{ hallazgo.propietario.apellidoPaterno }}
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <i class="fa-regular fa-calendar"></i>
+                {{ formatearFecha(hallazgo.fechaCreacion) }}
+              </span>
+            </span>
+          </span>
+
+          <i
+            class="fa-regular mt-1 shrink-0 text-base-content/50 transition-transform"
+            :class="
+              hallazgosExpandidos.includes(hallazgo.hallazgoId)
+                ? 'fa-chevron-up'
+                : 'fa-chevron-down'
+            "
+            aria-hidden="true"
+          ></i>
+        </button>
+
+        <div
+          v-if="hallazgosExpandidos.includes(hallazgo.hallazgoId)"
+          :id="idPanelHallazgo(hallazgo.hallazgoId)"
+          class="border-t border-base-200 bg-base-200/30 px-4 py-4 sm:px-5 sm:py-5"
+        >
+          <p class="whitespace-pre-line text-sm leading-relaxed text-base-content/80">
+            {{ hallazgo.descripcion }}
+          </p>
+          <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-base-content/50">
+            <span>Reactivo: {{ hallazgo.idReactivo }}</span>
+            <span>Actualizado: {{ formatearFecha(hallazgo.fechaModificacion) }}</span>
+          </div>
         </div>
       </article>
     </div>

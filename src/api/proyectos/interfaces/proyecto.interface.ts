@@ -17,13 +17,20 @@ export interface Fase {
 }
 
 export interface Hallazgo {
-  idHallazgo: string
-  titulo: string
+  hallazgoId: string | number
+  idProyecto: string
+  idReactivo: string
+  nombre: string
   descripcion: string
-  estado: string
-  prioridad: string
-  autor?: Propietario
   fechaCreacion: string
+  fechaModificacion: string
+  propietario: {
+    idCuenta: string
+    nombre: string
+    apellidoPaterno: string
+    apellidoMaterno: string
+  }
+  funcion: Funcion
 }
 
 export interface IdiomaProyecto {
@@ -97,4 +104,16 @@ export interface AsignarFuncionRequest {
 
 export interface AsignarFuncionResponse {
   funcionAsignada: boolean
+}
+
+export interface ActualizarFuncionMiembroRequest {
+  funcionesId: number[]
+}
+
+export interface ActualizarFuncionMiembroResponse {
+  funcionActualizada: boolean
+}
+
+export interface EliminarMiembroResponse {
+  miembroEliminado: boolean
 }

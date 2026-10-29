@@ -100,7 +100,9 @@ function fmtDate(iso: string): string {
         <div class="breadcrumbs text-sm mb-6">
           <ul>
             <li>
-              <RouterLink class="link link-hover" :to="{ name: routeNames.home }">Inicio</RouterLink>
+              <RouterLink class="link link-hover" :to="{ name: routeNames.home }"
+                >Inicio</RouterLink
+              >
             </li>
             <li>
               <RouterLink
@@ -339,13 +341,17 @@ function fmtDate(iso: string): string {
                   <table class="table table-bordered table-fixed w-full">
                     <thead>
                       <tr>
-                        <th class="bg-base-200 text-xs font-semibold uppercase tracking-wider w-[40%]">
+                        <th
+                          class="bg-base-200 text-xs font-semibold uppercase tracking-wider w-[40%]"
+                        >
                           <span class="flex items-center gap-2">
                             <i class="fa-regular fa-pen-to-square text-[14px]"></i>
                             Reactivo
                           </span>
                         </th>
-                        <th class="bg-base-200 text-xs font-semibold uppercase tracking-wider w-[60%]">
+                        <th
+                          class="bg-base-200 text-xs font-semibold uppercase tracking-wider w-[60%]"
+                        >
                           <span class="flex items-center gap-2">
                             <i class="fa-regular fa-circle-check text-[14px]"></i>
                             Respuestas
@@ -357,7 +363,7 @@ function fmtDate(iso: string): string {
                       <tr v-for="reactivo in reactivosGrupo" :key="reactivo.idReactivo">
                         <td>
                           <div
-                            class="fr-view min-w-0 text-sm text-base-content leading-relaxed [overflow-wrap:anywhere] [&_p]:m-0"
+                            class="fr-view min-w-0 text-sm text-base-content leading-relaxed wrap-anywhere [&_p]:m-0"
                             v-html="reactivo.descripcion"
                           ></div>
                         </td>
@@ -379,11 +385,9 @@ function fmtDate(iso: string): string {
                                 {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
                               </span>
                               <span
-                                class="fr-view min-w-0 flex-1 [overflow-wrap:anywhere] [&_p]:m-0"
+                                class="fr-view min-w-0 flex-1 wrap-anywhere [&_p]:m-0"
                                 :class="
-                                  r.esCorrecta
-                                    ? 'text-success font-medium'
-                                    : 'text-base-content'
+                                  r.esCorrecta ? 'text-success font-medium' : 'text-base-content'
                                 "
                                 v-html="r.respuesta"
                               ></span>

@@ -5,6 +5,7 @@ import type { Integrante } from '@/api/proyectos/interfaces/proyecto.interface'
 import { useIntegrantes } from '@/api/proyectos/composable/useIntegrantes'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import AgregarMiembroProyecto from '@/app/common/components/modals/AgregarMiembroProyecto.vue'
+import EliminarMiembroProyecto from '@/app/common/components/modals/eliminarMiembroProyecto.vue'
 
 const props = defineProps<{
   idProyecto: string
@@ -48,6 +49,18 @@ function abrirModal(): void {
       { label: 'Agregar', variant: 'primary', type: 'submit' },
     ],
     'max-w-3xl',
+  )
+}
+
+function abrirModalEliminar(integrante: Integrante): void {
+  modal.openModal(
+    EliminarMiembroProyecto,
+    { idProyecto: props.idProyecto, integrante },
+    [
+      { label: 'Cancelar', variant: 'outline' },
+      { label: 'Eliminar', variant: 'error', type: 'submit' },
+    ],
+    'max-w-lg',
   )
 }
 </script>
@@ -111,7 +124,7 @@ function abrirModal(): void {
           >
             {{ inicialesIntegrante(integrante) }}
           </div>
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-semibold" :title="nombreIntegrante(integrante)">
               {{ nombreIntegrante(integrante) }}
             </p>
@@ -120,6 +133,17 @@ function abrirModal(): void {
             >
               {{ funcionesIntegrante(integrante) }}
             </span>
+          </div>
+          <div class="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              :aria-label="`Eliminar a ${nombreIntegrante(integrante)} del proyecto`"
+              title="Eliminar integrante"
+              class="btn btn-ghost btn-xs btn-square text-error"
+              @click="abrirModalEliminar(integrante)"
+            >
+              <i class="fa-regular fa-trash"></i>
+            </button>
           </div>
         </div>
       </template>

@@ -2,12 +2,15 @@
 import { computed } from 'vue'
 import type { ProyectoDetalle } from '@/api/proyectos/interfaces/proyecto.interface'
 import FlujoDeTrabajo from '@/app/proyectos/components/FlujoDeTrabajo.vue'
+import AgregarHallazgoModal from '@/app/common/components/modals/agregarHallazgo.vue'
+import HallazgosPanel from '@/app/proyectos/components/HallazgosPanel.vue'
 import ListaMiembrosProyecto from '@/app/proyectos/components/ListaMiembrosProyecto.vue'
 import EditarProyecto from '@/app/common/components/modals/editarProyecto.vue'
 import { useAuthStore } from '@/auth/store/auth.store'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import banderaUs from '@/assets/banderas/us.png'
 import banderaFr from '@/assets/banderas/fr.png'
+import { hallazgosMock } from '@/app/proyectos/mocks/hallazgos.mock'
 
 const props = defineProps<{
   proyecto: ProyectoDetalle
@@ -15,6 +18,8 @@ const props = defineProps<{
 
 const authStore = useAuthStore()
 const modal = useModalStore()
+// Fuente temporal de datos; se reemplaza por la consulta del servicio al integrarlo.
+const hallazgos = hallazgosMock
 
 const BANDERAS: Record<string, string> = {
   en_US: banderaUs,
@@ -30,6 +35,18 @@ function abrirModalEditarProyecto(): void {
     { label: 'Cancelar', variant: 'outline' },
     { label: 'Guardar', variant: 'primary', type: 'submit' },
   ])
+}
+
+function abrirModalAgregarHallazgo(): void {
+  modal.openModal(
+    AgregarHallazgoModal,
+    {},
+    [
+      { label: 'Cancelar', variant: 'outline' },
+      { label: 'Guardar próximamente', variant: 'primary', type: 'submit', disabled: true },
+    ],
+    'max-w-2xl',
+  )
 }
 </script>
 
@@ -138,34 +155,11 @@ function abrirModalEditarProyecto(): void {
           class="md:col-span-6 xl:col-start-5 xl:col-span-1 xl:row-start-1 xl:row-span-6"
         />
 
-        <section
-          class="card min-h-56 border border-base-300 bg-base-100 p-5 sm:p-6 short:p-3 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-3 xl:row-span-4"
-        >
-          <div class="flex items-center gap-2.5 border-b border-base-200 pb-2">
-            <div class="rounded-lg bg-primary/10 p-2 text-primary">
-              <i class="fa-regular fa-comments"></i>
-            </div>
-            <h2 class="text-xs font-bold uppercase tracking-wider sm:text-sm">
-              Comentarios y observaciones
-            </h2>
-          </div>
-
-          <div class="mt-5 flex gap-4 overflow-x-auto pb-2">
-            <p v-if="!proyecto.hallazgos" class="self-center text-sm text-base-content/60">
-              Aún no hay comentarios en este proyecto.
-            </p>
-
-            <button
-              type="button"
-              disabled
-              title="Disponible próximamente"
-              class="flex min-w-56 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-base-300 p-6 text-sm font-semibold text-base-content/60"
-            >
-              <i class="fa-regular fa-circle-plus text-2xl"></i>
-              Nuevo comentario
-            </button>
-          </div>
-        </section>
+        <HallazgosPanel
+          :hallazgos="hallazgos"
+          class="min-h-56 md:col-span-6 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-3 xl:row-span-4"
+          @agregar-hallazgo="abrirModalAgregarHallazgo"
+        />
       </div>
     </main>
   </div>
