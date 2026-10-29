@@ -123,12 +123,11 @@ function abrirModalAgregarHallazgo(): void {
 
               <button
                 type="button"
-                disabled
                 title="Disponible próximamente"
                 class="btn btn-sm btn-outline rounded-full"
               >
-                <i class="fa-regular fa-comment-plus"></i>
-                Agregar observación
+                <i class="fa-regular fa-list"></i>
+                Reactivos
               </button>
               <button
                 type="button"
