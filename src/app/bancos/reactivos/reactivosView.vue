@@ -61,7 +61,9 @@ const { respuestasMap: respuestasGrupoMap, isLoading: cargandoRespuestasGrupo } 
   useRespuestasGrupo(bancoId, grupoReactivoIds)
 
 function getRespuestasReactivo(idReactivo: string): Respuesta[] {
-  return (respuestasGrupoMap.value.get(idReactivo) ?? []).sort((a, b) => a.posicion - b.posicion)
+  return [...(respuestasGrupoMap.value.get(idReactivo) ?? [])].sort(
+    (a, b) => a.posicion - b.posicion,
+  )
 }
 
 function abrirEliminar() {

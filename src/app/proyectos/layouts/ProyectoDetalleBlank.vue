@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import type { ProyectoDetalle } from '@/api/proyectos/interfaces/proyecto.interface'
 import FlujoDeTrabajo from '@/app/proyectos/components/FlujoDeTrabajo.vue'
 import AgregarHallazgoModal from '@/app/common/components/modals/agregarHallazgo.vue'
@@ -8,6 +9,7 @@ import ListaMiembrosProyecto from '@/app/proyectos/components/ListaMiembrosProye
 import EditarProyecto from '@/app/common/components/modals/editarProyecto.vue'
 import { useAuthStore } from '@/auth/store/auth.store'
 import { useModalStore } from '@/common/modals/store/modal.store'
+import { useBancoNavigation } from '@/app/common/banco-navigation'
 import banderaUs from '@/assets/banderas/us.png'
 import banderaFr from '@/assets/banderas/fr.png'
 import { hallazgosMock } from '@/app/proyectos/mocks/hallazgos.mock'
@@ -18,6 +20,8 @@ const props = defineProps<{
 
 const authStore = useAuthStore()
 const modal = useModalStore()
+const router = useRouter()
+const { routeNames } = useBancoNavigation()
 // Fuente temporal de datos; se reemplaza por la consulta del servicio al integrarlo.
 const hallazgos = hallazgosMock
 
@@ -47,6 +51,13 @@ function abrirModalAgregarHallazgo(): void {
     ],
     'max-w-2xl',
   )
+}
+
+function irAReactivos(): void {
+  router.push({
+    name: routeNames.value.reactivos,
+    params: { id: props.proyecto.idProyecto },
+  })
 }
 </script>
 
@@ -115,6 +126,15 @@ function abrirModalAgregarHallazgo(): void {
                 v-if="authStore.esAdministrador"
                 type="button"
                 class="btn btn-sm btn-primary rounded-full"
+                @click=""
+              >
+                <i class="fa-regular fa-pen"></i>
+                Finalizar Fase
+              </button>
+              <button
+                v-if="authStore.esAdministrador"
+                type="button"
+                class="btn btn-sm btn-primary rounded-full"
                 @click="abrirModalEditarProyecto"
               >
                 <i class="fa-regular fa-pen"></i>
@@ -123,8 +143,8 @@ function abrirModalAgregarHallazgo(): void {
 
               <button
                 type="button"
-                title="Disponible próximamente"
                 class="btn btn-sm btn-outline rounded-full"
+                @click="irAReactivos"
               >
                 <i class="fa-regular fa-list"></i>
                 Reactivos

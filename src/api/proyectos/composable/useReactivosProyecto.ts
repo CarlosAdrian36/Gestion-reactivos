@@ -2,7 +2,7 @@ import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { apiClient } from '@/api/http'
 import {
-  normalizarReactivo,
+  normalizarReactivoProyecto,
   type Reactivo,
   type ReactivoProyecto,
 } from '@/api/bancos/interfaces/reactivo.interface'
@@ -21,7 +21,7 @@ export const useReactivosProyecto = (proyectoId: MaybeRefOrGetter<string>) => {
       const { data } = await apiClient.get<{ reactivos: Reactivo[] }>(
         `/bancos/${id.value}/reactivos`,
       )
-      return (data.reactivos ?? []).map(normalizarReactivo)
+      return (data.reactivos ?? []).map(normalizarReactivoProyecto)
     },
     staleTime: 1000 * 60,
     refetchOnWindowFocus: true,
