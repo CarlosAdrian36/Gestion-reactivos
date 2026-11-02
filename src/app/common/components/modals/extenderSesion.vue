@@ -2,14 +2,19 @@
 import { useAuthStore } from '@/auth/store/auth.store'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { onBeforeUnmount, onMounted } from 'vue'
+import { toast } from 'vue-sonner'
 
 const authStore = useAuthStore()
 
 const modal = useModalStore()
 
 const onExtenderSesion = async () => {
-  await authStore.extenderSesion()
-  modal.closeModal()
+  try {
+    await authStore.extenderSesion()
+    modal.closeModal()
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : 'No se pudo extender la sesión')
+  }
 }
 
 onMounted(() => modal.setSubmitFN(onExtenderSesion))

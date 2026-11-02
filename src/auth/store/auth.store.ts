@@ -19,6 +19,8 @@ export const useAuthStore = defineStore('auth', () => {
   const modal = useModalStore()
   const now = ref(Date.now())
   const avisoExtenisonMostrado = ref(false)
+  const isExtendingSession = ref(false)
+  let extensionSessionPromise: Promise<void> | null = null
 
   setInterval(() => {
     now.value = Date.now()
@@ -151,11 +153,35 @@ export const useAuthStore = defineStore('auth', () => {
     }
     return `${secs} segundo${secs !== 1 ? 's' : ''}`
   }
-  const extenderSesion = async () => {
-    const { sesionDTO } = await extenderSesionAction()
-    token.value = sesionDTO.token
-    expiracion.value = Date.now() + sesionDTO.tiempoRestante * 1000
-    avisoExtenisonMostrado.value = false
+  const esperarExtensionSesion = (): Promise<void> =>
+    extensionSessionPromise ?? Promise.resolve()
+
+  const extenderSesion = async (): Promise<void> => {
+    if (extensionSessionPromise) return extensionSessionPromise
+
+    isExtendingSession.value = true
+    const promise = (async () => {
+      const { sesionDTO } = await extenderSesionAction()
+      if (
+        !sesionDTO?.token ||
+        !Number.isFinite(sesionDTO.tiempoRestante) ||
+        sesionDTO.tiempoRestante <= 0
+      ) {
+        throw new Error('El servidor devolvió datos de sesión incompletos')
+      }
+
+      token.value = sesionDTO.token
+      expiracion.value = Date.now() + sesionDTO.tiempoRestante * 1000
+      avisoExtenisonMostrado.value = false
+    })()
+
+    extensionSessionPromise = promise
+    try {
+      await promise
+    } finally {
+      if (extensionSessionPromise === promise) extensionSessionPromise = null
+      isExtendingSession.value = false
+    }
   }
 
   const clearSession = () => {
@@ -182,8 +208,8 @@ export const useAuthStore = defineStore('auth', () => {
       ])
     }
   })
-  watch(remainingSeconds, async (value) => {
-    if (value <= 0 && token.value && !isLoggingOut) {
+  watch([remainingSeconds, isExtendingSession], async ([value, extending]) => {
+    if (value <= 0 && token.value && !isLoggingOut && !extending) {
       isLoggingOut = true
       try {
         const result = await logout()
@@ -208,6 +234,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     rolActivoId,
     remainingSeconds,
+    isExtendingSession,
     minutes,
     seconds,
     rolActivo: computed(
@@ -235,6 +262,7 @@ export const useAuthStore = defineStore('auth', () => {
     hasActiveSession,
     getRemainingTime,
     extenderSesion,
+    esperarExtensionSesion,
     actualizarRolSesion,
   }
 })
