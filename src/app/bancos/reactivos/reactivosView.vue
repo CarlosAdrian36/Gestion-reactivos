@@ -110,8 +110,9 @@ function fmtDate(iso: string): string {
               <RouterLink
                 class="link link-hover"
                 :to="{ name: routeNames.detail, params: { id: bancoId } }"
-                >Banco Detalle</RouterLink
               >
+                {{ route.meta.contexto === 'proyectos' ? 'Proyecto detalle' : 'Banco detalle' }}
+              </RouterLink>
             </li>
             <li class="text-base-content/60">Reactivo {{ selectedReactivo.posicion }}</li>
           </ul>
