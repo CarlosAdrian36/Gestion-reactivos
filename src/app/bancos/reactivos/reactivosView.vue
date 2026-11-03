@@ -168,6 +168,15 @@ function fmtDate(iso: string): string {
                   Editar
                 </button>
                 <button
+                  v-if="route.meta.contexto === 'proyectos'"
+                  disabled
+                  title="Disponible próximamente"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content/40 disabled:cursor-not-allowed"
+                >
+                  <i class="fa-regular fa-language text-[14px]"></i>
+                  Traducir
+                </button>
+                <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm cursor-pointer"
                   @click="abrirEliminar"
                 >
