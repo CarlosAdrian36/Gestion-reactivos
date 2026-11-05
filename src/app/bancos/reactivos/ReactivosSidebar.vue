@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
@@ -8,6 +8,7 @@ import { stripHtmlToText } from '@/utils/html'
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 import { useInstruccionesGrupos } from '@/api/bancos/composable/useInstruccionesGrupos'
 import { useBancoNavigation } from '@/app/common/banco-navigation'
+import { useSidebarStore } from '@/app/common/store/ui/sidebarStore'
 import { storeToRefs } from 'pinia'
 
 interface DisplayIndividual {
@@ -56,7 +57,8 @@ function seleccionarGrupo(item: DisplayGrupo) {
   })
 }
 
-const abierto = ref(true)
+const uiSidebar = useSidebarStore()
+const { reactivosOpen: abierto } = storeToRefs(uiSidebar)
 const { data: reactivos, isLoading } = useReactivos(bancoId)
 const { data: instrucciones } = useInstruccionesGrupos(bancoId)
 const sidebarStore = useReactivoSeleccionadoStore()
@@ -143,7 +145,7 @@ function fmtDate(iso: string): string {
     <!-- Collapse toggle -->
     <button
       class="hover: cursor-pointer absolute -right-5 top-1/2 -translate-y-1/2 z-10 size-9 rounded-full border-2 border-base-300 bg-base-100 flex items-center justify-center transition-all"
-      @click="abierto = !abierto"
+      @click="uiSidebar.toggleReactivos()"
     >
       <i
         :class="

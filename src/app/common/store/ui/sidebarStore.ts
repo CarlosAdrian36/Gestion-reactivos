@@ -1,12 +1,22 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { useSessionStorage } from '@vueuse/core'
 
 export const useSidebarStore = defineStore('sidebar', () => {
-  const isOpen = ref(true)
+  const isOpen = useSessionStorage('sidebarAbierto', true)
+  const reactivosOpen = useSessionStorage('sidebarReactivos', true)
 
   function toggleSidebar() {
     isOpen.value = !isOpen.value
   }
 
-  return { isOpen, toggleSidebar }
+  function collapseAll() {
+    isOpen.value = false
+    reactivosOpen.value = false
+  }
+
+  function toggleReactivos() {
+    reactivosOpen.value = !reactivosOpen.value
+  }
+
+  return { isOpen, reactivosOpen, toggleSidebar, collapseAll, toggleReactivos }
 })

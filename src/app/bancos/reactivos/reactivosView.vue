@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
@@ -11,6 +11,8 @@ import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vu
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 import { useInstruccionesGrupos } from '@/api/bancos/composable/useInstruccionesGrupos'
 import { useRespuestasGrupo } from '@/api/bancos/composable/useRespuestasGrupo'
+import { useSidebarStore } from '@/app/common/store/ui/sidebarStore'
+import TraduccionPreview from './components/TraduccionPreview.vue'
 import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
 
 const route = useRoute()
@@ -22,6 +24,12 @@ const store = useReactivoSeleccionadoStore()
 const { selectedReactivo } = storeToRefs(store)
 const { clear } = store
 const modal = useModalStore()
+const sidebar = useSidebarStore()
+
+const mostrarTraduccion = ref(false)
+
+const traduccionesDescripcion = ref<Record<string, string>>({})
+const traduccionesRespuestas = ref<Record<string, string>>({})
 
 watch(reactivos, (lista) => {
   const sel = selectedReactivo.value
@@ -76,6 +84,13 @@ function abrirEliminar() {
 
 function irAEditar() {
   router.push({ name: routeNames.value.edit, params: { id: bancoId } })
+}
+
+function alternarTraduccion() {
+  mostrarTraduccion.value = !mostrarTraduccion.value
+  if (mostrarTraduccion.value) {
+    sidebar.collapseAll()
+  }
 }
 
 function fmtDate(iso: string): string {
@@ -169,9 +184,10 @@ function fmtDate(iso: string): string {
                 </button>
                 <button
                   v-if="route.meta.contexto === 'proyectos'"
-                  disabled
-                  title="Disponible próximamente"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content/40 disabled:cursor-not-allowed"
+                  type="button"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content hover:bg-base-200 transition-colors cursor-pointer"
+                  :class="mostrarTraduccion ? 'border-warning text-warning' : ''"
+                  @click="alternarTraduccion"
                 >
                   <i class="fa-regular fa-language text-[14px]"></i>
                   Traducir
@@ -243,6 +259,11 @@ function fmtDate(iso: string): string {
                   v-html="selectedReactivo.descripcion"
                 ></div>
               </div>
+              <TraduccionPreview
+                v-if="mostrarTraduccion"
+                v-model="traduccionesDescripcion[selectedReactivo.idReactivo]"
+                :original="selectedReactivo.descripcion"
+              />
             </div>
 
             <!-- Respuestas: Opción Múltiple / Respuesta Múltiple -->
@@ -261,25 +282,34 @@ function fmtDate(iso: string): string {
                 <div
                   v-for="(r, i) in respuestasOrdenadas"
                   :key="r.idRespuesta"
-                  class="flex items-center gap-3 p-4 rounded-xl border"
-                  :class="
-                    r.esCorrecta ? 'border-success bg-success/10' : 'border-base-300 bg-base-200/50'
-                  "
                 >
-                  <span
-                    class="size-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                  <div
+                    class="flex items-center gap-3 p-4 rounded-xl border"
                     :class="
-                      r.esCorrecta
-                        ? 'bg-success text-success-content'
-                        : 'bg-base-300 text-base-content/60'
+                      r.esCorrecta ? 'border-success bg-success/10' : 'border-base-300 bg-base-200/50'
                     "
                   >
-                    {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
-                  </span>
-                  <div
-                    class="fr-view min-w-0 flex-1 text-sm text-base-content leading-relaxed [&_p]:m-0"
-                    v-html="r.respuesta"
-                  ></div>
+                    <span
+                      class="size-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                      :class="
+                        r.esCorrecta
+                          ? 'bg-success text-success-content'
+                          : 'bg-base-300 text-base-content/60'
+                      "
+                    >
+                      {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
+                    </span>
+                    <div
+                      class="fr-view min-w-0 flex-1 text-sm text-base-content leading-relaxed [&_p]:m-0"
+                      v-html="r.respuesta"
+                    ></div>
+                  </div>
+                  <TraduccionPreview
+                    v-if="mostrarTraduccion"
+                    v-model="traduccionesRespuestas[r.idRespuesta]"
+                    class="mt-2"
+                    :original="r.respuesta"
+                  />
                 </div>
               </div>
               <p v-else class="text-sm text-base-content/40">Sin respuestas guardadas</p>
