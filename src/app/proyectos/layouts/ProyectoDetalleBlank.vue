@@ -126,7 +126,6 @@ function irAReactivos(): void {
                 v-if="authStore.esAdministrador"
                 type="button"
                 class="btn btn-sm btn-primary rounded-full"
-                @click=""
               >
                 <i class="fa-regular fa-pen"></i>
                 Finalizar Fase

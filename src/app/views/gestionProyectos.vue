@@ -59,18 +59,27 @@ const columnas: DataTableColumns<BancoProyecto> = [
   {
     id: 'tipo',
     header: 'Tipo',
-    meta: { thClass: 'w-16 text-center', tdClass: 'text-center align-middle' },
+    meta: {
+      thClass: 'w-16 text-center',
+      tdClass: 'px-4 py-4 text-center align-middle',
+    },
   },
   {
     accessorKey: 'nombre',
     header: 'Nombre',
-    meta: { thClass: 'min-w-62.5', tdClass: 'align-middle' },
+    meta: {
+      thClass: 'min-w-[17rem]',
+      tdClass: 'px-4 py-4 align-middle',
+    },
   },
   {
     id: 'idiomas',
     accessorFn: (p) => p.idiomas.filter((i) => i.etiqueta !== 'es_MX').length,
     header: 'Idiomas',
-    meta: { thClass: 'w-32 text-center', tdClass: 'text-center align-middle' },
+    meta: {
+      thClass: 'w-36 text-center',
+      tdClass: 'px-4 py-4 text-center align-middle',
+    },
   },
   {
     id: 'flujo',
@@ -79,12 +88,18 @@ const columnas: DataTableColumns<BancoProyecto> = [
       return faseActual ? `${faseActual.nombre}-${p.estado.nombre}` : p.estado.nombre
     },
     header: 'Flujo de trabajo',
-    meta: { thClass: 'w-80 text-center', tdClass: 'text-center align-middle' },
+    meta: {
+      thClass: 'min-w-[22rem] text-center',
+      tdClass: 'px-6 py-4 text-center align-middle',
+    },
   },
   {
     id: 'acciones',
     header: 'Acciones',
-    meta: { thClass: 'w-24 text-center', tdClass: 'text-center align-middle overflow-visible' },
+    meta: {
+      thClass: 'w-28 text-center',
+      tdClass: 'px-4 py-4 text-center align-middle overflow-visible',
+    },
   },
 ]
 
@@ -101,6 +116,58 @@ function getBandera(etiqueta: string): string {
     default:
       return ''
   }
+}
+
+function getCodigoIdioma(etiqueta: string): string {
+  if (etiqueta === 'en_US') return 'EN'
+  if (etiqueta === 'fr_FR') return 'FR'
+  return etiqueta.slice(0, 2).toUpperCase()
+}
+
+function normalizarTexto(valor: string | null | undefined): string {
+  return valor?.trim().toLocaleLowerCase('es-MX') ?? ''
+}
+
+function esEstadoCompletado(estado: string): boolean {
+  return ['completada', 'completado', 'finalizada', 'finalizado'].includes(normalizarTexto(estado))
+}
+
+function getFaseVigente(proyecto: BancoProyecto) {
+  const fasesNoFinalizadas = proyecto.fases.filter(
+    (fase) =>
+      normalizarTexto(fase.nombre) !== 'finalizado' &&
+      !esEstadoCompletado(fase.estado),
+  )
+
+  return (
+    fasesNoFinalizadas.find((fase) => normalizarTexto(fase.estado) === 'en proceso') ??
+    fasesNoFinalizadas[0]
+  )
+}
+
+function getFaseAccionable(proyecto: BancoProyecto) {
+  const faseVigente = getFaseVigente(proyecto)
+  const funcionFase = normalizarTexto(faseVigente?.funcion)
+
+  if (!faseVigente || !funcionFase) return undefined
+
+  const estaAsignada = proyecto.funciones.some(
+    (funcion) => normalizarTexto(funcion.nombre) === funcionFase,
+  )
+
+  return estaAsignada ? faseVigente : undefined
+}
+
+function tieneTurnoActual(proyecto: BancoProyecto): boolean {
+  return getFaseAccionable(proyecto) !== undefined
+}
+
+function getClaseFila(proyecto: BancoProyecto): string {
+  const clasesBase = 'group cursor-pointer border-b border-slate-100 transition-colors'
+
+  return tieneTurnoActual(proyecto)
+    ? `${clasesBase} border-l-4 border-l-primary bg-gradient-to-r from-blue-50/70 via-white to-white hover:from-blue-50 hover:to-white`
+    : `${clasesBase} hover:bg-slate-50/80`
 }
 </script>
 
@@ -121,68 +188,119 @@ function getBandera(etiqueta: string): string {
       </div>
     </div>
 
-    <DataTable :data="proyectos" :columns="columnas" :is-loading="isLoading" @row-click="goToItem">
+    <DataTable
+      :data="proyectos"
+      :columns="columnas"
+      :is-loading="isLoading"
+      container-class="rounded-2xl border border-slate-200/80 bg-base-100 shadow-sm overflow-visible"
+      table-class="table table-fixed w-full min-w-[980px] block overflow-x-auto whitespace-nowrap"
+      :row-class="getClaseFila"
+      @row-click="goToItem"
+    >
       <template #cell-tipo>
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-primary/10">
-          <i class="fa-regular fa-file-lines text-primary text-lg"></i>
+        <div
+          class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto bg-blue-50 border border-blue-100 text-primary shadow-sm transition-transform group-hover:scale-105"
+        >
+          <i class="fa-regular fa-file-lines text-lg"></i>
         </div>
       </template>
 
       <template #cell-nombre="{ row }">
         <div class="min-w-0">
-          <p class="font-semibold truncate" :title="row.nombre">{{ row.nombre }}</p>
-          <p class="text-sm text-base-content/60 truncate mt-1" :title="row.descripcion">
+          <div class="flex min-w-0 flex-wrap items-center gap-2">
+            <p
+              class="min-w-0 truncate font-bold text-[15px] text-base-content transition-colors group-hover:text-primary"
+              :title="row.nombre"
+            >
+              {{ row.nombre }}
+            </p>
+            <span
+              v-if="tieneTurnoActual(row)"
+              class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/30 bg-primary px-2.5 py-0.5 text-[10px] font-bold text-primary-content shadow-sm"
+              :title="`Tu turno: ${getFaseAccionable(row)?.nombre ?? ''}`"
+            >
+              <span class="inline-grid *:[grid-area:1/1]">
+                <span class="status status-accent animate-ping"></span>
+                <span class="status status-accent"></span>
+              </span>
+              Tu turno · {{ getFaseAccionable(row)?.nombre }}
+            </span>
+          </div>
+          <p class="text-xs text-base-content/60 truncate mt-1" :title="row.descripcion">
             {{ row.descripcion }}
           </p>
         </div>
       </template>
 
       <template #cell-idiomas="{ row }">
-        <div class="flex justify-center gap-1">
-          <img
+        <div class="flex justify-center gap-1.5">
+          <span
             v-for="idioma in row.idiomas.filter((i) => i.etiqueta !== 'es_MX')"
             :key="idioma.etiqueta"
-            :src="getBandera(idioma.etiqueta)"
-            :alt="idioma.descripcion"
-            class="w-6 h-4 object-contain"
+            class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200/80 bg-slate-100/80 px-2 py-1 shadow-sm"
             :title="idioma.descripcion"
-          />
+          >
+            <img
+              v-if="getBandera(idioma.etiqueta)"
+              :src="getBandera(idioma.etiqueta)"
+              alt=""
+              class="h-3 w-4 rounded-xs object-cover"
+            />
+            <span class="text-[10px] font-bold uppercase text-base-content">
+              {{ getCodigoIdioma(idioma.etiqueta) }}
+            </span>
+          </span>
           <span
             v-if="row.idiomas.filter((i) => i.etiqueta !== 'es_MX').length === 0"
-            class="text-base-content/40 text-sm"
+            class="text-base-content/40 text-sm font-light"
             >-</span
           >
         </div>
       </template>
 
       <template #cell-flujo="{ row }">
-        <WorkflowStepper :fases="row.fases" :estado="row.estado" />
+        <WorkflowStepper
+          :fases="row.fases"
+          :funciones-asignadas="row.funciones.map((funcion) => funcion.nombre)"
+          size="table"
+        />
       </template>
 
       <template #cell-acciones="{ row }">
-        <div class="dropdown dropdown-end dropdown-left" @click.stop>
-          <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
-            <i class="fa-regular fa-ellipsis-vertical"></i>
-          </div>
-          <ul
-            tabindex="0"
-            class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
+        <div class="flex items-center justify-end gap-1" @click.stop>
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm btn-circle text-base-content/70 hover:text-primary"
+            title="Ver proyecto"
+            aria-label="Ver proyecto"
+            @click.stop="goToItem(row)"
           >
-            <li>
-              <a><i class="fa-regular fa-eye"></i>Ver</a>
-            </li>
-            <li v-if="authStore.esAdministrador">
-              <a @click="abrirModalEditarProyecto(row)">
-                <i class="fa-regular fa-pen"></i>Editar
-              </a>
-            </li>
-            <div v-if="authStore.esAdministrador" class="divider my-1"></div>
-            <li v-if="authStore.esAdministrador">
-              <a class="text-error" @click="abrirModalEliminarProyecto(row)">
-                <i class="fa-regular fa-trash"></i>Eliminar
-              </a>
-            </li>
-          </ul>
+            <i class="fa-regular fa-eye"></i>
+          </button>
+          <div class="dropdown dropdown-end dropdown-left">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
+              <i class="fa-regular fa-ellipsis-vertical"></i>
+            </div>
+            <ul
+              tabindex="0"
+              class="dropdown-content menu bg-base-100 rounded-2xl w-52 p-2 shadow-xl border border-base-300"
+            >
+              <li>
+                <a @click="goToItem(row)"><i class="fa-regular fa-eye"></i>Ver</a>
+              </li>
+              <li v-if="authStore.esAdministrador">
+                <a @click="abrirModalEditarProyecto(row)">
+                  <i class="fa-regular fa-pen"></i>Editar
+                </a>
+              </li>
+              <div v-if="authStore.esAdministrador" class="divider my-1"></div>
+              <li v-if="authStore.esAdministrador">
+                <a class="text-error" @click="abrirModalEliminarProyecto(row)">
+                  <i class="fa-regular fa-trash"></i>Eliminar
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </template>
 

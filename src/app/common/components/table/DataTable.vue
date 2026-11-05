@@ -11,6 +11,8 @@ interface Props {
   pageSize?: number
   placeholder?: string
   containerClass?: string
+  tableClass?: string
+  rowClass?: string | ((row: T) => string)
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,6 +20,8 @@ const props = withDefaults(defineProps<Props>(), {
   pageSize: 10,
   placeholder: 'Buscar...',
   containerClass: 'rounded-box border border-base-300 bg-base-100 shadow-sm overflow-visible',
+  tableClass: 'table table-fixed w-full block overflow-x-auto whitespace-nowrap',
+  rowClass: 'hover transition-colors cursor-pointer',
 })
 
 const emit = defineEmits<{
@@ -80,6 +84,10 @@ function iconoSort(column: Column<DataTableFeatures, T>): string {
   if (dir === 'desc') return 'fa-solid fa-sort-down'
   return 'fa-solid fa-sort text-base-content/30'
 }
+
+function getRowClass(row: T): string {
+  return typeof props.rowClass === 'function' ? props.rowClass(row) : props.rowClass
+}
 </script>
 
 <template>
@@ -112,7 +120,7 @@ function iconoSort(column: Column<DataTableFeatures, T>): string {
         <div class="skeleton h-16 w-full"></div>
       </div>
 
-      <table v-else class="table table-fixed w-full block overflow-x-auto whitespace-nowrap">
+      <table v-else :class="tableClass">
         <thead class="bg-base-200">
           <tr>
             <th
@@ -142,7 +150,7 @@ function iconoSort(column: Column<DataTableFeatures, T>): string {
           <tr
             v-for="row in table.getRowModel().rows"
             :key="row.id"
-            class="hover transition-colors cursor-pointer"
+            :class="getRowClass(row.original)"
             @click="emit('row-click', row.original)"
           >
             <td

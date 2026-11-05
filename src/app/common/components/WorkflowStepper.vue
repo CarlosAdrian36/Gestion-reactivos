@@ -4,8 +4,9 @@ import type { Fase } from '@/api/proyectos/interfaces/proyecto.interface'
 
 interface Props {
   fases: Fase[]
-  size?: 'compact' | 'large'
+  size?: 'compact' | 'table' | 'large'
   orientation?: 'horizontal' | 'vertical'
+  funcionesAsignadas?: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,21 +22,35 @@ const STEPS_CONFIG = [
   { nombre: 'Finalizado', icon: 'fa-solid fa-flag' },
 ]
 
-const projectPhases = computed(() => props.fases.filter((fase) => fase.nombre !== 'Finalizado'))
+function normalizarTexto(valor: string): string {
+  return valor.trim().toLocaleLowerCase('es-MX')
+}
+
+function esEstadoCompletado(estado: string): boolean {
+  return ['completada', 'completado', 'finalizada', 'finalizado'].includes(
+    normalizarTexto(estado),
+  )
+}
+
+const projectPhases = computed(
+  () => props.fases.filter((fase) => normalizarTexto(fase.nombre) !== 'finalizado'),
+)
 
 const allPhasesCompleted = computed(
   () =>
     projectPhases.value.length > 0 &&
-    projectPhases.value.every((fase) => fase.estado === 'Completada'),
+    projectPhases.value.every((fase) => esEstadoCompletado(fase.estado)),
 )
 
 const isFinalizado = computed(() => allPhasesCompleted.value)
 const isLarge = computed(() => props.size === 'large')
+const isTable = computed(() => props.size === 'table')
 const isVertical = computed(() => props.orientation === 'vertical')
 const workflowStatus = computed(() =>
   isFinalizado.value
     ? 'Completada'
-    : props.fases.find((fase) => fase.estado === 'En proceso')?.estado || 'Pendiente',
+    : props.fases.find((fase) => normalizarTexto(fase.estado) === 'en proceso')?.estado ||
+      'Pendiente',
 )
 
 const workflowPhases = computed<Fase[]>(() => [
@@ -50,10 +65,14 @@ const workflowPhases = computed<Fase[]>(() => [
 const currentPhaseIndex = computed(() => {
   if (isFinalizado.value) return workflowPhases.value.length - 1
 
-  const inProgressIndex = projectPhases.value.findIndex((f) => f.estado === 'En proceso')
+  const inProgressIndex = projectPhases.value.findIndex(
+    (fase) => normalizarTexto(fase.estado) === 'en proceso',
+  )
   if (inProgressIndex !== -1) return inProgressIndex
 
-  const firstPendingIndex = projectPhases.value.findIndex((f) => f.estado !== 'Completada')
+  const firstPendingIndex = projectPhases.value.findIndex(
+    (fase) => !esEstadoCompletado(fase.estado),
+  )
   return firstPendingIndex
 })
 
@@ -75,10 +94,10 @@ const displayedPhase = computed(
 )
 
 function getStepState(fase: Fase): 'completed' | 'in_progress' | 'pending' {
-  if (fase.nombre === 'Finalizado') {
+  if (normalizarTexto(fase.nombre) === 'finalizado') {
     return allPhasesCompleted.value ? 'completed' : 'pending'
   }
-  if (fase.estado === 'Completada') return 'completed'
+  if (esEstadoCompletado(fase.estado)) return 'completed'
   if (fase === currentPhase.value) return 'in_progress'
   return 'pending'
 }
@@ -90,6 +109,25 @@ function getStepIcon(stepNombre: string): string {
 
 function getStepLabel(fase: Fase): string {
   return `${fase.nombre} (${fase.estado})`
+}
+
+function esFaseAsignada(fase: Fase): boolean {
+  if (
+    !isTable.value ||
+    !fase.funcion ||
+    normalizarTexto(fase.nombre) === 'finalizado' ||
+    esEstadoCompletado(fase.estado)
+  ) {
+    return false
+  }
+
+  const funcionFase = normalizarTexto(fase.funcion)
+
+  return (
+    props.funcionesAsignadas?.some(
+      (funcion) => normalizarTexto(funcion) === funcionFase,
+    ) ?? false
+  )
 }
 
 function getStepStateLabel(fase: Fase): string {
@@ -180,13 +218,25 @@ function getStateLabelClass(state: 'completed' | 'in_progress' | 'pending'): str
         <div
           aria-hidden="true"
           class="absolute -translate-y-1/2 rounded-full bg-base-200"
-          :class="isLarge ? 'left-14 right-14 top-6 h-1' : 'left-5 right-5 top-1/2 h-0.5'"
+        :class="
+          isLarge
+            ? 'left-14 right-14 top-6 h-1'
+            : isTable
+              ? 'left-4 right-4 top-1/2 h-[3px]'
+              : 'left-5 right-5 top-1/2 h-0.5'
+        "
         />
         <!-- Línea de avance -->
         <div
           aria-hidden="true"
           class="absolute -translate-y-1/2 rounded-full bg-success origin-left transition-transform duration-300"
-          :class="isLarge ? 'left-14 right-14 top-6 h-1' : 'left-5 right-5 top-1/2 h-0.5'"
+        :class="
+          isLarge
+            ? 'left-14 right-14 top-6 h-1'
+            : isTable
+              ? 'left-4 right-4 top-1/2 h-[3px]'
+              : 'left-5 right-5 top-1/2 h-0.5'
+        "
           :style="{ transform: `translateY(-50%) scaleX(${progressScale})` }"
         />
 
@@ -194,10 +244,22 @@ function getStateLabelClass(state: 'completed' | 'in_progress' | 'pending'): str
           v-for="(fase, idx) in workflowPhases"
           :key="idx"
           class="relative z-10 flex items-center group"
-          :class="isLarge ? 'w-28 flex-col justify-start' : 'w-10 h-10 justify-center'"
+          :class="
+            isLarge
+              ? 'w-28 flex-col justify-start'
+              : isTable
+                ? 'size-7 justify-center'
+                : 'w-10 h-10 justify-center'
+          "
           :title="getStepLabel(fase)"
           :aria-current="getStepState(fase) === 'in_progress' ? 'step' : undefined"
         >
+          <span
+            v-if="esFaseAsignada(fase)"
+            aria-hidden="true"
+            class="pointer-events-none absolute left-1/2 top-1/2 z-0 size-7 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/30 animate-ping"
+          ></span>
+
           <template v-if="isLarge">
             <!-- Nodo completado -->
             <div
@@ -246,23 +308,50 @@ function getStateLabelClass(state: 'completed' | 'in_progress' | 'pending'): str
           <template v-else>
             <div
               v-if="getStepState(fase) === 'completed'"
-              class="flex items-center justify-center text-white rounded-full bg-emerald-500 border-2 border-emerald-500 shadow-sm w-7 h-7"
+              class="relative z-10 flex items-center justify-center text-white rounded-full bg-emerald-500 border-2 border-emerald-500 shadow-sm"
+              :class="[
+                isTable ? 'size-5' : 'w-7 h-7',
+                esFaseAsignada(fase) ? 'ring-4 ring-primary/25 shadow-lg shadow-primary/20' : '',
+              ]"
             >
-              <i :class="[getStepIcon(fase.nombre), 'text-xs']"></i>
+              <i :class="[getStepIcon(fase.nombre), isTable ? 'text-[10px]' : 'text-xs']"></i>
             </div>
 
             <div
               v-else-if="getStepState(fase) === 'in_progress'"
-              class="flex items-center justify-center bg-white border-2 rounded-full border-blue-600 shadow-md w-10 h-10"
+              class="relative z-10 flex items-center justify-center bg-white border-2 rounded-full border-blue-600 shadow-md"
+              :class="
+                isTable
+                  ? esFaseAsignada(fase)
+                    ? 'size-7 ring-4 ring-primary/25 shadow-lg shadow-primary/30'
+                    : 'size-7 ring-2 ring-primary/15'
+                  : 'w-10 h-10'
+              "
             >
-              <i :class="[getStepIcon(fase.nombre), 'text-blue-600', 'text-sm']"></i>
+              <i
+                :class="[
+                  getStepIcon(fase.nombre),
+                  'text-blue-600',
+                  isTable ? 'text-xs' : 'text-sm',
+                ]"
+              ></i>
             </div>
 
             <div
               v-else
-              class="flex items-center justify-center bg-white border-2 rounded-full border-slate-300 shadow-sm w-7 h-7"
+              class="relative z-10 flex items-center justify-center bg-white border-2 rounded-full border-slate-300 shadow-sm"
+              :class="[
+                isTable ? 'size-5' : 'w-7 h-7',
+                esFaseAsignada(fase) ? 'ring-4 ring-primary/25 shadow-lg shadow-primary/20' : '',
+              ]"
             >
-              <i :class="[getStepIcon(fase.nombre), 'text-slate-400', 'text-xs']"></i>
+              <i
+                :class="[
+                  getStepIcon(fase.nombre),
+                  'text-slate-400',
+                  isTable ? 'text-[10px]' : 'text-xs',
+                ]"
+              ></i>
             </div>
           </template>
         </div>
@@ -281,8 +370,11 @@ function getStateLabelClass(state: 'completed' | 'in_progress' | 'pending'): str
       </div>
       <span
         v-else
-        class="mt-1 text-xs font-semibold"
-        :class="isFinalizado ? 'text-emerald-600' : 'text-blue-600'"
+        class="mt-1 font-semibold"
+        :class="[
+          isTable ? 'text-[11px]' : 'text-xs',
+          isFinalizado ? 'text-emerald-600' : 'text-blue-600',
+        ]"
       >
         {{ displayedPhase }}
       </span>
