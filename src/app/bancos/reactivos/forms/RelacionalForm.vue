@@ -36,10 +36,13 @@ const reactivoSchema = z.object({
         correcta: z.boolean(),
       }),
     )
-    .min(1, 'Cada reactivo debe tener al menos 1 respuesta')
-    .refine((respuestas) => respuestas.some((r) => r.correcta), {
+    .refine(
+      (respuestas) => respuestas.length === 0 || respuestas.some((respuesta) => respuesta.correcta),
+      {
       message: 'Debe haber exactamente 1 respuesta correcta',
-    }),
+        path: [],
+      },
+    ),
 })
 
 const erroresReactivo = ref<string[]>([])
@@ -166,19 +169,26 @@ function validar(): boolean {
 
   for (let i = 0; i < reactivos.value.length; i++) {
     const reactivo = reactivos.value[i]!
-    const result = reactivoSchema.safeParse(reactivo)
+    const respuestasConTexto = reactivo.respuestas
+      .map((respuesta, index) => ({ respuesta, index }))
+      .filter(({ respuesta }) => respuesta.texto.trim().length > 0)
+    const result = reactivoSchema.safeParse({
+      ...reactivo,
+      respuestas: respuestasConTexto.map(({ respuesta }) => respuesta),
+    })
 
     if (!result.success) {
       valido = false
-      const msg = result.error.issues[0]?.message ?? 'Error'
-      nuevosErroresReactivo[i] = msg
+      nuevosErroresReactivo[i] =
+        result.error.issues.find((issue) => issue.path[0] === 'descripcion')?.message ?? ''
 
-      const errsResp: string[] = []
-      for (let j = 0; j < reactivo.respuestas.length; j++) {
-        const respIssue = result.error.issues.find(
-          (issue) => issue.path[0] === 'respuestas' && issue.path[1] === j,
-        )
-        errsResp[j] = respIssue?.message ?? ''
+      const errsResp = reactivo.respuestas.map(() => '')
+      for (const issue of result.error.issues) {
+        if (issue.path[0] !== 'respuestas') continue
+
+        const indiceFiltrado = typeof issue.path[1] === 'number' ? issue.path[1] : 0
+        const indiceOriginal = respuestasConTexto[indiceFiltrado]?.index
+        if (indiceOriginal !== undefined) errsResp[indiceOriginal] = issue.message
       }
       nuevosErroresRespuesta[i] = errsResp
     } else {
@@ -204,11 +214,13 @@ async function guardarForm() {
     reactivos.value.map((r) => ({
       idReactivo: r.idReactivo,
       descripcion: r.descripcion,
-      respuestas: r.respuestas.map((resp) => ({
-        idRespuesta: resp.idRespuesta,
-        texto: resp.texto,
-        correcta: resp.correcta,
-      })),
+      respuestas: r.respuestas
+        .filter((respuesta) => respuesta.texto.trim().length > 0)
+        .map((resp) => ({
+          idRespuesta: resp.idRespuesta,
+          texto: resp.texto,
+          correcta: resp.correcta,
+        })),
     })),
     idsReactivoActuales.value,
   )

@@ -26,6 +26,7 @@ const router = createRouter({
           path: 'proyectos',
           name: 'proyectos',
           component: () => import('@/app/views/gestionProyectos.vue'),
+          meta: { requiereOrganizacionProyectos: true },
         },
         {
           path: 'compartidos',
@@ -74,6 +75,17 @@ router.beforeEach(async (to, from, next) => {
 
     if (authStore.authStatus === AuthStatus.NotAuthenticated) {
       next({ name: 'login' })
+      return
+    }
+  }
+
+  if (to.meta.requiereOrganizacionProyectos === true) {
+    if (!authStore.user) {
+      await authStore.loadUserProfile()
+    }
+
+    if (!authStore.esOrganizacionProyectos) {
+      next({ name: 'misBancos' })
       return
     }
   }

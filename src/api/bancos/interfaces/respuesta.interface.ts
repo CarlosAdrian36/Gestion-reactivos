@@ -1,4 +1,5 @@
 import type { Idioma } from './reactivo.interface'
+import type { Propietario } from './banco.interface'
 
 export interface Respuesta {
   idRespuesta: string
@@ -9,5 +10,7 @@ export interface Respuesta {
   esCorrecta: boolean
   fechaCreacion: string
   fechaModificacion: string
+  creadoPor: Propietario
+  modificadoPor: Propietario
   idioma: Idioma
 }

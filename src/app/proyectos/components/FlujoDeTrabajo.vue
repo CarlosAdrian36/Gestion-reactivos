@@ -4,6 +4,7 @@ import type { Fase } from '@/api/proyectos/interfaces/proyecto.interface'
 
 const props = defineProps<{
   fases: Fase[]
+  funcionesAsignadas?: string[]
   orientacion?: 'auto' | 'horizontal' | 'vertical'
 }>()
 
@@ -17,18 +18,44 @@ const ICONOS_FASE: Record<string, string> = {
   Finalizado: 'fa-solid fa-flag',
 }
 
+function normalizarTexto(valor: string): string {
+  return valor.trim().toLocaleLowerCase('es-MX')
+}
+
+function esEstadoCompletado(estado: string): boolean {
+  return ['completada', 'completado', 'finalizada', 'finalizado'].includes(normalizarTexto(estado))
+}
+
 function getEstadoFase(fase: Fase): EstadoFase {
-  if (fase.estado === 'Completada') return 'completada'
-  if (fase.estado === 'En proceso') return 'en_proceso'
+  if (esEstadoCompletado(fase.estado)) return 'completada'
+  if (normalizarTexto(fase.estado) === 'en proceso') return 'en_proceso'
   return 'pendiente'
 }
 
-const fasesProyecto = computed(() => props.fases.filter((fase) => fase.nombre !== 'Finalizado'))
+function esFaseAsignada(fase: Fase): boolean {
+  if (
+    !fase.funcion ||
+    normalizarTexto(fase.nombre) === 'finalizado' ||
+    esEstadoCompletado(fase.estado)
+  ) {
+    return false
+  }
+
+  const funcionFase = normalizarTexto(fase.funcion)
+
+  return (
+    props.funcionesAsignadas?.some((funcion) => normalizarTexto(funcion) === funcionFase) ?? false
+  )
+}
+
+const fasesProyecto = computed(() =>
+  props.fases.filter((fase) => normalizarTexto(fase.nombre) !== 'finalizado'),
+)
 
 const todasCompletadas = computed(
   () =>
     fasesProyecto.value.length > 0 &&
-    fasesProyecto.value.every((fase) => fase.estado === 'Completada'),
+    fasesProyecto.value.every((fase) => esEstadoCompletado(fase.estado)),
 )
 
 const pasos = computed(() => [
@@ -37,12 +64,14 @@ const pasos = computed(() => [
     icono: ICONOS_FASE[fase.nombre] ?? 'fa-solid fa-circle',
     estado: getEstadoFase(fase),
     estadoTexto: fase.estado,
+    asignada: esFaseAsignada(fase),
   })),
   {
     nombre: 'Finalizado',
     icono: ICONOS_FASE.Finalizado ?? 'fa-solid fa-flag',
     estado: (todasCompletadas.value ? 'completada' : 'pendiente') as EstadoFase,
     estadoTexto: todasCompletadas.value ? 'Completada' : 'Pendiente',
+    asignada: false,
   },
 ])
 
@@ -59,7 +88,7 @@ const lineaHorizontal = computed(() => {
     class="workflow-card card flex h-full min-h-0 flex-col border border-base-300 bg-base-100"
   >
     <div class="flex min-h-0 flex-1 flex-col p-3 sm:p-4">
-      <div class="flex items-center gap-2.5 border-b border-base-200 pb-2">
+      <div class="flex items-center gap-2.5 pb-2">
         <div class="rounded-lg bg-primary/10 p-2 text-primary">
           <i class="fa-regular fa-diagram-project"></i>
         </div>
@@ -138,7 +167,7 @@ const lineaHorizontal = computed(() => {
             :aria-current="paso.estado === 'en_proceso' ? 'step' : undefined"
           >
             <span
-              class="workflow-icon flex size-12 shrink-0 items-center justify-center rounded-full text-lg font-bold"
+              class="workflow-icon relative isolate flex size-12 shrink-0 items-center justify-center rounded-full text-lg font-bold"
               :class="[
                 esCompacto ? 'sm:size-12 sm:text-lg' : 'sm:size-14 sm:text-xl',
                 {
@@ -149,9 +178,15 @@ const lineaHorizontal = computed(() => {
                   'border border-base-300 bg-base-200 text-base-content/50':
                     paso.estado === 'pendiente',
                 },
+                paso.asignada ? 'ring-4 ring-primary/25' : '',
               ]"
             >
-              <i :class="paso.icono"></i>
+              <span
+                v-if="paso.asignada"
+                aria-hidden="true"
+                class="pointer-events-none absolute inset-0 z-0 rounded-full bg-primary/30 animate-ping"
+              ></span>
+              <i class="relative z-10" :class="paso.icono"></i>
             </span>
 
             <div class="workflow-copy flex min-w-0 flex-col">

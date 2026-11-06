@@ -60,7 +60,10 @@ function seleccionarGrupo(item: DisplayGrupo) {
 const uiSidebar = useSidebarStore()
 const { reactivosOpen: abierto } = storeToRefs(uiSidebar)
 const { data: reactivos, isLoading } = useReactivos(bancoId)
-const { data: instrucciones } = useInstruccionesGrupos(bancoId)
+const tieneGruposRelacionales = computed(() =>
+  (reactivos.value ?? []).some((reactivo) => reactivo.tipoReactivoId === 5 && reactivo.grupo > 0),
+)
+const { data: instrucciones } = useInstruccionesGrupos(bancoId, tieneGruposRelacionales)
 const sidebarStore = useReactivoSeleccionadoStore()
 const { selectedReactivo } = storeToRefs(sidebarStore)
 const { select } = sidebarStore

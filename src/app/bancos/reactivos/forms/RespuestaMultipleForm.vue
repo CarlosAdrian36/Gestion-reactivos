@@ -60,12 +60,19 @@ async function guardar() {
     toast.error('La pregunta no puede estar vacía')
     return
   }
-  const result = opcionesSchema.safeParse(opciones.value)
+
+  const opcionesConTexto = opciones.value
+    .map((opcion, index) => ({ opcion, index }))
+    .filter(({ opcion }) => opcion.texto.trim().length > 0)
+  const result = opcionesSchema.safeParse(opcionesConTexto.map(({ opcion }) => opcion))
+
   if (!result.success) {
     const errores = opciones.value.map(() => '')
     for (const issue of result.error.issues) {
-      const idx = issue.path[0] as number
-      errores[idx] = issue.message
+      const indiceFiltrado = issue.path[0]
+      if (typeof indiceFiltrado !== 'number') continue
+      const indiceOriginal = opcionesConTexto[indiceFiltrado]?.index
+      if (indiceOriginal !== undefined) errores[indiceOriginal] = issue.message
     }
     erroresOpciones.value = errores
     toast.error('Cada respuesta debe tener al menos 1 carácter')
@@ -75,7 +82,7 @@ async function guardar() {
   await guardarTodo(
     pregunta.value,
     result.data.map((o, i) => ({
-      idRespuesta: opciones.value[i]?.idRespuesta,
+      idRespuesta: opcionesConTexto[i]?.opcion.idRespuesta,
       texto: o.texto,
       correcta: o.correcta,
     })),
@@ -105,6 +112,9 @@ async function guardar() {
           Agregar opción
         </button>
       </div>
+      <p class="mb-3 text-xs text-base-content/60">
+        Las respuestas son opcionales; puedes agregarlas después.
+      </p>
 
       <div
         v-for="(opcion, index) in opciones"

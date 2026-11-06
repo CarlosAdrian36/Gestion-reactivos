@@ -10,7 +10,7 @@ import {
 /**
  * Consulta los reactivos de un proyecto reutilizando el mismo endpoint
  * de bancos (`/bancos/:id/reactivos`). El backend devuelve los campos
- * extra `hallazgos` y `estado` cuando el id corresponde a un proyecto.
+ * extra `hallazgo` y `estado` cuando el id corresponde a un proyecto.
  */
 export const useReactivosProyecto = (proyectoId: MaybeRefOrGetter<string>) => {
   const id = computed(() => toValue(proyectoId))

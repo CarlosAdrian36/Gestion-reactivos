@@ -146,7 +146,7 @@ watch(temaOscuro, (val) => {
             </div>
           </RouterLink>
         </li>
-        <li>
+        <li v-if="authStore.esOrganizacionProyectos">
           <RouterLink v-slot="{ navigate }" :to="{ name: 'proyectos' }">
             <div class="relative">
               <div

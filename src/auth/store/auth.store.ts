@@ -10,6 +10,8 @@ import { queryClient } from '@/api/queryClient'
 import ExtenderSesion from '@/app/common/components/modals/extenderSesion.vue'
 import { extenderSesionAction } from '../actions/extenderSesion'
 
+const ORGANIZACION_PROYECTOS_ID = 1
+
 export const useAuthStore = defineStore('auth', () => {
   const token = useLocalStorage('token', '')
   const authStatus = ref<AuthStatus>(AuthStatus.Checking)
@@ -244,6 +246,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     isChecking: computed(() => authStatus.value === AuthStatus.Checking),
     isAuthenticated: computed(() => authStatus.value === AuthStatus.Authenticated),
+    esOrganizacionProyectos: computed(
+      () => user.value?.organizacion.organizacionId === ORGANIZACION_PROYECTOS_ID,
+    ),
     esAdministrador: computed(
       () =>
         user.value?.roles.some(

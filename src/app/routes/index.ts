@@ -35,24 +35,40 @@ export const bancoRoutes: RouteRecordRaw[] = [
     path: 'proyectos/banco/:id',
     name: 'proyectoBancoDetalle',
     component: () => import('@/app/proyectos/views/proyectoBancoDetalle.vue'),
-    meta: { sidebar: 'default', contexto: 'proyectos' },
+    meta: {
+      sidebar: 'default',
+      contexto: 'proyectos',
+      requiereOrganizacionProyectos: true,
+    },
   },
   {
     path: 'proyectos/banco/:id/reactivos',
     name: 'proyectoReactivosList',
     component: () => import('@/app/bancos/reactivos/reactivosView.vue'),
-    meta: { sidebar: 'reactivos', contexto: 'proyectos' },
+    meta: {
+      sidebar: 'reactivos',
+      contexto: 'proyectos',
+      requiereOrganizacionProyectos: true,
+    },
   },
   {
     path: 'proyectos/banco/:id/reactivos/editar',
     name: 'proyectoEditarReactivo',
     component: () => import('@/app/bancos/reactivos/editarReactivo.vue'),
-    meta: { sidebar: 'reactivos', contexto: 'proyectos' },
+    meta: {
+      sidebar: 'reactivos',
+      contexto: 'proyectos',
+      requiereOrganizacionProyectos: true,
+    },
   },
   {
     path: 'proyectos/banco/:id/reactivos/crear',
     name: 'proyectoCrearReactivo',
     component: () => import('@/app/bancos/reactivos/crearReactivo.vue'),
-    meta: { sidebar: 'reactivos', contexto: 'proyectos' },
+    meta: {
+      sidebar: 'reactivos',
+      contexto: 'proyectos',
+      requiereOrganizacionProyectos: true,
+    },
   },
 ]

@@ -1,3 +1,5 @@
+import type { Propietario } from './banco.interface'
+
 export interface Idioma {
   idiomaId: number
   descripcion: string
@@ -24,10 +26,12 @@ export interface Reactivo {
   esCompleto: boolean
   fechaCreacion: string
   fechaModificacion: string
+  creadoPor: Propietario
+  modificadoPor: Propietario
   idioma: Idioma
   nivelCognitivo: NivelCognitivo
   subTema: SubTema
-  hallazgos: boolean
+  hallazgo: boolean
   estado: EstadoReactivo
 }
 
@@ -36,12 +40,12 @@ export type EstadoReactivo = string | null
 
 /**
  * Reactivo con los campos extra que agrega el backend en el contexto de proyecto:
- * - `hallazgos`: bandera para saber si el reactivo tiene hallazgos (después se consultan).
+ * - `hallazgo`: bandera para saber si el reactivo tiene hallazgos (después se consultan).
  * - `estado`: `'Aceptado' | 'Rechazado'`. En banco normal llega `''`.
  * Comparte la misma respuesta del servicio (`/bancos/:id/reactivos`).
  */
 export interface ReactivoProyecto extends Reactivo {
-  hallazgos: boolean
+  hallazgo: boolean
   estado: string
 }
 
@@ -52,14 +56,14 @@ export function esReactivoDeProyecto(r: Reactivo): r is ReactivoProyecto {
 
 /** ¿El reactivo de proyecto tiene hallazgos por consultar? */
 export function tieneHallazgos(r: Reactivo): boolean {
-  return esReactivoDeProyecto(r) && r.hallazgos === true
+  return esReactivoDeProyecto(r) && r.hallazgo === true
 }
 
 /** Rellena los campos extra también en reactivos de bancos normales. */
 export function normalizarReactivo(r: Reactivo): Reactivo {
   return {
     ...r,
-    hallazgos: r.hallazgos ?? false,
+    hallazgo: r.hallazgo ?? false,
     estado: r.estado ?? '',
   }
 }

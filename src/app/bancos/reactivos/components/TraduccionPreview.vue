@@ -2,9 +2,15 @@
 import FroalaEditor from '@/components/FroalaEditor.vue'
 import { preguntaConfig } from '../forms/froalaConfig'
 
-defineProps<{
-  original: string
-}>()
+withDefaults(
+  defineProps<{
+    original: string
+    originalLabel?: string
+  }>(),
+  {
+    originalLabel: 'Original',
+  },
+)
 
 const traduccion = defineModel<string>({ default: '' })
 </script>
@@ -20,31 +26,28 @@ const traduccion = defineModel<string>({ default: '' })
       </span>
     </div>
 
-    <div class="">
-      <!-- <div class="min-w-0">
-        <p class="mb-1 text-[11px] font-semibold uppercase tracking-wider text-base-content/50">
-          Original
-        </p>
+    <div
+      class="grid grid-cols-1 divide-y divide-warning/30 md:grid-cols-2 md:divide-x md:divide-y-0"
+    >
+      <section class="min-w-0 p-4">
+        <h4 class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-base-content/50">
+          {{ originalLabel }}
+        </h4>
         <div
-          class="fr-view text-sm text-base-content leading-relaxed [&_p]:m-0"
+          class="fr-view text-sm leading-relaxed text-base-content [&_p]:m-0"
           v-html="original"
         ></div>
-      </div> -->
-      <FroalaEditor
-        v-model="traduccion"
-        :config="{ ...preguntaConfig, placeholderText: 'Escribe la traducción aquí...' }"
-      />
+      </section>
 
-      <!-- <div class="traduccion-editor min-w-0 rounded-lg border border-warning/30 bg-warning/10 p-3">
-      </div> -->
+      <section class="min-w-0">
+        <!-- <h4 class="px-4 pt-4 text-[11px] font-semibold uppercase tracking-wider text-warning">
+          Traducción
+        </h4> -->
+        <FroalaEditor
+          v-model="traduccion"
+          :config="{ ...preguntaConfig, placeholderText: 'Escribe la traducción aquí...' }"
+        />
+      </section>
     </div>
   </div>
 </template>
-
-<style scoped>
-.traduccion-editor :deep(.fr-box),
-.traduccion-editor :deep(.fr-wrapper),
-.traduccion-editor :deep(.fr-element) {
-  width: 100%;
-}
-</style>

@@ -47,8 +47,11 @@ const respuestasOrdenadas = computed(() =>
   [...(respuestas.value ?? [])].sort((a, b) => a.posicion - b.posicion),
 )
 
-// Relacional: datos del grupo
-const { data: instrucciones } = useInstruccionesGrupos(bancoId)
+// Relacional: consultar instrucciones solo al seleccionar un reactivo agrupado.
+const requiereInstruccionesGrupo = computed(
+  () => selectedReactivo.value?.tipoReactivoId === 5 && selectedReactivo.value.grupo > 0,
+)
+const { data: instrucciones } = useInstruccionesGrupos(bancoId, requiereInstruccionesGrupo)
 
 const instruccionGrupo = computed(() => {
   if (!selectedReactivo.value?.grupo) return ''
@@ -88,6 +91,7 @@ function irAEditar() {
 
 function alternarTraduccion() {
   mostrarTraduccion.value = !mostrarTraduccion.value
+
   if (mostrarTraduccion.value) {
     sidebar.collapseAll()
   }
@@ -112,7 +116,14 @@ function fmtDate(iso: string): string {
     </template>
 
     <template v-else-if="selectedReactivo">
-      <div class="w-full max-w-4xl">
+      <div
+        class="w-full"
+        :class="
+          mostrarTraduccion
+            ? 'max-w-none px-4 sm:px-5 lg:px-6'
+            : 'max-w-4xl'
+        "
+      >
         <!-- Breadcrumbs (DaisyUI) -->
         <div class="breadcrumbs text-sm mb-6">
           <ul>
@@ -253,7 +264,7 @@ function fmtDate(iso: string): string {
                 <i class="fa-regular fa-file-lines text-[14px]"></i>
                 Descripción / Enunciado
               </h3>
-              <div class="bg-base-200 rounded-xl p-6">
+              <div v-if="!mostrarTraduccion" class="bg-base-200 rounded-xl p-6">
                 <div
                   class="fr-view text-lg text-base-content leading-relaxed [&_p]:m-0"
                   v-html="selectedReactivo.descripcion"
@@ -300,6 +311,7 @@ function fmtDate(iso: string): string {
                       {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
                     </span>
                     <div
+                      v-if="!mostrarTraduccion"
                       class="fr-view min-w-0 flex-1 text-sm text-base-content leading-relaxed [&_p]:m-0"
                       v-html="r.respuesta"
                     ></div>
@@ -309,6 +321,7 @@ function fmtDate(iso: string): string {
                     v-model="traduccionesRespuestas[r.idRespuesta]"
                     class="mt-2"
                     :original="r.respuesta"
+                    :original-label="`Respuesta ${String.fromCharCode(65 + i)}`"
                   />
                 </div>
               </div>

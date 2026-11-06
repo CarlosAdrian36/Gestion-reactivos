@@ -43,14 +43,15 @@ async function guardarTodoForm() {
   const idFalso = props.respuestas?.find(
     (r) => r.respuesta.trim().toLowerCase() === 'falso',
   )?.idRespuesta
-  await guardarTodo(
-    pregunta.value,
-    [
-      { idRespuesta: idVerdadero, texto: 'Verdadero', correcta: respuestaCorrecta.value === true },
-      { idRespuesta: idFalso, texto: 'Falso', correcta: respuestaCorrecta.value === false },
-    ],
-    props.respuestas?.map((r) => r.idRespuesta) ?? [],
-  )
+  const sinRespuestasExistentes = !props.respuestas?.length
+  const opciones = respuestaCorrecta.value === null && sinRespuestasExistentes
+    ? []
+    : [
+        { idRespuesta: idVerdadero, texto: 'Verdadero', correcta: respuestaCorrecta.value === true },
+        { idRespuesta: idFalso, texto: 'Falso', correcta: respuestaCorrecta.value === false },
+      ]
+
+  await guardarTodo(pregunta.value, opciones, props.respuestas?.map((r) => r.idRespuesta) ?? [])
 }
 </script>
 

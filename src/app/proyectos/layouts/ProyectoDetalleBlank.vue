@@ -163,6 +163,7 @@ function irAReactivos(): void {
 
         <FlujoDeTrabajo
           :fases="proyecto.fases"
+          :funciones-asignadas="proyecto.funciones.map((funcion) => funcion.nombre)"
           orientacion="auto"
           class="md:col-span-3 md:min-h-0 xl:col-start-1 xl:col-span-4 xl:row-start-2"
         />
