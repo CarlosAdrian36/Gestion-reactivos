@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
+import { useProyectoDetalle } from '@/api/proyectos/composable/useProyectoDetalle'
 import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
 import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { storeToRefs } from 'pinia'
@@ -11,25 +12,32 @@ import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vu
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 import { useInstruccionesGrupos } from '@/api/bancos/composable/useInstruccionesGrupos'
 import { useRespuestasGrupo } from '@/api/bancos/composable/useRespuestasGrupo'
-import { useSidebarStore } from '@/app/common/store/ui/sidebarStore'
-import TraduccionPreview from './components/TraduccionPreview.vue'
 import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
+import type { Propietario } from '@/api/bancos/interfaces/banco.interface'
 
 const route = useRoute()
 const router = useRouter()
 const bancoId = String(route.params.id)
+const esProyecto = computed(() => route.meta.contexto === 'proyectos')
+const { data: proyecto } = useProyectoDetalle(() => bancoId, esProyecto)
+const idiomasProyecto = computed(() => (esProyecto.value ? (proyecto.value?.idiomas ?? []) : []))
+const idiomaSeleccionado = ref('')
 const { routeNames } = useBancoNavigation()
 const { data: reactivos, isLoading } = useReactivos(bancoId)
 const store = useReactivoSeleccionadoStore()
 const { selectedReactivo } = storeToRefs(store)
 const { clear } = store
 const modal = useModalStore()
-const sidebar = useSidebarStore()
 
-const mostrarTraduccion = ref(false)
-
-const traduccionesDescripcion = ref<Record<string, string>>({})
-const traduccionesRespuestas = ref<Record<string, string>>({})
+watch(
+  idiomasProyecto,
+  (idiomas) => {
+    if (!idiomas.some((idioma) => idioma.etiqueta === idiomaSeleccionado.value)) {
+      idiomaSeleccionado.value = idiomas[0]?.etiqueta ?? ''
+    }
+  },
+  { immediate: true },
+)
 
 watch(reactivos, (lista) => {
   const sel = selectedReactivo.value
@@ -89,12 +97,8 @@ function irAEditar() {
   router.push({ name: routeNames.value.edit, params: { id: bancoId } })
 }
 
-function alternarTraduccion() {
-  mostrarTraduccion.value = !mostrarTraduccion.value
-
-  if (mostrarTraduccion.value) {
-    sidebar.collapseAll()
-  }
+function seleccionarIdioma(etiqueta: string) {
+  idiomaSeleccionado.value = etiqueta
 }
 
 function fmtDate(iso: string): string {
@@ -103,6 +107,13 @@ function fmtDate(iso: string): string {
     month: 'short',
     day: 'numeric',
   })
+}
+
+function nombreAutor(autor?: Propietario): string {
+  return (
+    [autor?.nombre, autor?.apellidoPaterno, autor?.apellidoMaterno].filter(Boolean).join(' ') ||
+    'No disponible'
+  )
 }
 </script>
 
@@ -119,7 +130,7 @@ function fmtDate(iso: string): string {
       <div
         class="w-full"
         :class="
-          mostrarTraduccion
+          esProyecto && idiomasProyecto.length > 0
             ? 'max-w-none px-4 sm:px-5 lg:px-6'
             : 'max-w-4xl'
         "
@@ -194,64 +205,50 @@ function fmtDate(iso: string): string {
                   Editar
                 </button>
                 <button
-                  v-if="route.meta.contexto === 'proyectos'"
-                  type="button"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content hover:bg-base-200 transition-colors cursor-pointer"
-                  :class="mostrarTraduccion ? 'border-warning text-warning' : ''"
-                  @click="alternarTraduccion"
-                >
-                  <i class="fa-regular fa-language text-[14px]"></i>
-                  Traducir
-                </button>
-                <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm cursor-pointer"
                   @click="abrirEliminar"
                 >
                   <i class="fa-regular fa-trash"></i>
                   Eliminar
                 </button>
-              </div>
+            </div>
+          </div>
+
+          <div
+            v-if="esProyecto && idiomasProyecto.length"
+            class="border-t border-base-200 px-6 pt-4"
+          >
+            <div class="tabs tabs-lift" role="tablist" aria-label="Idioma de traducción">
+              <button
+                v-for="idioma in idiomasProyecto"
+                :key="idioma.etiqueta"
+                type="button"
+                role="tab"
+                class="tab gap-2"
+                :class="idiomaSeleccionado === idioma.etiqueta ? 'tab-active' : ''"
+                :aria-selected="idiomaSeleccionado === idioma.etiqueta"
+                @click="seleccionarIdioma(idioma.etiqueta)"
+              >
+                <span
+                  v-if="idiomaSeleccionado === idioma.etiqueta"
+                  class="status status-warning"
+                  aria-label="Idioma seleccionado"
+                ></span>
+                {{ idioma.etiqueta }}
+              </button>
             </div>
 
-            <!-- Tabs -->
-            <!-- <div class="w-full border-b border-base-300">
-              <div class="flex gap-6">
-                <button
-                  :class="
-                    idiomas[selectedReactivo.idioma.idiomaId] === 'Original (EN)'
-                      ? 'relative px-1 pb-4 text-sm font-bold text-primary'
-                      : 'group relative px-1 pb-4 text-sm font-medium text-base-content/60 hover:text-base-content transition-colors'
-                  "
-                >
-                  <span class="flex items-center gap-2">Original (EN)</span>
-                  <span
-                    v-if="idiomas[selectedReactivo.idioma.idiomaId] === 'Original (EN)'"
-                    class="absolute bottom-0 left-0 w-full h-0.5 bg-primary"
-                  ></span>
-                </button>
-                <button
-                  :class="
-                    idiomas[selectedReactivo.idioma.idiomaId] === 'v1: Es-MX'
-                      ? 'relative px-1 pb-4 text-sm font-bold text-primary'
-                      : 'group relative px-1 pb-4 text-sm font-medium text-base-content/60 hover:text-base-content transition-colors'
-                  "
-                >
-                  <span class="flex items-center gap-2">
-                    v1: Es-MX
-                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                  </span>
-                  <span
-                    v-if="idiomas[selectedReactivo.idioma.idiomaId] === 'v1: Es-MX'"
-                    class="absolute bottom-0 left-0 w-full h-0.5 bg-primary"
-                  ></span>
-                </button>
-                <button
-                  class="ml-auto px-2 pb-4 text-base-content/60 hover:text-primary transition-colors cursor-pointer"
-                >
-                  <i class="fa-regular fa-circle-plus text-[20px]"></i>
-                </button>
+            <!-- TODO: Rehabilitar el botón y editor de traducción cuando se retome esa funcionalidad. -->
+            <div class="tab-content border-base-300 bg-base-100 p-4 sm:p-6">
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="badge badge-warning badge-outline">{{ idiomaSeleccionado }}</span>
+                <p class="text-sm text-base-content/60">
+                  La edición y el guardado de traducciones están temporalmente deshabilitados.
+                </p>
               </div>
-            </div> -->
+            </div>
+          </div>
+
           </div>
 
           <!-- Content Area -->
@@ -264,17 +261,12 @@ function fmtDate(iso: string): string {
                 <i class="fa-regular fa-file-lines text-[14px]"></i>
                 Descripción / Enunciado
               </h3>
-              <div v-if="!mostrarTraduccion" class="bg-base-200 rounded-xl p-6">
+              <div class="bg-base-200 rounded-xl p-6">
                 <div
                   class="fr-view text-lg text-base-content leading-relaxed [&_p]:m-0"
                   v-html="selectedReactivo.descripcion"
                 ></div>
               </div>
-              <TraduccionPreview
-                v-if="mostrarTraduccion"
-                v-model="traduccionesDescripcion[selectedReactivo.idReactivo]"
-                :original="selectedReactivo.descripcion"
-              />
             </div>
 
             <!-- Respuestas: Opción Múltiple / Respuesta Múltiple -->
@@ -311,18 +303,10 @@ function fmtDate(iso: string): string {
                       {{ r.esCorrecta ? '✓' : String.fromCharCode(65 + i) }}
                     </span>
                     <div
-                      v-if="!mostrarTraduccion"
                       class="fr-view min-w-0 flex-1 text-sm text-base-content leading-relaxed [&_p]:m-0"
                       v-html="r.respuesta"
                     ></div>
                   </div>
-                  <TraduccionPreview
-                    v-if="mostrarTraduccion"
-                    v-model="traduccionesRespuestas[r.idRespuesta]"
-                    class="mt-2"
-                    :original="r.respuesta"
-                    :original-label="`Respuesta ${String.fromCharCode(65 + i)}`"
-                  />
                 </div>
               </div>
               <p v-else class="text-sm text-base-content/40">Sin respuestas guardadas</p>
@@ -344,17 +328,20 @@ function fmtDate(iso: string): string {
                 <div
                   v-for="r in respuestasOrdenadas"
                   :key="r.idRespuesta"
-                  class="flex items-center gap-2 px-6 py-4 rounded-xl border"
-                  :class="
-                    r.esCorrecta
-                      ? 'border-success bg-success/10 text-success'
-                      : 'border-base-300 bg-base-200/50 text-base-content/70'
-                  "
                 >
-                  <i
-                    :class="r.esCorrecta ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'"
-                  ></i>
-                  <span class="font-semibold">{{ r.respuesta }}</span>
+                  <div
+                    class="flex items-center gap-2 px-6 py-4 rounded-xl border"
+                    :class="
+                      r.esCorrecta
+                        ? 'border-success bg-success/10 text-success'
+                        : 'border-base-300 bg-base-200/50 text-base-content/70'
+                    "
+                  >
+                    <i
+                      :class="r.esCorrecta ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'"
+                    ></i>
+                    <span class="font-semibold">{{ r.respuesta }}</span>
+                  </div>
                 </div>
               </div>
               <p v-else class="text-sm text-base-content/40">Sin respuestas guardadas</p>
@@ -535,6 +522,12 @@ function fmtDate(iso: string): string {
                   <p class="text-base-content font-medium">
                     {{ fmtDate(selectedReactivo.fechaCreacion) }}
                   </p>
+                  <p
+                    class="max-w-48 truncate text-[10px] text-base-content/60"
+                    :title="`Creado por ${nombreAutor(selectedReactivo.creadoPor)}`"
+                  >
+                    Por {{ nombreAutor(selectedReactivo.creadoPor) }}
+                  </p>
                 </div>
                 <div class="text-right">
                   <p class="text-[10px] uppercase tracking-wider text-base-content/40">
@@ -542,6 +535,12 @@ function fmtDate(iso: string): string {
                   </p>
                   <p class="text-base-content font-medium">
                     {{ fmtDate(selectedReactivo.fechaModificacion) }}
+                  </p>
+                  <p
+                    class="max-w-48 truncate text-[10px] text-base-content/60"
+                    :title="`Modificado por ${nombreAutor(selectedReactivo.modificadoPor)}`"
+                  >
+                    Por {{ nombreAutor(selectedReactivo.modificadoPor) }}
                   </p>
                 </div>
               </div>
