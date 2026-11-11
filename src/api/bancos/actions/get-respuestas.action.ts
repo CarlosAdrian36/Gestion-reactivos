@@ -5,10 +5,12 @@ import type { Respuesta } from '../interfaces/respuesta.interface'
 export const getRespuestasAction = async (
   idBanco: string,
   idReactivo: string,
+  idioma?: string,
 ): Promise<Respuesta[]> => {
   try {
     const { data } = await apiClient.get<{ respuestas: Respuesta[] }>(
       `/bancos/${idBanco}/reactivos/${idReactivo}/respuestas`,
+      idioma ? { headers: { Idioma: idioma } } : undefined,
     )
     return data.respuestas
   } catch (error) {

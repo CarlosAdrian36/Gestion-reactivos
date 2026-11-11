@@ -16,7 +16,7 @@ export const bancoRoutes: RouteRecordRaw[] = [
   {
     path: 'mis-bancos/banco/:id/reactivos',
     name: 'reactivosList',
-    component: () => import('@/app/bancos/reactivos/reactivosView.vue'),
+    component: () => import('@/app/bancos/reactivos/ReactivosBancoView.vue'),
     meta: { sidebar: 'reactivos' },
   },
   {
@@ -44,7 +44,7 @@ export const bancoRoutes: RouteRecordRaw[] = [
   {
     path: 'proyectos/banco/:id/reactivos',
     name: 'proyectoReactivosList',
-    component: () => import('@/app/bancos/reactivos/reactivosView.vue'),
+    component: () => import('@/app/bancos/reactivos/ReactivosProyectoView.vue'),
     meta: {
       sidebar: 'reactivos',
       contexto: 'proyectos',

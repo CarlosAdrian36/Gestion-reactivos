@@ -10,11 +10,16 @@ const route = useRoute()
 const sidebar = useSidebarStore()
 const sidebarType = computed(() => (route.meta as Record<string, string>).sidebar)
 
-watch(sidebarType, (val) => {
-  if (val === 'reactivos') {
-    sidebar.isOpen = false
-  }
-})
+watch(
+  () => route.fullPath,
+  () => {
+    if (sidebarType.value === 'reactivos') {
+      sidebar.isOpen = false
+      sidebar.reactivosOpen = true
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

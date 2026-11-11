@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
-import { useProyectoDetalle } from '@/api/proyectos/composable/useProyectoDetalle'
 import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
 import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { storeToRefs } from 'pinia'
@@ -14,29 +13,29 @@ import { useInstruccionesGrupos } from '@/api/bancos/composable/useInstrucciones
 import { useRespuestasGrupo } from '@/api/bancos/composable/useRespuestasGrupo'
 import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
 import type { Propietario } from '@/api/bancos/interfaces/banco.interface'
+import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 
-const route = useRoute()
+const props = withDefaults(defineProps<{
+  bancoId: string
+  esProyecto?: boolean
+  reactivoMostrado?: Reactivo
+  idioma?: string
+  cargandoIdioma?: boolean
+  errorIdioma?: boolean
+}>(), {
+  esProyecto: false,
+})
+
 const router = useRouter()
-const bancoId = String(route.params.id)
-const esProyecto = computed(() => route.meta.contexto === 'proyectos')
-const { data: proyecto } = useProyectoDetalle(() => bancoId, esProyecto)
-const idiomasProyecto = computed(() => (esProyecto.value ? (proyecto.value?.idiomas ?? []) : []))
-const idiomaSeleccionado = ref('')
 const { routeNames } = useBancoNavigation()
-const { data: reactivos, isLoading } = useReactivos(bancoId)
+const { data: reactivos, isLoading } = useReactivos(props.bancoId)
 const store = useReactivoSeleccionadoStore()
 const { selectedReactivo } = storeToRefs(store)
 const { clear } = store
 const modal = useModalStore()
 
-watch(
-  idiomasProyecto,
-  (idiomas) => {
-    if (!idiomas.some((idioma) => idioma.etiqueta === idiomaSeleccionado.value)) {
-      idiomaSeleccionado.value = idiomas[0]?.etiqueta ?? ''
-    }
-  },
-  { immediate: true },
+const reactivoMostrado = computed(
+  () => props.reactivoMostrado ?? selectedReactivo.value ?? undefined,
 )
 
 watch(reactivos, (lista) => {
@@ -44,12 +43,14 @@ watch(reactivos, (lista) => {
   if (lista && sel && !lista.some((r) => r.idReactivo === sel.idReactivo)) clear()
 })
 
-const { data: respuestas, isLoading: cargandoRespuestas } = useRespuestas(
-  bancoId,
+const { data: respuestas, isLoading: cargandoRespuestas, isError: errorRespuestas } = useRespuestas(
+  props.bancoId,
   () => selectedReactivo.value?.idReactivo,
+  () => props.idioma,
 )
-
-const tipoReactivoId = computed(() => selectedReactivo.value?.tipoReactivoId)
+const tipoReactivoId = computed(
+  () => reactivoMostrado.value?.tipoReactivoId ?? selectedReactivo.value?.tipoReactivoId,
+)
 const { tipoPorId } = useTiposReactivo()
 const respuestasOrdenadas = computed(() =>
   [...(respuestas.value ?? [])].sort((a, b) => a.posicion - b.posicion),
@@ -59,7 +60,7 @@ const respuestasOrdenadas = computed(() =>
 const requiereInstruccionesGrupo = computed(
   () => selectedReactivo.value?.tipoReactivoId === 5 && selectedReactivo.value.grupo > 0,
 )
-const { data: instrucciones } = useInstruccionesGrupos(bancoId, requiereInstruccionesGrupo)
+const { data: instrucciones } = useInstruccionesGrupos(props.bancoId, requiereInstruccionesGrupo)
 
 const instruccionGrupo = computed(() => {
   if (!selectedReactivo.value?.grupo) return ''
@@ -77,7 +78,7 @@ const reactivosGrupo = computed(() => {
 
 const grupoReactivoIds = computed(() => reactivosGrupo.value.map((r) => r.idReactivo))
 const { respuestasMap: respuestasGrupoMap, isLoading: cargandoRespuestasGrupo } =
-  useRespuestasGrupo(bancoId, grupoReactivoIds)
+  useRespuestasGrupo(props.bancoId, grupoReactivoIds)
 
 function getRespuestasReactivo(idReactivo: string): Respuesta[] {
   return [...(respuestasGrupoMap.value.get(idReactivo) ?? [])].sort(
@@ -87,18 +88,14 @@ function getRespuestasReactivo(idReactivo: string): Respuesta[] {
 
 function abrirEliminar() {
   if (!selectedReactivo.value) return
-  modal.openModal(eliminarReactivo, { bancoId, reactivo: selectedReactivo.value }, [
+  modal.openModal(eliminarReactivo, { bancoId: props.bancoId, reactivo: selectedReactivo.value }, [
     { label: 'Cerrar', variant: 'outline' },
     { label: 'Eliminar', variant: 'error', type: 'submit' },
   ])
 }
 
 function irAEditar() {
-  router.push({ name: routeNames.value.edit, params: { id: bancoId } })
-}
-
-function seleccionarIdioma(etiqueta: string) {
-  idiomaSeleccionado.value = etiqueta
+  router.push({ name: routeNames.value.edit, params: { id: props.bancoId } })
 }
 
 function fmtDate(iso: string): string {
@@ -130,7 +127,7 @@ function nombreAutor(autor?: Propietario): string {
       <div
         class="w-full"
         :class="
-          esProyecto && idiomasProyecto.length > 0
+          props.esProyecto
             ? 'max-w-none px-4 sm:px-5 lg:px-6'
             : 'max-w-4xl'
         "
@@ -146,9 +143,9 @@ function nombreAutor(autor?: Propietario): string {
             <li>
               <RouterLink
                 class="link link-hover"
-                :to="{ name: routeNames.detail, params: { id: bancoId } }"
+                :to="{ name: routeNames.detail, params: { id: props.bancoId } }"
               >
-                {{ route.meta.contexto === 'proyectos' ? 'Proyecto detalle' : 'Banco detalle' }}
+                {{ props.esProyecto ? 'Proyecto detalle' : 'Banco detalle' }}
               </RouterLink>
             </li>
             <li class="text-base-content/60">Reactivo {{ selectedReactivo.posicion }}</li>
@@ -164,30 +161,33 @@ function nombreAutor(autor?: Propietario): string {
                 <div
                   class="text-2xl font-bold text-base-content tracking-tight mb-1 [&_p]:inline [&_p]:m-0"
                 >
-                  Reactivo {{ selectedReactivo.posicion }}
+                  Reactivo {{ reactivoMostrado?.posicion ?? selectedReactivo.posicion }}
                   <!-- <span v-html="selectedReactivo.descripcion.slice(0, 50) + '...'"></span> -->
                 </div>
                 <div class="flex items-center gap-3 text-xs text-base-content/60">
                   <span class="flex items-center gap-1">
                     <i class="fa-regular fa-code-branch text-[14px]"></i>
-                    v{{ selectedReactivo.version }}
+                    v{{ reactivoMostrado?.version ?? selectedReactivo.version }}
                   </span>
                   <span class="w-1 h-1 rounded-full bg-base-300"></span>
-                  <span>{{ tipoPorId(selectedReactivo.tipoReactivoId)?.nombre ?? 'Unknown' }}</span>
+                  <span>
+              {{ tipoPorId(reactivoMostrado?.tipoReactivoId ?? selectedReactivo.tipoReactivoId)?.nombre ?? 'Unknown' }}
+                  </span>
                   <span class="w-1 h-1 rounded-full bg-base-300"></span>
                   <span
                     class="flex items-center gap-1"
-                    :class="selectedReactivo.esCompleto ? 'text-success' : 'text-error'"
+                    :class="(reactivoMostrado?.esCompleto ?? selectedReactivo.esCompleto) ? 'text-success' : 'text-error'"
                   >
                     <i
                       :class="
-                        selectedReactivo.esCompleto
+                        (reactivoMostrado?.esCompleto ?? selectedReactivo.esCompleto)
                           ? 'fa-solid fa-circle-check'
                           : 'fa-solid fa-circle-x'
                       "
                     ></i>
-                    {{ selectedReactivo.esCompleto ? 'Completo' : 'Incompleto' }}
+                    {{ (reactivoMostrado?.esCompleto ?? selectedReactivo.esCompleto) ? 'Completo' : 'Incompleto' }}
                   </span>
+                  <slot name="datos-proyecto"></slot>
                 </div>
               </div>
               <div class="flex gap-2">
@@ -211,48 +211,25 @@ function nombreAutor(autor?: Propietario): string {
                   <i class="fa-regular fa-trash"></i>
                   Eliminar
                 </button>
-            </div>
-          </div>
-
-          <div
-            v-if="esProyecto && idiomasProyecto.length"
-            class="border-t border-base-200 px-6 pt-4"
-          >
-            <div class="tabs tabs-lift" role="tablist" aria-label="Idioma de traducción">
-              <button
-                v-for="idioma in idiomasProyecto"
-                :key="idioma.etiqueta"
-                type="button"
-                role="tab"
-                class="tab gap-2"
-                :class="idiomaSeleccionado === idioma.etiqueta ? 'tab-active' : ''"
-                :aria-selected="idiomaSeleccionado === idioma.etiqueta"
-                @click="seleccionarIdioma(idioma.etiqueta)"
-              >
-                <span
-                  v-if="idiomaSeleccionado === idioma.etiqueta"
-                  class="status status-warning"
-                  aria-label="Idioma seleccionado"
-                ></span>
-                {{ idioma.etiqueta }}
-              </button>
-            </div>
-
-            <!-- TODO: Rehabilitar el botón y editor de traducción cuando se retome esa funcionalidad. -->
-            <div class="tab-content border-base-300 bg-base-100 p-4 sm:p-6">
-              <div class="flex flex-wrap items-center gap-3">
-                <span class="badge badge-warning badge-outline">{{ idiomaSeleccionado }}</span>
-                <p class="text-sm text-base-content/60">
-                  La edición y el guardado de traducciones están temporalmente deshabilitados.
-                </p>
               </div>
             </div>
-          </div>
 
+            <slot name="idiomas"></slot>
           </div>
 
           <!-- Content Area -->
-          <div class="p-8 space-y-8">
+          <div v-if="props.cargandoIdioma" class="p-8 space-y-4">
+            <div class="skeleton h-6 w-48"></div>
+            <div class="skeleton h-40 w-full rounded-xl"></div>
+            <div class="skeleton h-24 w-full rounded-xl"></div>
+          </div>
+          <div
+            v-else-if="props.errorIdioma"
+            class="p-8 text-center text-sm text-error"
+          >
+            No se pudo cargar el reactivo en {{ props.idioma }}.
+          </div>
+          <div v-else-if="reactivoMostrado" class="p-8 space-y-8">
             <!-- Description / Question Stem -->
             <div v-if="tipoReactivoId !== 5" class="space-y-3">
               <h3
@@ -264,7 +241,7 @@ function nombreAutor(autor?: Propietario): string {
               <div class="bg-base-200 rounded-xl p-6">
                 <div
                   class="fr-view text-lg text-base-content leading-relaxed [&_p]:m-0"
-                  v-html="selectedReactivo.descripcion"
+                  v-html="reactivoMostrado.descripcion"
                 ></div>
               </div>
             </div>
@@ -281,15 +258,17 @@ function nombreAutor(autor?: Propietario): string {
                 <div class="skeleton h-12 w-full rounded-xl"></div>
                 <div class="skeleton h-12 w-full rounded-xl"></div>
               </div>
+              <p v-else-if="errorRespuestas" class="text-sm text-error">
+                No se pudieron cargar las respuestas en {{ props.idioma ?? 'el idioma original' }}.
+              </p>
               <div v-else-if="respuestasOrdenadas.length" class="space-y-2">
-                <div
-                  v-for="(r, i) in respuestasOrdenadas"
-                  :key="r.idRespuesta"
-                >
+                <div v-for="(r, i) in respuestasOrdenadas" :key="r.idRespuesta">
                   <div
                     class="flex items-center gap-3 p-4 rounded-xl border"
                     :class="
-                      r.esCorrecta ? 'border-success bg-success/10' : 'border-base-300 bg-base-200/50'
+                      r.esCorrecta
+                        ? 'border-success bg-success/10'
+                        : 'border-base-300 bg-base-200/50'
                     "
                   >
                     <span
@@ -321,14 +300,14 @@ function nombreAutor(autor?: Propietario): string {
                 Respuestas
               </h3>
               <div v-if="cargandoRespuestas" class="skeleton h-14 w-full rounded-xl"></div>
+              <p v-else-if="errorRespuestas" class="text-sm text-error">
+                No se pudieron cargar las respuestas en {{ props.idioma ?? 'el idioma original' }}.
+              </p>
               <div
                 v-else-if="respuestasOrdenadas.length"
                 class="grid grid-cols-1 sm:grid-cols-2 gap-3"
               >
-                <div
-                  v-for="r in respuestasOrdenadas"
-                  :key="r.idRespuesta"
-                >
+                <div v-for="r in respuestasOrdenadas" :key="r.idRespuesta">
                   <div
                     class="flex items-center gap-2 px-6 py-4 rounded-xl border"
                     :class="
@@ -520,13 +499,13 @@ function nombreAutor(autor?: Propietario): string {
                 <div class="text-right">
                   <p class="text-[10px] uppercase tracking-wider text-base-content/40">Creado</p>
                   <p class="text-base-content font-medium">
-                    {{ fmtDate(selectedReactivo.fechaCreacion) }}
+                    {{ fmtDate(reactivoMostrado?.fechaCreacion ?? selectedReactivo.fechaCreacion) }}
                   </p>
                   <p
                     class="max-w-48 truncate text-[10px] text-base-content/60"
-                    :title="`Creado por ${nombreAutor(selectedReactivo.creadoPor)}`"
+                    :title="`Creado por ${nombreAutor(reactivoMostrado?.creadoPor ?? selectedReactivo.creadoPor)}`"
                   >
-                    Por {{ nombreAutor(selectedReactivo.creadoPor) }}
+                    Por {{ nombreAutor(reactivoMostrado?.creadoPor ?? selectedReactivo.creadoPor) }}
                   </p>
                 </div>
                 <div class="text-right">
@@ -534,13 +513,13 @@ function nombreAutor(autor?: Propietario): string {
                     Modificado
                   </p>
                   <p class="text-base-content font-medium">
-                    {{ fmtDate(selectedReactivo.fechaModificacion) }}
+                    {{ fmtDate(reactivoMostrado?.fechaModificacion ?? selectedReactivo.fechaModificacion) }}
                   </p>
                   <p
                     class="max-w-48 truncate text-[10px] text-base-content/60"
-                    :title="`Modificado por ${nombreAutor(selectedReactivo.modificadoPor)}`"
+                    :title="`Modificado por ${nombreAutor(reactivoMostrado?.modificadoPor ?? selectedReactivo.modificadoPor)}`"
                   >
-                    Por {{ nombreAutor(selectedReactivo.modificadoPor) }}
+                    Por {{ nombreAutor(reactivoMostrado?.modificadoPor ?? selectedReactivo.modificadoPor) }}
                   </p>
                 </div>
               </div>
@@ -548,7 +527,7 @@ function nombreAutor(autor?: Propietario): string {
                 <div class="text-right">
                   <p class="text-[10px] uppercase tracking-wider text-base-content/40">ID</p>
                   <p class="text-base-content font-medium font-mono text-xs">
-                    {{ selectedReactivo.idReactivo }}
+                    {{ reactivoMostrado?.idReactivo ?? selectedReactivo.idReactivo }}
                   </p>
                 </div>
               </div>

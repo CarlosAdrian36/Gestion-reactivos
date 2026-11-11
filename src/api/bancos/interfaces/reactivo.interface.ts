@@ -35,6 +35,10 @@ export interface Reactivo {
   estado: EstadoReactivo
 }
 
+export interface ConsultarReactivoResponse {
+  reactivos: Reactivo[]
+}
+
 /** En bancos normales puede llegar null o cadena vacía; en proyectos contiene el estado. */
 export type EstadoReactivo = string | null
 
