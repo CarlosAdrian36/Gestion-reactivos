@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { getReactivoAction } from '../actions/get-reactivo.action'
 
+/** Consulta un reactivo en un idioma específico (devuelve `null` si no hay traducción). */
 export function useReactivoIdioma(
   bancoId: MaybeRefOrGetter<string>,
   idReactivo: MaybeRefOrGetter<string | undefined>,

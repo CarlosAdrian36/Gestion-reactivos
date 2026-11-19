@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
@@ -9,20 +9,23 @@ import { storeToRefs } from 'pinia'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vue'
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
-import type { Propietario } from '@/api/bancos/interfaces/banco.interface'
+import { useReactivoIdioma } from '@/api/bancos/composable/useReactivoIdioma'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
-import DetalleOpcionMultiple from './components/DetalleOpcionMultiple.vue'
-import DetalleVerdaderoFalso from './components/DetalleVerdaderoFalso.vue'
-import DetalleRelacional from './components/DetalleRelacional.vue'
+import DetalleContenido from './components/DetalleContenido.vue'
+
+export interface TabIdioma {
+  etiqueta: string
+  bandera: string
+  esOriginal: boolean
+}
 
 const props = withDefaults(
   defineProps<{
     bancoId: string
     esProyecto?: boolean
     reactivoMostrado?: Reactivo
-    idioma?: string
-    cargandoIdioma?: boolean
-    errorIdioma?: boolean
+    /** Idiomas del banco/proyecto; si hay más de uno se muestran pestañas. */
+    idiomas?: TabIdioma[]
   }>(),
   {
     esProyecto: false,
@@ -41,10 +44,41 @@ const reactivoMostrado = computed(
   () => props.reactivoMostrado ?? selectedReactivo.value ?? undefined,
 )
 
+// Reactivo a pintar en el contenido (siempre existe en la rama de detalle).
+const reactivoDetalle = computed<Reactivo>(
+  () => (reactivoMostrado.value ?? selectedReactivo.value) as Reactivo,
+)
+
 watch(reactivos, (lista) => {
   const sel = selectedReactivo.value
   if (lista && sel && !lista.some((r) => r.idReactivo === sel.idReactivo)) clear()
 })
+
+// Pestañas de idiomas (solo si hay más de uno); es_MX arranca activa por defecto.
+const idiomasTabs = computed(() => props.idiomas ?? [])
+const tieneVariosIdiomas = computed(() => idiomasTabs.value.length > 1)
+const idiomaSeleccionado = ref('')
+watch(
+  idiomasTabs,
+  (tabs) => {
+    if (!tabs.some((tab) => tab.etiqueta === idiomaSeleccionado.value)) {
+      idiomaSeleccionado.value =
+        tabs.find((tab) => tab.esOriginal)?.etiqueta ?? tabs[0]?.etiqueta ?? ''
+    }
+  },
+  { immediate: true },
+)
+
+// ¿El idioma activo es el original? (sin pestañas o sin selección → original)
+const esIdiomaOriginal = computed(
+  () =>
+    idiomasTabs.value.find((tab) => tab.etiqueta === idiomaSeleccionado.value)?.esOriginal ?? true,
+)
+
+// Idioma a consultar: solo cuando hay multi-idioma y no es el original.
+const idiomaParaConsulta = computed(() =>
+  tieneVariosIdiomas.value && !esIdiomaOriginal.value ? idiomaSeleccionado.value : undefined,
+)
 
 const {
   data: respuestas,
@@ -53,12 +87,31 @@ const {
 } = useRespuestas(
   props.bancoId,
   () => selectedReactivo.value?.idReactivo,
-  () => props.idioma,
+  () => idiomaParaConsulta.value,
 )
 const tipoReactivoId = computed(
   () => reactivoMostrado.value?.tipoReactivoId ?? selectedReactivo.value?.tipoReactivoId,
 )
 const { tipoPorId } = useTiposReactivo()
+
+// Reactivo traducido (null si no hay traducción); respuestas también por idioma.
+const {
+  data: reactivoTraducido,
+  isLoading: cargandoTraduccion,
+  isError: errorTraduccion,
+} = useReactivoIdioma(props.bancoId, () => selectedReactivo.value?.idReactivo, idiomaParaConsulta)
+
+// Reactivo que se pinta: el traducido si existe, si no el original.
+const reactivoContenido = computed<Reactivo>(() => reactivoTraducido.value ?? reactivoDetalle.value)
+
+// Sin traducción: idioma distinto del original y la consulta devolvió null.
+const sinTraduccion = computed(
+  () =>
+    !!idiomaParaConsulta.value &&
+    !cargandoTraduccion.value &&
+    !errorTraduccion.value &&
+    !reactivoTraducido.value,
+)
 
 function abrirEliminar() {
   if (!selectedReactivo.value) return
@@ -70,21 +123,6 @@ function abrirEliminar() {
 
 function irAEditar() {
   router.push({ name: routeNames.value.edit, params: { id: props.bancoId } })
-}
-
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('es-MX', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-}
-
-function nombreAutor(autor?: Propietario): string {
-  return (
-    [autor?.nombre, autor?.apellidoPaterno, autor?.apellidoMaterno].filter(Boolean).join(' ') ||
-    'No disponible'
-  )
 }
 </script>
 
@@ -123,7 +161,7 @@ function nombreAutor(autor?: Propietario): string {
         </div>
 
         <!-- Detail Card -->
-        <div class="bg-base-100 rounded-box border border-base-300 flex flex-col min-h-150">
+        <div class="bg-base-100 rounded-box border border-base-300 flex flex-col min-h-60">
           <!-- Card Header -->
           <div class="px-8 pt-8 pb-0">
             <div class="flex justify-between items-start mb-6">
@@ -132,7 +170,6 @@ function nombreAutor(autor?: Propietario): string {
                   class="text-2xl font-bold text-base-content tracking-tight mb-1 [&_p]:inline [&_p]:m-0"
                 >
                   Reactivo {{ reactivoMostrado?.posicion ?? selectedReactivo.posicion }}
-                  <!-- <span v-html="selectedReactivo.descripcion.slice(0, 50) + '...'"></span> -->
                 </div>
                 <div class="flex items-center gap-3 text-xs text-base-content/60">
                   <span class="flex items-center gap-1">
@@ -172,12 +209,6 @@ function nombreAutor(autor?: Propietario): string {
                 </div>
               </div>
               <div class="flex gap-2">
-                <!-- <button
-                  class="btn btn-xs btn-ghost gap-1.5 text-xs font-medium hover:bg-base-200 transition-colors"
-                >
-                  <i class="fa-regular fa-pen-to-square text-[12px]"></i>
-                  Editar
-                </button> -->
                 <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content hover:bg-base-200 transition-colors cursor-pointer"
                   @click="irAEditar"
@@ -194,169 +225,66 @@ function nombreAutor(autor?: Propietario): string {
                 </button>
               </div>
             </div>
-
-            <slot name="idiomas"></slot>
           </div>
 
-          <!-- Content Area -->
-          <div v-if="props.cargandoIdioma" class="p-8 space-y-4">
+          <!-- Pestañas de idiomas (solo si hay más de uno) -->
+          <div v-if="tieneVariosIdiomas" class="tabs tabs-lift px-8 pt-4">
+            <button
+              v-for="idioma in idiomasTabs"
+              :key="idioma.etiqueta"
+              type="button"
+              class="tab gap-2"
+              :class="idiomaSeleccionado === idioma.etiqueta ? 'tab-active' : ''"
+              @click="idiomaSeleccionado = idioma.etiqueta"
+            >
+              <span
+                v-if="idiomaSeleccionado === idioma.etiqueta"
+                class="status status-warning"
+                aria-label="Idioma seleccionado"
+              ></span>
+              <img
+                v-if="idioma.bandera"
+                :src="idioma.bandera"
+                :alt="idioma.etiqueta"
+                class="size-4 rounded-full object-cover"
+              />
+              {{ idioma.etiqueta }}
+            </button>
+          </div>
+
+          <!-- Contenido único: descripción + respuestas del idioma activo -->
+          <div v-if="cargandoTraduccion" class="p-8 space-y-4">
             <div class="skeleton h-6 w-48"></div>
             <div class="skeleton h-40 w-full rounded-xl"></div>
             <div class="skeleton h-24 w-full rounded-xl"></div>
           </div>
-          <div v-else-if="props.errorIdioma" class="p-8 text-center text-sm text-error">
-            No se pudo cargar el reactivo en {{ props.idioma }}.
+          <div v-else-if="errorTraduccion" class="p-8 text-center text-sm text-error">
+            No se pudo cargar el reactivo en {{ idiomaSeleccionado }}.
           </div>
-
-          <div v-else-if="reactivoMostrado" class="p-8 space-y-8">
-            <!-- Description / Question Stem -->
-            <div v-if="tipoReactivoId !== 5" class="space-y-3">
-              <h3
-                class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
-              >
-                <i class="fa-regular fa-file-lines text-[14px]"></i>
-                Descripción / Enunciado
-              </h3>
-              <div class="bg-base-200 rounded-xl p-6">
-                <div
-                  class="fr-view text-lg text-base-content leading-relaxed [&_p]:m-0"
-                  v-html="reactivoMostrado.descripcion"
-                ></div>
-              </div>
-            </div>
-
-            <!-- Respuestas según el tipo de reactivo -->
-            <DetalleOpcionMultiple
-              v-if="tipoReactivoId === 1 || tipoReactivoId === 2"
-              :respuestas="respuestas ?? []"
-              :cargando="cargandoRespuestas"
-              :error="errorRespuestas"
-              :idioma="props.idioma"
-            />
-            <DetalleVerdaderoFalso
-              v-else-if="tipoReactivoId === 3"
-              :respuestas="respuestas ?? []"
-              :cargando="cargandoRespuestas"
-              :error="errorRespuestas"
-              :idioma="props.idioma"
-            />
-            <DetalleRelacional
-              v-else-if="tipoReactivoId === 5"
-              :banco-id="props.bancoId"
-              :grupo="selectedReactivo.grupo"
-              :reactivos="reactivos ?? []"
-            />
-
-            <!-- Details Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Cognitive Level -->
-              <!-- <div class="space-y-2">
-                <h3
-                  class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
-                >
-                  <i class="fa-regular fa-brain text-[14px]"></i>
-                  Cognitive Level
-                </h3>
-                <div class="bg-base-200 rounded-xl p-4">
-                  <p class="font-semibold text-base-content">
-                    {{ selectedReactivo.nivelCognitivo.descripcion }}
-                  </p>
-                  <p class="text-xs text-base-content/60 mt-1">
-                    ID: {{ selectedReactivo.nivelCognitivo.nivelCognitivoId }}
-                  </p>
-                </div>
-              </div> -->
-
-              <!-- Subject -->
-              <!-- <div class="space-y-2">
-                <h3
-                  class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
-                >
-                  <i class="fa-regular fa-book text-[14px]"></i>
-                  Subject
-                </h3>
-                <div class="bg-base-200 rounded-xl p-4">
-                  <p class="font-semibold text-base-content">
-                    {{ selectedReactivo.subTema.descripcion }}
-                  </p>
-                  <p class="text-xs text-base-content/60 mt-1">
-                    ID: {{ selectedReactivo.subTema.subTemaId }}
-                  </p>
-                </div>
-              </div> -->
-            </div>
-
-            <!-- Metadata Footer -->
-            <div
-              class="pt-6 border-t border-base-300 flex items-center justify-between text-xs text-base-content/60"
-            >
-              <!-- <div class="flex gap-6">
-                <div class="flex flex-col gap-1">
-                  <span class="uppercase tracking-wider font-semibold">Version</span>
-                  <span
-                    class="px-2 py-0.5 bg-base-300 rounded text-base-content font-mono font-medium"
-                  >
-                    v{{ selectedReactivo.version }}
-                  </span>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <span class="uppercase tracking-wider font-semibold">Type</span>
-                  <span class="px-2 py-0.5 bg-base-300 rounded text-base-content font-medium">
-                    {{ tipoPorId(selectedReactivo.tipoReactivoId)?.nombre ?? 'Unknown' }}
-                  </span>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <span class="uppercase tracking-wider font-semibold">Language</span>
-                  <span class="px-2 py-0.5 bg-base-300 rounded text-base-content font-medium">
-                    {{ idiomas[selectedReactivo.idioma.idiomaId] || 'Unknown' }}
-                  </span>
-                </div>
-              </div> -->
-              <div class="flex items-center gap-4">
-                <div class="text-right">
-                  <p class="text-[10px] uppercase tracking-wider text-base-content/40">Creado</p>
-                  <p class="text-base-content font-medium">
-                    {{ fmtDate(reactivoMostrado?.fechaCreacion ?? selectedReactivo.fechaCreacion) }}
-                  </p>
-                  <p
-                    class="max-w-48 truncate text-[10px] text-base-content/60"
-                    :title="`Creado por ${nombreAutor(reactivoMostrado?.creadoPor ?? selectedReactivo.creadoPor)}`"
-                  >
-                    Por {{ nombreAutor(reactivoMostrado?.creadoPor ?? selectedReactivo.creadoPor) }}
-                  </p>
-                </div>
-                <div class="text-right">
-                  <p class="text-[10px] uppercase tracking-wider text-base-content/40">
-                    Modificado
-                  </p>
-                  <p class="text-base-content font-medium">
-                    {{
-                      fmtDate(
-                        reactivoMostrado?.fechaModificacion ?? selectedReactivo.fechaModificacion,
-                      )
-                    }}
-                  </p>
-                  <p
-                    class="max-w-48 truncate text-[10px] text-base-content/60"
-                    :title="`Modificado por ${nombreAutor(reactivoMostrado?.modificadoPor ?? selectedReactivo.modificadoPor)}`"
-                  >
-                    Por
-                    {{
-                      nombreAutor(reactivoMostrado?.modificadoPor ?? selectedReactivo.modificadoPor)
-                    }}
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center gap-4">
-                <div class="text-right">
-                  <p class="text-[10px] uppercase tracking-wider text-base-content/40">ID</p>
-                  <p class="text-base-content font-medium font-mono text-xs">
-                    {{ reactivoMostrado?.idReactivo ?? selectedReactivo.idReactivo }}
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div
+            v-else-if="sinTraduccion"
+            class="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center min-h-60"
+          >
+            <p class="text-sm text-base-content/60">
+              <i class="fa-regular fa-language me-2"></i>
+              Este reactivo no tiene traducción en {{ idiomaSeleccionado }}.
+            </p>
+            <button type="button" class="btn btn-warning btn-sm gap-2">
+              <i class="fa-regular fa-language"></i>
+              Traducir
+            </button>
           </div>
+          <DetalleContenido
+            v-else
+            :banco-id="props.bancoId"
+            :reactivo="reactivoContenido"
+            :tipo-reactivo-id="tipoReactivoId"
+            :respuestas="respuestas ?? []"
+            :cargando-respuestas="cargandoRespuestas"
+            :error-respuestas="errorRespuestas"
+            :reactivos="reactivos ?? []"
+            :grupo="selectedReactivo.grupo"
+          />
         </div>
         <!-- <div class="h-10"></div> -->
       </div>

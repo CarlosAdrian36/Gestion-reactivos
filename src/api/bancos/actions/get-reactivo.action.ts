@@ -1,25 +1,33 @@
 import { isAxiosError } from 'axios'
 import { apiClient } from '@/api/http'
 import {
+  esReactivoSinTraduccion,
   normalizarReactivo,
   type ConsultarReactivoResponse,
   type Reactivo,
 } from '../interfaces/reactivo.interface'
 
+/**
+ * Consulta un reactivo con el header `Idioma`.
+ * Si el backend responde con el placeholder de "sin traducción" devuelve `null`
+ * (no es un error: el reactivo simplemente no tiene traducción en ese idioma).
+ */
 export const getReactivoAction = async (
   idBanco: string,
   idReactivo: string,
   idioma: string,
-): Promise<Reactivo> => {
+): Promise<Reactivo | null> => {
   try {
     const { data } = await apiClient.get<ConsultarReactivoResponse>(
       `/bancos/${idBanco}/reactivos/${idReactivo}`,
       { headers: { Idioma: idioma } },
     )
     const reactivo =
-      data.reactivos?.find((item) => item.idReactivo === idReactivo) ?? data.reactivos?.[0]
+      data.reactivos?.find((item) => item.idReactivo === idReactivo) ??
+      data.reactivos?.[0] ??
+      data.reactivo
 
-    if (!reactivo) throw new Error('No se encontró el reactivo en el idioma solicitado')
+    if (!reactivo || esReactivoSinTraduccion(reactivo)) return null
 
     return normalizarReactivo(reactivo)
   } catch (error) {

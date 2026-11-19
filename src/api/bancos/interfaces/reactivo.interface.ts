@@ -36,7 +36,17 @@ export interface Reactivo {
 }
 
 export interface ConsultarReactivoResponse {
-  reactivos: Reactivo[]
+  reactivos?: Reactivo[]
+  /** La consulta con header `Idioma` responde con un solo objeto (singular). */
+  reactivo?: Reactivo
+}
+
+/** GUID en ceros que el backend usa como placeholder cuando no existe la traducción. */
+const ID_REACTIVO_VACIO = '00000000-0000-0000-0000-000000000000'
+
+/** ¿El reactivo devuelto es el placeholder de "sin traducción"? */
+export function esReactivoSinTraduccion(r?: Reactivo | null): boolean {
+  return !r || r.idReactivo === ID_REACTIVO_VACIO || r.idReactivo === '' || r.descripcion === ''
 }
 
 /** En bancos normales puede llegar null o cadena vacía; en proyectos contiene el estado. */
