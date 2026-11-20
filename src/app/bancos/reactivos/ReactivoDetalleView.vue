@@ -129,6 +129,28 @@ watch(
   },
 )
 
+// Traducción existente (para el modo actualizar del editor).
+const traduccionActual = computed(() => {
+  if (!reactivoTraducido.value) return undefined
+  return {
+    idReactivo: reactivoTraducido.value.idReactivo,
+    descripcion: reactivoTraducido.value.descripcion,
+    respuestas: respuestas.value ?? [],
+  }
+})
+
+// Editar es exclusivo del reactivo original (o de bancos sin multi-idioma).
+const mostrarEditar = computed(() => !tieneVariosIdiomas.value || esIdiomaOriginal.value)
+
+// Traducir: solo en pestaña de idioma CON traducción, y no estando ya editando.
+const mostrarTraducir = computed(
+  () =>
+    tieneVariosIdiomas.value &&
+    !esIdiomaOriginal.value &&
+    !!reactivoTraducido.value &&
+    !traduciendo.value,
+)
+
 function abrirEliminar() {
   if (!selectedReactivo.value) return
   modal.openModal(eliminarReactivo, { bancoId: props.bancoId, reactivo: selectedReactivo.value }, [
@@ -226,11 +248,20 @@ function irAEditar() {
               </div>
               <div class="flex gap-2">
                 <button
+                  v-if="mostrarEditar"
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content hover:bg-base-200 transition-colors cursor-pointer"
                   @click="irAEditar"
                 >
                   <i class="fa-regular fa-pen-to-square text-[14px]"></i>
                   Editar
+                </button>
+                <button
+                  v-if="mostrarTraducir"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-warning text-xs font-medium text-warning hover:bg-warning/10 transition-colors cursor-pointer"
+                  @click="traduciendo = true"
+                >
+                  <i class="fa-regular fa-language text-[14px]"></i>
+                  Traducir
                 </button>
                 <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm cursor-pointer"
@@ -269,7 +300,15 @@ function irAEditar() {
           </div>
 
           <!-- Contenido único: descripción + respuestas del idioma activo -->
-          <div v-if="cargandoTraduccion" class="p-8 space-y-4">
+          <TraduccionEditor
+            v-if="traduciendo"
+            :banco-id="props.bancoId"
+            :reactivo="reactivoDetalle"
+            :idioma="idiomaSeleccionado"
+            :traduccion-actual="traduccionActual"
+            @cancelar="traduciendo = false"
+          />
+          <div v-else-if="cargandoTraduccion" class="p-8 space-y-4">
             <div class="skeleton h-6 w-48"></div>
             <div class="skeleton h-40 w-full rounded-xl"></div>
             <div class="skeleton h-24 w-full rounded-xl"></div>
@@ -278,7 +317,7 @@ function irAEditar() {
             No se pudo cargar el reactivo en {{ idiomaSeleccionado }}.
           </div>
           <div
-            v-else-if="sinTraduccion && !traduciendo"
+            v-else-if="sinTraduccion"
             class="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center min-h-60"
           >
             <p class="text-sm text-base-content/60">
@@ -290,13 +329,6 @@ function irAEditar() {
               Traducir
             </button>
           </div>
-          <TraduccionEditor
-            v-else-if="sinTraduccion"
-            :banco-id="props.bancoId"
-            :reactivo="reactivoDetalle"
-            :idioma="idiomaSeleccionado"
-            @cancelar="traduciendo = false"
-          />
           <DetalleContenido
             v-else
             :banco-id="props.bancoId"

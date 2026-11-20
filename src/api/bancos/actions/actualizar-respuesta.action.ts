@@ -6,11 +6,13 @@ export const actualizarRespuestaAction = async (
   idReactivo: string,
   idRespuesta: string,
   body: { esCorrecta: boolean; respuesta: string },
+  idioma?: string,
 ): Promise<{ respuestaActualizada: boolean }> => {
   try {
     const { data } = await apiClient.put<{ respuestaActualizada: boolean }>(
       `/bancos/${bancoId}/reactivos/${idReactivo}/respuestas/${idRespuesta}`,
       body,
+      idioma ? { headers: { Idioma: idioma } } : undefined,
     )
     return data
   } catch (error) {

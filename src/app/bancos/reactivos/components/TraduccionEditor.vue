@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import { useGuardarTraduccion } from '@/api/bancos/composable/useGuardarTraduccion'
+import { useActualizarTraduccion } from '@/api/bancos/composable/useActualizarTraduccion'
 import type { RespuestaTraduccionInput } from '@/api/bancos/interfaces/traduccion.interface'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import type { Respuesta } from '@/api/bancos/interfaces/respuesta.interface'
@@ -11,19 +12,29 @@ import FroalaEditor from '@/components/FroalaEditor.vue'
 import TraduccionPreview from './TraduccionPreview.vue'
 import { opcionConfig } from '../forms/froalaConfig'
 
+export interface TraduccionActual {
+  idReactivo: string
+  descripcion: string
+  respuestas: Respuesta[]
+}
+
 const props = defineProps<{
   bancoId: string
   /** Reactivo original (es_MX) del que se parte para traducir. */
   reactivo: Reactivo
   /** Etiqueta del idioma destino, p. ej. 'en_US'. */
   idioma: string
+  /** Traducción existente; si viene, el editor precarga y actualiza (en vez de crear). */
+  traduccionActual?: TraduccionActual
 }>()
 
 const emit = defineEmits<{
   cancelar: []
 }>()
 
-// Respuestas originales (sin header Idioma) para traducir cada una.
+const esActualizacion = computed(() => !!props.traduccionActual)
+
+// Respuestas originales (sin header Idioma) para mostrar el original a la par.
 const { data: respuestasOriginales, isLoading: cargandoRespuestas } = useRespuestas(
   props.bancoId,
   () => props.reactivo.idReactivo,
@@ -47,8 +58,31 @@ watch(
   { immediate: true },
 )
 
+// Precarga (modo actualizar): llena descripción y respuestas traducidas
+// casando por posición con las respuestas originales.
+watch(
+  respuestasOrdenadas,
+  (ordenadas) => {
+    const actual = props.traduccionActual
+    if (!actual) return
+    descripcionTraducida.value = actual.descripcion
+    const porPosicion = new Map<number, Respuesta>()
+    for (const r of actual.respuestas) porPosicion.set(r.posicion, r)
+    const mapa: Record<string, string> = {}
+    for (const original of ordenadas) {
+      const texto = porPosicion.get(original.posicion)?.respuesta
+      if (texto != null) mapa[original.idRespuesta] = texto
+    }
+    traduccionesRespuestas.value = mapa
+  },
+  { immediate: true },
+)
+
 const guardarTraduccion = useGuardarTraduccion(props.bancoId)
-const guardando = computed(() => guardarTraduccion.isPending.value)
+const actualizarTraduccion = useActualizarTraduccion(props.bancoId)
+const guardando = computed(
+  () => guardarTraduccion.isPending.value || actualizarTraduccion.isPending.value,
+)
 
 async function guardar() {
   if (!stripHtmlToText(descripcionTraducida.value)) {
@@ -56,24 +90,56 @@ async function guardar() {
     return
   }
 
-  const respuestas: RespuestaTraduccionInput[] = respuestasOrdenadas.value
-    .map((respuesta: Respuesta) => ({
-      idRespuesta: respuesta.idRespuesta,
-      esCorrecta: respuesta.esCorrecta,
-      respuesta: traduccionesRespuestas.value[respuesta.idRespuesta] ?? '',
-    }))
-    .filter((item) => stripHtmlToText(item.respuesta) !== '')
-
   try {
-    await guardarTraduccion.mutateAsync({
-      idReactivo: props.reactivo.idReactivo,
-      idioma: props.idioma,
-      descripcion: descripcionTraducida.value,
-      respuestas,
-    })
-    toast.success('Traducción guardada correctamente')
+    if (esActualizacion.value) {
+      // Actualizar: los PUT apuntan al reactivo traducido y sus respuestas.
+      const respuestasActualizadas = respuestasOrdenadas.value
+        .map((original) => {
+          const traducida = props.traduccionActual!.respuestas.find(
+            (r) => r.posicion === original.posicion,
+          )
+          return {
+            idRespuesta: traducida?.idRespuesta ?? '',
+            esCorrecta: traducida?.esCorrecta ?? original.esCorrecta,
+            respuesta: traduccionesRespuestas.value[original.idRespuesta] ?? '',
+          }
+        })
+        .filter((item) => item.idRespuesta && stripHtmlToText(item.respuesta) !== '')
+
+      await actualizarTraduccion.mutateAsync({
+        idReactivoOriginal: props.reactivo.idReactivo,
+        idReactivoTraducido: props.traduccionActual!.idReactivo,
+        idioma: props.idioma,
+        tipoReactivoId: props.reactivo.tipoReactivoId,
+        descripcion: descripcionTraducida.value,
+        respuestas: respuestasActualizadas,
+      })
+      toast.success('Traducción actualizada correctamente')
+    } else {
+      const respuestas: RespuestaTraduccionInput[] = respuestasOrdenadas.value
+        .map((respuesta: Respuesta) => ({
+          idRespuesta: respuesta.idRespuesta,
+          esCorrecta: respuesta.esCorrecta,
+          respuesta: traduccionesRespuestas.value[respuesta.idRespuesta] ?? '',
+        }))
+        .filter((item) => stripHtmlToText(item.respuesta) !== '')
+
+      await guardarTraduccion.mutateAsync({
+        idReactivo: props.reactivo.idReactivo,
+        idioma: props.idioma,
+        descripcion: descripcionTraducida.value,
+        respuestas,
+      })
+      toast.success('Traducción guardada correctamente')
+    }
   } catch (error) {
-    toast.error(error instanceof Error ? error.message : 'No se pudo guardar la traducción')
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : esActualizacion.value
+          ? 'No se pudo actualizar la traducción'
+          : 'No se pudo guardar la traducción',
+    )
   }
 }
 </script>
@@ -85,7 +151,9 @@ async function guardar() {
     >
       <i class="fa-regular fa-language text-[18px] text-warning"></i>
       <div class="min-w-0">
-        <p class="text-sm font-semibold text-warning">Traduciendo a {{ props.idioma }}</p>
+        <p class="text-sm font-semibold text-warning">
+          {{ esActualizacion ? 'Actualizando traducción a' : 'Traduciendo a' }} {{ props.idioma }}
+        </p>
         <p class="text-xs text-base-content/60">
           Escribe la traducción junto al original y guárdala.
         </p>
@@ -178,7 +246,13 @@ async function guardar() {
       >
         <span v-if="guardando" class="loading loading-spinner loading-xs"></span>
         <i v-else class="fa-regular fa-language text-[14px]"></i>
-        {{ guardando ? 'Guardando…' : 'Guardar traducción' }}
+        {{
+          guardando
+            ? 'Guardando…'
+            : esActualizacion
+              ? 'Actualizar traducción'
+              : 'Guardar traducción'
+        }}
       </button>
     </div>
   </div>
