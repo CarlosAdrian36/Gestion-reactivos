@@ -4,30 +4,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
 import { useReactivoSeleccionadoStore } from './useReactivoSeleccionado'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
-import { stripHtmlToText } from '@/utils/html'
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 import { useInstruccionesGrupos } from '@/api/bancos/composable/useInstruccionesGrupos'
 import { useBancoNavigation } from '@/app/common/banco-navigation'
 import { useSidebarStore } from '@/app/common/store/ui/sidebarStore'
 import { storeToRefs } from 'pinia'
-
-interface DisplayIndividual {
-  tipo: 'individual'
-  reactivo: Reactivo
-  posicion: number
-}
-
-interface DisplayGrupo {
-  tipo: 'grupo'
-  grupoId: number
-  posicion: number
-  instruccion: string
-  cantidadReactivos: number
-  esCompleto: boolean
-  primerReactivo: Reactivo
-}
-
-type DisplayItem = DisplayIndividual | DisplayGrupo
+import { stripHtmlToText } from '@/utils/html'
+import { construirItemsListado, type DisplayGrupo, type DisplayItem } from './listado-reactivos'
 
 const route = useRoute()
 const router = useRouter()
@@ -68,39 +51,9 @@ const sidebarStore = useReactivoSeleccionadoStore()
 const { selectedReactivo } = storeToRefs(sidebarStore)
 const { select } = sidebarStore
 
-const itemsParaMostrar = computed<DisplayItem[]>(() => {
-  if (!reactivos.value) return []
-
-  const individuales: DisplayItem[] = []
-  const porGrupo = new Map<number, Reactivo[]>()
-
-  for (const r of reactivos.value) {
-    if (r.tipoReactivoId === 5 && r.grupo > 0) {
-      const lista = porGrupo.get(r.grupo) ?? []
-      lista.push(r)
-      porGrupo.set(r.grupo, lista)
-    } else {
-      individuales.push({ tipo: 'individual', reactivo: r, posicion: r.posicion })
-    }
-  }
-
-  const grupos: DisplayItem[] = []
-  for (const [grupoId, miembros] of porGrupo) {
-    miembros.sort((a, b) => a.posicionGrupo - b.posicionGrupo)
-    const instruccion = instrucciones.value?.find((i) => i.grupo === grupoId)
-    grupos.push({
-      tipo: 'grupo',
-      grupoId,
-      posicion: miembros[0]!.posicion,
-      instruccion: stripHtmlToText(instruccion?.descripcion ?? 'Sin instrucción'),
-      cantidadReactivos: miembros.length,
-      esCompleto: miembros.every((r) => r.esCompleto),
-      primerReactivo: miembros[0]!,
-    })
-  }
-
-  return [...individuales, ...grupos].sort((a, b) => a.posicion - b.posicion)
-})
+const itemsParaMostrar = computed<DisplayItem[]>(() =>
+  construirItemsListado(reactivos.value ?? [], instrucciones.value ?? []),
+)
 
 function preview(r: Reactivo): string {
   return stripHtmlToText(r.descripcion)

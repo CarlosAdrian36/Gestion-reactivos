@@ -16,7 +16,7 @@ const traduccion = defineModel<string>({ default: '' })
 </script>
 
 <template>
-  <div class="mt-3 overflow-hidden rounded-xl border border-warning/40">
+  <div class="overflow-hidden rounded-xl border border-warning/40">
     <div class="bg-warning/10 px-4 py-3">
       <span
         class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-warning"
@@ -40,9 +40,6 @@ const traduccion = defineModel<string>({ default: '' })
       </section>
 
       <section class="min-w-0">
-        <!-- <h4 class="px-4 pt-4 text-[11px] font-semibold uppercase tracking-wider text-warning">
-          Traducción
-        </h4> -->
         <FroalaEditor
           v-model="traduccion"
           :config="{ ...preguntaConfig, placeholderText: 'Escribe la traducción aquí...' }"

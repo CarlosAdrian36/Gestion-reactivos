@@ -66,6 +66,21 @@ function irAReactivos(): void {
     <main
       class="mx-auto flex h-full max-w-9xl flex-col space-y-5 px-4 py-5 sm:px-6 sm:py-8 lg:px-8 short:py-3"
     >
+      <div class="breadcrumbs text-sm">
+        <ul>
+          <li>
+            <RouterLink class="link link-hover gap-1.5" :to="{ name: routeNames.home }">
+              <i class="fa-solid fa-house text-[12px]"></i>
+              Proyectos
+            </RouterLink>
+          </li>
+          <li class="text-base-content/60 gap-1.5">
+            <i class="fa-regular fa-folder-open text-[12px]"></i>
+            {{ proyecto.nombre }}
+          </li>
+        </ul>
+      </div>
+
       <div
         class="grid min-h-0 flex-1 grid-cols-1 items-stretch gap-4 short:gap-2 md:grid-cols-6 xl:grid-cols-[repeat(4,minmax(0,3fr))_minmax(0,4fr)] xl:grid-rows-[auto_auto_repeat(4,minmax(0,1fr))] xl:gap-5"
       >

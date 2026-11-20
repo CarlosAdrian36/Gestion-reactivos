@@ -12,6 +12,7 @@ import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 import { useReactivoIdioma } from '@/api/bancos/composable/useReactivoIdioma'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import DetalleContenido from './components/DetalleContenido.vue'
+import TraduccionEditor from './components/TraduccionEditor.vue'
 
 export interface TabIdioma {
   etiqueta: string
@@ -80,26 +81,32 @@ const idiomaParaConsulta = computed(() =>
   tieneVariosIdiomas.value && !esIdiomaOriginal.value ? idiomaSeleccionado.value : undefined,
 )
 
+// Reactivo traducido (null si no hay traducción).
+const {
+  data: reactivoTraducido,
+  isLoading: cargandoTraduccion,
+  isError: errorTraduccion,
+} = useReactivoIdioma(props.bancoId, () => selectedReactivo.value?.idReactivo, idiomaParaConsulta)
+
+// El id con el que se consultan las respuestas: el del reactivo traducido
+// si existe (las respuestas traducidas se crearon bajo él), si no el original.
+const idReactivoParaRespuestas = computed(
+  () => reactivoTraducido.value?.idReactivo ?? selectedReactivo.value?.idReactivo,
+)
+
 const {
   data: respuestas,
   isLoading: cargandoRespuestas,
   isError: errorRespuestas,
 } = useRespuestas(
   props.bancoId,
-  () => selectedReactivo.value?.idReactivo,
+  () => idReactivoParaRespuestas.value,
   () => idiomaParaConsulta.value,
 )
 const tipoReactivoId = computed(
   () => reactivoMostrado.value?.tipoReactivoId ?? selectedReactivo.value?.tipoReactivoId,
 )
 const { tipoPorId } = useTiposReactivo()
-
-// Reactivo traducido (null si no hay traducción); respuestas también por idioma.
-const {
-  data: reactivoTraducido,
-  isLoading: cargandoTraduccion,
-  isError: errorTraduccion,
-} = useReactivoIdioma(props.bancoId, () => selectedReactivo.value?.idReactivo, idiomaParaConsulta)
 
 // Reactivo que se pinta: el traducido si existe, si no el original.
 const reactivoContenido = computed<Reactivo>(() => reactivoTraducido.value ?? reactivoDetalle.value)
@@ -111,6 +118,15 @@ const sinTraduccion = computed(
     !cargandoTraduccion.value &&
     !errorTraduccion.value &&
     !reactivoTraducido.value,
+)
+
+// Estado del editor de traducción; se resetea al cambiar de reactivo o idioma.
+const traduciendo = ref(false)
+watch(
+  () => [selectedReactivo.value?.idReactivo, idiomaSeleccionado.value] as const,
+  () => {
+    traduciendo.value = false
+  },
 )
 
 function abrirEliminar() {
@@ -262,18 +278,25 @@ function irAEditar() {
             No se pudo cargar el reactivo en {{ idiomaSeleccionado }}.
           </div>
           <div
-            v-else-if="sinTraduccion"
+            v-else-if="sinTraduccion && !traduciendo"
             class="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center min-h-60"
           >
             <p class="text-sm text-base-content/60">
               <i class="fa-regular fa-language me-2"></i>
               Este reactivo no tiene traducción en {{ idiomaSeleccionado }}.
             </p>
-            <button type="button" class="btn btn-warning btn-sm gap-2">
+            <button type="button" class="btn btn-warning btn-sm gap-2" @click="traduciendo = true">
               <i class="fa-regular fa-language"></i>
               Traducir
             </button>
           </div>
+          <TraduccionEditor
+            v-else-if="sinTraduccion"
+            :banco-id="props.bancoId"
+            :reactivo="reactivoDetalle"
+            :idioma="idiomaSeleccionado"
+            @cancelar="traduciendo = false"
+          />
           <DetalleContenido
             v-else
             :banco-id="props.bancoId"
@@ -291,17 +314,41 @@ function irAEditar() {
     </template>
 
     <template v-else>
-      <div class="flex items-center justify-center h-full">
-        <div class="text-center py-16">
-          <div
-            class="size-20 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-5"
-          >
-            <i class="fa-regular fa-hand-pointer text-4xl"></i>
+      <div
+        class="w-full"
+        :class="props.esProyecto ? 'max-w-none px-4 sm:px-5 lg:px-6' : 'max-w-4xl'"
+      >
+        <!-- Breadcrumbs (DaisyUI) -->
+        <div class="breadcrumbs text-sm mb-6">
+          <ul>
+            <li>
+              <RouterLink class="link link-hover" :to="{ name: routeNames.home }"
+                >Inicio</RouterLink
+              >
+            </li>
+            <li>
+              <RouterLink
+                class="link link-hover"
+                :to="{ name: routeNames.detail, params: { id: props.bancoId } }"
+              >
+                {{ props.esProyecto ? 'Proyecto detalle' : 'Banco detalle' }}
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
+
+        <div class="flex items-center justify-center">
+          <div class="text-center py-16">
+            <div
+              class="size-20 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-5"
+            >
+              <i class="fa-regular fa-hand-pointer text-4xl"></i>
+            </div>
+            <h3 class="font-bold text-lg text-base-content">Selecciona un reactivo</h3>
+            <p class="text-sm text-base-content/60 mt-2">
+              Elige un reactivo de la barra lateral para ver sus detalles.
+            </p>
           </div>
-          <h3 class="font-bold text-lg text-base-content">Selecciona un reactivo</h3>
-          <p class="text-sm text-base-content/60 mt-2">
-            Elige un reactivo de la barra lateral para ver sus detalles.
-          </p>
         </div>
       </div>
     </template>
