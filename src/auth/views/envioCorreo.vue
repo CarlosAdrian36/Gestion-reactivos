@@ -49,11 +49,7 @@ const onSubmit = handleSubmit(async (formValues) => {
           class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left"
         >
           <div class="h-12 px-3 flex items-center justify-center rounded-lg">
-            <img
-              src="/src/assets/logos/Logo_de_la_UANL.svg.webp"
-              alt="UANL Logo"
-              class="h-20 w-auto"
-            />
+            <img src="/src/assets/logos/UANL-Logo-tm.png" alt="UANL Logo" class="h-20 w-auto" />
           </div>
 
           <div class="h-8 w-px bg-white/30 dark:bg-white/20"></div>
