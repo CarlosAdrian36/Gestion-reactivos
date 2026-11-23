@@ -27,13 +27,11 @@ function normalizarTexto(valor: string): string {
 }
 
 function esEstadoCompletado(estado: string): boolean {
-  return ['completada', 'completado', 'finalizada', 'finalizado'].includes(
-    normalizarTexto(estado),
-  )
+  return ['completada', 'completado', 'finalizada', 'finalizado'].includes(normalizarTexto(estado))
 }
 
-const projectPhases = computed(
-  () => props.fases.filter((fase) => normalizarTexto(fase.nombre) !== 'finalizado'),
+const projectPhases = computed(() =>
+  props.fases.filter((fase) => normalizarTexto(fase.nombre) !== 'finalizado'),
 )
 
 const allPhasesCompleted = computed(
@@ -124,9 +122,7 @@ function esFaseAsignada(fase: Fase): boolean {
   const funcionFase = normalizarTexto(fase.funcion)
 
   return (
-    props.funcionesAsignadas?.some(
-      (funcion) => normalizarTexto(funcion) === funcionFase,
-    ) ?? false
+    props.funcionesAsignadas?.some((funcion) => normalizarTexto(funcion) === funcionFase) ?? false
   )
 }
 
@@ -218,25 +214,25 @@ function getStateLabelClass(state: 'completed' | 'in_progress' | 'pending'): str
         <div
           aria-hidden="true"
           class="absolute -translate-y-1/2 rounded-full bg-base-200"
-        :class="
-          isLarge
-            ? 'left-14 right-14 top-6 h-1'
-            : isTable
-              ? 'left-4 right-4 top-1/2 h-[3px]'
-              : 'left-5 right-5 top-1/2 h-0.5'
-        "
+          :class="
+            isLarge
+              ? 'left-14 right-14 top-6 h-1'
+              : isTable
+                ? 'left-4 right-4 top-1/2 h-0.75'
+                : 'left-5 right-5 top-1/2 h-0.5'
+          "
         />
         <!-- Línea de avance -->
         <div
           aria-hidden="true"
           class="absolute -translate-y-1/2 rounded-full bg-success origin-left transition-transform duration-300"
-        :class="
-          isLarge
-            ? 'left-14 right-14 top-6 h-1'
-            : isTable
-              ? 'left-4 right-4 top-1/2 h-[3px]'
-              : 'left-5 right-5 top-1/2 h-0.5'
-        "
+          :class="
+            isLarge
+              ? 'left-14 right-14 top-6 h-1'
+              : isTable
+                ? 'left-4 right-4 top-1/2 h-0.75'
+                : 'left-5 right-5 top-1/2 h-0.5'
+          "
           :style="{ transform: `translateY(-50%) scaleX(${progressScale})` }"
         />
 

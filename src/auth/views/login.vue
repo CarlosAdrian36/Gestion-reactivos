@@ -87,21 +87,15 @@ const onSubmit = handleSubmit(async () => {
     >
       <!-- HEADER -->
       <div class="flex flex-col items-center gap-6 mb-10">
-        <div
-          class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left"
-        >
-          <div class="h-12 px-3 flex items-center justify-center rounded-lg">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+          <div class="h-12 flex items-center justify-center">
             <!-- <span class="text-base-content font-bold text-xl tracking-tighter"> UANL </span> -->
-            <!-- <img
-              src="/src/assets/logos/Logo_de_la_UANL.svg.webp"
-              alt="UANL Logo"
-              class="h-20 w-auto"
-            /> -->
+            <img src="/src/assets/logos/UANL-Logo-tm.png" alt="UANL Logo" class="h-20 w-auto" />
           </div>
 
           <div class="h-8 w-px bg-white/30 dark:bg-white/20"></div>
 
-          <div class="flex items-center gap-2">
+          <div class="h-12 flex items-center justify-center">
             <!-- <span class="text-base-content font-semibold text-2xl tracking-tight"> Nexus </span> -->
             <img src="/src/assets/logos/nx-logo.png" alt="Nexus Logo" class="h-10 w-auto" />
           </div>
