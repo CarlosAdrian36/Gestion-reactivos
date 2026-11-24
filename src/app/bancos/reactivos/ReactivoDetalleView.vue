@@ -25,7 +25,6 @@ const props = withDefaults(
     bancoId: string
     esProyecto?: boolean
     reactivoMostrado?: Reactivo
-    /** Idiomas del banco/proyecto; si hay más de uno se muestran pestañas. */
     idiomas?: TabIdioma[]
   }>(),
   {
