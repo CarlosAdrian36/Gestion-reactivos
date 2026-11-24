@@ -30,6 +30,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   cancelar: []
+  guardado: []
 }>()
 
 const esActualizacion = computed(() => !!props.traduccionActual)
@@ -132,6 +133,7 @@ async function guardar() {
       })
       toast.success('Traducción guardada correctamente')
     }
+    emit('guardado')
   } catch (error) {
     toast.error(
       error instanceof Error

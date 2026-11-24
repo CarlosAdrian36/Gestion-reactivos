@@ -94,6 +94,13 @@ const idReactivoParaRespuestas = computed(
   () => reactivoTraducido.value?.idReactivo ?? selectedReactivo.value?.idReactivo,
 )
 
+// El header `Idioma` solo aplica cuando no hay una traducción cargada: al tener
+// el reactivo traducido, sus respuestas ya están en el idioma destino y se
+// consultan por su propio id sin header (evita que el backend devuelva vacío).
+const idiomaParaRespuestas = computed(() =>
+  reactivoTraducido.value ? undefined : idiomaParaConsulta.value,
+)
+
 const {
   data: respuestas,
   isLoading: cargandoRespuestas,
@@ -101,7 +108,7 @@ const {
 } = useRespuestas(
   props.bancoId,
   () => idReactivoParaRespuestas.value,
-  () => idiomaParaConsulta.value,
+  () => idiomaParaRespuestas.value,
 )
 const tipoReactivoId = computed(
   () => reactivoMostrado.value?.tipoReactivoId ?? selectedReactivo.value?.tipoReactivoId,
@@ -151,9 +158,31 @@ const mostrarTraducir = computed(
     !traduciendo.value,
 )
 
+// ¿Se está viendo una traducción (no el original)? → eliminar solo esa traducción.
+const eliminandoTraduccion = computed(
+  () => tieneVariosIdiomas.value && !esIdiomaOriginal.value && !!reactivoTraducido.value,
+)
+
+// Eliminar: en el original siempre; en una pestaña de idioma solo si hay traducción.
+const mostrarEliminar = computed(() => {
+  if (!tieneVariosIdiomas.value || esIdiomaOriginal.value) return true
+  return !!reactivoTraducido.value
+})
+
 function abrirEliminar() {
   if (!selectedReactivo.value) return
-  modal.openModal(eliminarReactivo, { bancoId: props.bancoId, reactivo: selectedReactivo.value }, [
+  const propsModal = eliminandoTraduccion.value
+    ? {
+        bancoId: props.bancoId,
+        reactivo: selectedReactivo.value,
+        traduccion: {
+          idReactivo: reactivoTraducido.value!.idReactivo,
+          idioma: idiomaSeleccionado.value,
+        },
+      }
+    : { bancoId: props.bancoId, reactivo: selectedReactivo.value }
+
+  modal.openModal(eliminarReactivo, propsModal, [
     { label: 'Cerrar', variant: 'outline' },
     { label: 'Eliminar', variant: 'error', type: 'submit' },
   ])
@@ -264,11 +293,12 @@ function irAEditar() {
                   Traducir
                 </button>
                 <button
+                  v-if="mostrarEliminar"
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm cursor-pointer"
                   @click="abrirEliminar"
                 >
                   <i class="fa-regular fa-trash"></i>
-                  Eliminar
+                  {{ eliminandoTraduccion ? 'Eliminar traducción' : 'Eliminar' }}
                 </button>
               </div>
             </div>
@@ -307,6 +337,7 @@ function irAEditar() {
             :idioma="idiomaSeleccionado"
             :traduccion-actual="traduccionActual"
             @cancelar="traduciendo = false"
+            @guardado="traduciendo = false"
           />
           <div v-else-if="cargandoTraduccion" class="p-8 space-y-4">
             <div class="skeleton h-6 w-48"></div>

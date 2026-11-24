@@ -95,7 +95,7 @@ const displayedToken = computed(() => {
         >
       </span> -->
     </div>
-    <!-- <div class="ml-6 flex flex-col">
+    <div class="ml-6 flex flex-col">
       <span class="mb-1 text-xs font-semibold uppercase tracking-wide text-base-content/60">
         Token
       </span>
@@ -112,7 +112,7 @@ const displayedToken = computed(() => {
           <i class="swap-on fa-regular fa-circle-check text-success text-sm"></i>
         </label>
       </button>
-    </div> -->
+    </div>
 
     <!-- <div class="navbar-end gap-2">
       <div class="dropdown dropdown-end">
