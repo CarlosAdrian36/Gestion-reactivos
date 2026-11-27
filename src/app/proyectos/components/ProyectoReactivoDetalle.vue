@@ -1,19 +1,23 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useReactivos } from '@/api/bancos/composable/useReactivos'
-import { useRespuestas } from '@/api/bancos/composable/useRespuestas'
 import { useTiposReactivo } from '@/api/bancos/composable/useTiposReactivo'
 import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
 import { useBancoNavigation } from '@/app/common/banco-navigation'
-import DetalleOpcionMultiple from '@/app/bancos/reactivos/components/DetalleOpcionMultiple.vue'
-import DetalleVerdaderoFalso from '@/app/bancos/reactivos/components/DetalleVerdaderoFalso.vue'
-import DetalleRelacional from '@/app/bancos/reactivos/components/DetalleRelacional.vue'
+import { useProyectoDetalle } from '@/api/proyectos/composable/useProyectoDetalle'
+import { IDIOMA_ORIGINAL, normalizarEtiquetaIdioma } from '@/app/proyectos/idiomas'
+import ReactivoContenido from '@/app/proyectos/components/ReactivoContenido.vue'
+import ReactivoTraduccion from '@/app/proyectos/components/ReactivoTraduccion.vue'
+import { useModalStore } from '@/common/modals/store/modal.store'
+import eliminarReactivo from '@/app/common/components/modals/eliminarReactivo.vue'
 
 const props = defineProps<{
   proyectoId: string
 }>()
 
+const { data: proyecto } = useProyectoDetalle(() => props.proyectoId)
 const { routeNames } = useBancoNavigation()
 const store = useReactivoSeleccionadoStore()
 const { selectedReactivo } = storeToRefs(store)
@@ -27,14 +31,48 @@ watch(reactivos, (lista) => {
   if (lista && sel && !lista.some((r) => r.idReactivo === sel.idReactivo)) clear()
 })
 
-const {
-  data: respuestas,
-  isLoading: cargandoRespuestas,
-  isError: errorRespuestas,
-} = useRespuestas(props.proyectoId, () => selectedReactivo.value?.idReactivo)
+// Idioma activo: arranca en el original (es_MX) cuando cargan los idiomas.
+const idiomaActivo = ref('')
+watch(
+  () => proyecto.value?.idiomas,
+  (idiomas) => {
+    if (idiomas && !idiomas.some((i) => i.etiqueta === idiomaActivo.value)) {
+      const original = idiomas.find((i) => normalizarEtiquetaIdioma(i.etiqueta) === IDIOMA_ORIGINAL)
+      idiomaActivo.value = original?.etiqueta ?? idiomas[0]?.etiqueta ?? ''
+    }
+  },
+  { immediate: true },
+)
 
-const tipoReactivoId = computed(() => selectedReactivo.value?.tipoReactivoId)
+const tieneVariosIdiomas = computed(() => (proyecto.value?.idiomas?.length ?? 0) > 1)
+
+const esIdiomaOriginal = computed(
+  () => normalizarEtiquetaIdioma(idiomaActivo.value) === IDIOMA_ORIGINAL,
+)
+
 const { tipoPorId } = useTiposReactivo()
+
+const router = useRouter()
+const modal = useModalStore()
+
+// Los botones de Editar/Eliminar solo aplican al reactivo original.
+const mostrarAcciones = computed(() => !tieneVariosIdiomas.value || esIdiomaOriginal.value)
+
+function irAEditar() {
+  router.push({ name: routeNames.value.edit, params: { id: props.proyectoId } })
+}
+
+function abrirEliminar() {
+  if (!selectedReactivo.value) return
+  modal.openModal(
+    eliminarReactivo,
+    { bancoId: props.proyectoId, reactivo: selectedReactivo.value },
+    [
+      { label: 'Cerrar', variant: 'outline' },
+      { label: 'Eliminar', variant: 'error', type: 'submit' },
+    ],
+  )
+}
 </script>
 
 <template>
@@ -125,45 +163,52 @@ const { tipoPorId } = useTiposReactivo()
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Contenido: enunciado + respuestas según tipo -->
-          <div class="p-8 space-y-8">
-            <div v-if="tipoReactivoId !== 5" class="space-y-3">
-              <h3
-                class="text-xs font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2"
-              >
-                <i class="fa-regular fa-file-lines text-[14px]"></i>
-                Descripción / Enunciado
-              </h3>
-              <div class="bg-base-200 rounded-xl p-6">
-                <div
-                  class="fr-view text-lg text-base-content leading-relaxed [&_p]:m-0"
-                  v-html="selectedReactivo.descripcion"
-                ></div>
+              <div v-if="mostrarAcciones" class="flex gap-2">
+                <button
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-base-300 text-xs font-medium text-base-content hover:bg-base-200 transition-colors cursor-pointer"
+                  @click="irAEditar"
+                >
+                  <i class="fa-regular fa-pen-to-square text-[14px]"></i>
+                  Editar
+                </button>
+                <button
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error text-error-content text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm cursor-pointer"
+                  @click="abrirEliminar"
+                >
+                  <i class="fa-regular fa-trash"></i>
+                  Eliminar
+                </button>
               </div>
             </div>
-
-            <DetalleOpcionMultiple
-              v-if="tipoReactivoId === 1 || tipoReactivoId === 2"
-              :respuestas="respuestas ?? []"
-              :cargando="cargandoRespuestas"
-              :error="errorRespuestas"
-            />
-            <DetalleVerdaderoFalso
-              v-else-if="tipoReactivoId === 3"
-              :respuestas="respuestas ?? []"
-              :cargando="cargandoRespuestas"
-              :error="errorRespuestas"
-            />
-            <DetalleRelacional
-              v-else-if="tipoReactivoId === 5"
-              :banco-id="props.proyectoId"
-              :grupo="selectedReactivo.grupo"
-              :reactivos="reactivos ?? []"
-            />
           </div>
+
+          <!-- Pestañas de idiomas (solo si hay más de uno) -->
+          <div v-if="tieneVariosIdiomas" class="tabs tabs-lift px-8 pt-4">
+            <button
+              v-for="idioma in proyecto?.idiomas"
+              :key="idioma.etiqueta"
+              type="button"
+              class="tab"
+              :class="{ 'tab-active': idioma.etiqueta === idiomaActivo }"
+              @click="idiomaActivo = idioma.etiqueta"
+            >
+              {{ idioma.etiqueta }}
+            </button>
+          </div>
+
+          <!-- Contenido: original o traducción según el tab activo -->
+          <ReactivoContenido
+            v-if="!tieneVariosIdiomas || esIdiomaOriginal"
+            :proyecto-id="props.proyectoId"
+            :reactivo="selectedReactivo"
+          />
+          <ReactivoTraduccion
+            v-else
+            :proyecto-id="props.proyectoId"
+            :reactivo="selectedReactivo"
+            :idioma="idiomaActivo"
+          />
         </div>
       </div>
     </template>

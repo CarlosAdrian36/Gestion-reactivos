@@ -6,7 +6,7 @@
         <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
       </div>
       <h2 class="text-xl font-bold text-slate-800">
-        {{ esTraduccion ? 'Eliminar Traducción' : 'Eliminar Reactivo' }}
+        {{ esTraduccion ? 'Eliminar Traducción' : esRelacional ? 'Eliminar Grupo' : 'Eliminar Reactivo' }}
       </h2>
     </div>
   </header>
@@ -18,6 +18,10 @@
       <template v-if="esTraduccion">
         ¿Estás seguro que deseas eliminar la traducción en
         <span class="text-rose-600">{{ props.traduccion?.idioma }}</span> del reactivo
+        <span class="text-rose-600"> #{{ props.reactivo.posicion }} </span>?
+      </template>
+      <template v-else-if="esRelacional">
+        ¿Estás seguro que deseas eliminar el grupo
         <span class="text-rose-600"> #{{ props.reactivo.posicion }} </span>?
       </template>
       <template v-else>
@@ -36,6 +40,10 @@
           Esta acción eliminará únicamente la traducción en {{ props.traduccion?.idioma }}. El
           reactivo original no se verá afectado. Esta acción no se puede deshacer.
         </template>
+        <template v-else-if="esRelacional">
+          Esta acción eliminará el grupo completo con todos sus reactivos y respuestas. Esta
+          acción no se puede deshacer.
+        </template>
         <template v-else>
           Esta acción eliminará el reactivo junto con sus respuestas. Esta acción no se puede
           deshacer.
@@ -48,6 +56,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted } from 'vue'
 import { deleteReactivoAction } from '@/api/bancos/actions/delete-reactivo.action'
+import { eliminarGrupoAction } from '@/api/bancos/actions/eliminar-grupo.action'
 import type { Reactivo } from '@/api/bancos/interfaces/reactivo.interface'
 import { useModalStore } from '@/common/modals/store/modal.store'
 import { useReactivoSeleccionadoStore } from '@/app/bancos/reactivos/useReactivoSeleccionado'
@@ -67,33 +76,23 @@ const props = defineProps<{
 
 const esTraduccion = computed(() => !!props.traduccion)
 
+// Relacional (tipo 5): se elimina el grupo completo, no un solo reactivo.
+const esRelacional = computed(() => props.reactivo.tipoReactivoId === 5)
+
 const onSubmit = async () => {
   try {
-    const idReactivo = esTraduccion.value
-      ? props.traduccion!.idReactivo
-      : props.reactivo.idReactivo
-
-    const result = await deleteReactivoAction(
-      props.bancoId,
-      idReactivo,
-      esTraduccion.value ? undefined : props.reactivo.grupo,
-    )
-    if (!result.reactivoEliminado) {
-      toast.error(
-        esTraduccion.value
-          ? 'No se pudo eliminar la traducción'
-          : 'No se pudo eliminar el reactivo',
-      )
-      return
-    }
-
-    toast.success(
-      esTraduccion.value
-        ? 'Se eliminó la traducción correctamente'
-        : 'Se eliminó el reactivo correctamente',
-    )
-
     if (esTraduccion.value) {
+      // Eliminar traducción: borra el reactivo traducido.
+      const result = await deleteReactivoAction(
+        props.bancoId,
+        props.traduccion!.idReactivo,
+        undefined,
+      )
+      if (!result.reactivoEliminado) {
+        toast.error('No se pudo eliminar la traducción')
+        return
+      }
+      toast.success('Se eliminó la traducción correctamente')
       await queryClient.invalidateQueries({
         queryKey: [
           'reactivo-idioma',
@@ -102,7 +101,30 @@ const onSubmit = async () => {
           props.traduccion!.idioma,
         ],
       })
+    } else if (esRelacional.value) {
+      // Eliminar el grupo relacional completo.
+      const result = await eliminarGrupoAction(props.bancoId, props.reactivo.grupo)
+      if (!result.grupoEliminado) {
+        toast.error('No se pudo eliminar el grupo')
+        return
+      }
+      toast.success('Se eliminó el grupo correctamente')
+      clear()
+      await queryClient.invalidateQueries({ queryKey: ['reactivos', props.bancoId] })
+      await queryClient.invalidateQueries({ queryKey: ['reactivos-proyecto', props.bancoId] })
+      await queryClient.invalidateQueries({ queryKey: ['instruccionesGrupos', props.bancoId] })
     } else {
+      // Eliminar reactivo individual.
+      const result = await deleteReactivoAction(
+        props.bancoId,
+        props.reactivo.idReactivo,
+        props.reactivo.grupo,
+      )
+      if (!result.reactivoEliminado) {
+        toast.error('No se pudo eliminar el reactivo')
+        return
+      }
+      toast.success('Se eliminó el reactivo correctamente')
       clear()
       await queryClient.invalidateQueries({ queryKey: ['reactivos', props.bancoId] })
       await queryClient.invalidateQueries({ queryKey: ['reactivos-proyecto', props.bancoId] })
